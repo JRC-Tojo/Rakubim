@@ -5,10 +5,10 @@ import shutil
 FOLDER_NAME = ['CAD', 'PDF']
 
 for folder in FOLDER_NAME:
-  # ãƒ•ã‚©ãƒ«ãƒ€ã‚’å‰Šé™¤ã—ã¦æƒé™¤
+  # ƒtƒHƒ‹ƒ_‚ğíœ‚µ‚Ä‘|œ
   shutil.rmtree(Path(__file__).parent/folder)
-  # æ–°ã—ãå†ç”Ÿæˆ
+  # V‚µ‚­Ä¶¬
   (Path(__file__).parent/folder).mkdir()
-  # ãƒ•ã‚¡ã‚¤ãƒ«ã®åå‰ã‚’ã²ã¨ã¤ã¥ã¤å–å¾—&ä½œæˆ
+  # ƒtƒ@ƒCƒ‹‚Ì–¼‘O‚ğ‚Ğ‚Æ‚Â‚Ã‚Âæ“¾&ì¬
   for path in (Path(__file__).parent/'secret'/folder).iterdir():
     (Path(__file__).parent/folder/path.name).touch()
