@@ -3,3 +3,4 @@ logs
 /xvba_excel_backup
 .gitignore
 secret/
+~$*
