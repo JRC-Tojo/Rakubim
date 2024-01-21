@@ -12,15 +12,30 @@ Option Explicit
 
 ' 目録入力シートに入力された図面のObject
 
-Public paperID As String
-Public SourceName As String
-Public paperName As String
-Public PaperNumber As Integer
-Public pdfPath As String
-Public dwgPath As String
+Private inner_paperID As String
+Private inner_SourceName As String
+Private inner_SnippedName As String
+Private inner_PaperNumber As Integer
+Private inner_pdfPath As String
+Private inner_dwgPath As String
 
 Private Sub class_initialize()
 
+End Sub
+
+Public Property Get SourceName() As String
+  Set SourceName = inner_SourceName
+End Property
+
+Public Property Get SnippedName() As String
+  Set SnippedName = inner_SnippedName
+End Property
+Public Property Set SnippedName(name As String)
+  inner_SnippedName = name
+End Property
+
+Public Sub InitPaperObj(ByVal fileName As String)
+  inner_SourceName = fileName
 End Sub
 
 ' 指定した行数にあるデータから図面Objectを作成する
