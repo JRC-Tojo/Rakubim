@@ -23,19 +23,23 @@ Private Function getAllFileNames(folderName As String)
 End Function
 
 ' ファイルの一覧オブジェクトを取得
-Public Function GetFileCollection(folderName As String)
+Public Function GetFileCollection(folderName As String) As Collection
   Dim filePaths As Variant
-  Dim returns As Collection
   filePaths = getAllFileNames(folderName)
+  Dim file As FileObj
+  Dim returns As Collection
   Set returns = New Collection
 
   If (UBound(filePaths) = 0) Then
     Set GetFileCollection = returns
+    Exit Function
   End If
   
   For Each filePath In filePaths
     If filePath <> "" Then
-      returns.Add AnalyzeName(filePath)
+      Set file = New FileObj
+      Call file.InitFileObj(filePath)
+      returns.Add file
     End If
   Next filePath
   
@@ -49,28 +53,20 @@ Private Function DropDuplicateName(fileObjCollection As Collection)
   Dim file As FileObj
   
   For Each file In fileObjCollection
-    If tmpDict.Exists(file.paperName) = True Then
+    If tmpDict.Exists(file.SnippedName) = True Then
       For Each tmpKey In dictKeys(file.PaperPaths)
-        Set tmpDict(file.paperName).PaperPaths = JointPaperPaths(tmpDict(file.paperName).PaperPaths, tmpKey, file.PaperPaths(tmpKey))
+        Set tmpDict(file.SnippedName).PaperPaths = JointPaperPaths(tmpDict(file.SnippedName).PaperPaths, tmpKey, file.PaperPaths(tmpKey))
       Next tmpKey
     Else
-      tmpDict.Add file.paperName, file
+      tmpDict.Add file.SnippedName, file
     End If
   Next file
   
   Set DropDuplicateName = dictValues(tmpDict)
 End Function
-' 重複したFileObjをまとめる際に，PaperNumbersを統合する
-Function JointPaperNumbers(PaperNumbers As Collection, newPaperNumber As Integer, newPaperPathKey As String, Optional suffix As Integer = 1)
-  If HasItem(PaperNumbers, newPaperPathKey) = True Then
-    Set JointPaperNumbers = JointPaperNumbers(PaperNumbers, newPaperNumber, newPaperPathKey & "-" & suffix, suffix + 1)
-  Else
-    PaperNumbers.Add newPaperNumber, newPaperPathKey
-    Set JointPaperNumbers = PaperNumbers
-  End If
-End Function
+
 ' 重複したFileObjをまとめる際に，PaperPathsを統合する
-Function JointPaperPaths(PaperPaths As Scripting.Dictionary, ByVal newPaperKey As String, newPaperPath As String, Optional suffix As Integer = 0)
+Private Function JointPaperPaths(PaperPaths As Scripting.Dictionary, ByVal newPaperKey As String, newPaperPath As String, Optional suffix As Integer = 0)
   ' 無効なパスを登録しない
   If newPaperPath = "" Then
     Set JointPaperPaths = PaperPaths
@@ -79,7 +75,7 @@ Function JointPaperPaths(PaperPaths As Scripting.Dictionary, ByVal newPaperKey A
   
   Dim tmpKey As String
   tmpKey = IIf(suffix = 0, newPaperKey, newPaperKey & "-" & suffix)
-  
+
   If PaperPaths.Exists(tmpKey) = True Then
     Set JointPaperPaths = JointPaperPaths(PaperPaths, newPaperNumber, newPaperPath, suffix + 1)
   Else
@@ -87,15 +83,3 @@ Function JointPaperPaths(PaperPaths As Scripting.Dictionary, ByVal newPaperKey A
     Set JointPaperPaths = PaperPaths
   End If
 End Function
-
-' ファイル名称を解析
-Public Function AnalyzeName(ByVal path As String)
-  Dim file As FileObj
-  Set file = New FileObj
-  
-  ' ファイル名の分析
-  Call file.Analyze(path)
-
-  Set AnalyzeName = file
-End Function
-

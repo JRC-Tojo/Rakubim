@@ -25,12 +25,6 @@ Public Property Get SnippedName() As String
   SnippedName = inner_SnippedName
 End Property
 
-
-Private Sub class_initialize()
-  ' ‰Šú‰»
-  Set inner_systemIds = New SystemIdObj
-End Sub
-
 Public Sub SetPaperInfo(paper As PaperObj)
   Call analyze(paper.SourceName)
 End Sub
@@ -45,7 +39,7 @@ End Sub
 
 ' –¼Ì‚ð•ªÍ‚µ‚ÄƒNƒ‰ƒX‚ðì¬
 Private Sub analyze(ByVal path As String, Optional fileType As String = "")
-  inner_PaperNumbers = getPaperNumber(path, fileType)
+  Set inner_PaperNumbers = getPaperNumber(path, fileType)
   inner_SnippedName = getBluePrintName(path)
 End Sub
 
@@ -128,9 +122,9 @@ Private Function getPaperNumber(ByVal fileName As String, fileType As String) As
     sameNum = CInt(numMatches.item(numMatches.Count - hasDateNum - 1))
     Set getPaperNumber = RangeCollection(sameNum, sameNum)
   End If
-End Sub
+End Function
 
-Private Sub getBluePrintName(ByVal fileName As String)
+Private Function getBluePrintName(ByVal fileName As String) As String
   Dim reg As RegExp
   Set reg = New RegExp
   Dim matches As MatchCollection
@@ -166,8 +160,8 @@ Private Sub getBluePrintName(ByVal fileName As String)
   
   ' }–¼‚ðŠm’è
   If matches.Count > 0 Then
-    paperName = matches.item(0)
+    getBluePrintName = matches.item(0)
   Else
-    paperName = tmpName
+    getBluePrintName = tmpName
   End If
-End Sub
+End Function
