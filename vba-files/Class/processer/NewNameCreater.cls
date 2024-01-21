@@ -22,7 +22,7 @@ Private Sub class_initialize()
 
   Dim systemObj As SystemIdObj
   Set systemObj = New SystemIdObj
-  inner_FixedHeadName = systemIds.CompanyID & "-" & systemIds.ProjectID & "-" & systemIds.StructureID
+  inner_FixedHeadName = systemObj.CompanyID & "-" & systemObj.ProjectID & "-" & systemObj.StructureID
 End Sub
 
 Public Property Get Papers() As Scripting.Dictionary
@@ -39,10 +39,10 @@ Public Property Get NewNames() As Collection
   Dim returnCol As Collection
   Set returnCol = New Collection
 
-  For Each file As FileObj In dictValues(inner_RenamePDFFiles)
+  For Each file In dictValues(inner_RenamePDFFiles)
     Call returnCol.Add(GetNewFileName(file))
   Next file
-  For Each file As FileObj In dictValues(inner_RenameCADFiles)
+  For Each file In dictValues(inner_RenameCADFiles)
     Call returnCol.Add(GetNewFileName(file))
   Next file
 
@@ -88,7 +88,7 @@ Private Function SetPaperNumberText(file As FileObj)
   Dim number As String
   Dim FormattedNumber As String
 
-  For Each paperID As String In file.MatchedPaperIds
+  For Each paperID In file.MatchedPaperIds
     number = inner_Papers.Item(paperID).GlobalNumber
     FormattedNumber = IIf(Len(number) > 4, number, Right("0000" & number, 4))
     returnText = returnText & FormattedNumber & ", "
@@ -104,7 +104,7 @@ Private Function SetPaperNameText(file As FileObj)
   Set texts = New Collection
 
   ' 図面名の重複を除外しながらユニークな図面名のリストを作成
-  For Each paperID As String In file.MatchedPaperIds
+  For Each paperID In file.MatchedPaperIds
     paperName = inner_Papers.Item(paperID).SnippedName
     If (Not HasItem(texts, paperName)) Then
       Call texts.Add(paperName)
@@ -113,7 +113,7 @@ Private Function SetPaperNameText(file As FileObj)
 
   ' カンマ区切りで図面名を結合
   Dim returnText As String
-  For Each text As String In texts
+  For Each text In texts
     returnText = returnText & text & ", "
   Next
 

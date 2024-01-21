@@ -83,7 +83,7 @@ End Function
 
 ' ‚Q‚Â‚Ì”z—ñ‚ğŒ‹‡‚·‚é
 Function CombineCols(ByVal col1 As Collection, ByVal col2 As Collection) As Collection
-  For Each item As Object In col2
+  For Each item In col2
     Call col1.Add(item)
   Next
   Set CombineCols = col1

@@ -23,12 +23,14 @@ Function checkFill4Mokuroku()
     Dim dwgCounts As Integer: dwgCounts = WorksheetFunction.CountA(.Range("H:H"))
   End With
   
-  If Sheets(sheets.FirstInputPage).AllFilesBtn.Value = True Then
+  Dim systemObj As SystemIdObj
+  Set systemObj = New SystemIdObj
+  If systemObj.SelectedFileType = "ALL" Then
     checkFill4Mokuroku = Equal(paperCounts, pdfCounts, dwgCounts)
-  ElseIf Sheets(sheets.FirstInputPage).OnlyCADBtn.Value = True Then
-    checkFill4Mokuroku = Equal(paperCounts, dwgCounts)
-  ElseIf Sheets(sheets.FirstInputPage).OnlyPDFBtn.Value = True Then
+  ElseIf systemObj.SelectedFileType = "PDF" Then
     checkFill4Mokuroku = Equal(paperCounts, pdfCounts)
+  ElseIf systemObj.SelectedFileType = "CAD" Then
+    checkFill4Mokuroku = Equal(paperCounts, dwgCounts)
   End If
 End Function
 

@@ -10,26 +10,52 @@ Attribute VB_Exposed = False
 
 Option Explicit
 
-Public CompanyID As String
-Public ProjectID As String
-Public StructureID As String
-Public DesignID As String
-Public SelectedFileType As String
-Public UseContinuousNumber As Boolean
+Private inner_CompanyID As String
+Private inner_ProjectID As String
+Private inner_StructureID As String
+Private inner_DesignID As String
+Private inner_SelectedFileType As String
+Private inner_UseContinuousNumber As Boolean
 
 Private Sub class_initialize()
   Dim sheets As SheetObj
   Set sheets = New SheetObj
 
   With Worksheets(sheets.FirstInputPage)
-    CompanyID = getCompanyID(.Range("C3"))
-    ProjectID = .Range("C4")
-    StructureID = .Range("C5")
-    DesignID = .Range("C6")
-    SelectedFileType = SetFileType()
-    UseContinuousNumber = CBool(.useContinuousNumberCheck.Value)
+    inner_CompanyID = getCompanyID(.Range("C3"))
+    inner_ProjectID = .Range("C4")
+    inner_StructureID = .Range("C5")
+    inner_DesignID = .Range("C6")
+    inner_SelectedFileType = SetFileType()
+    inner_UseContinuousNumber = CBool(.useContinuousNumberCheck.Value)
   End With
 End Sub
+
+Public Property Get CompanyID() As String
+  CompanyID = inner_CompanyID
+End Property
+
+Public Property Get ProjectID() As String
+  ProjectID = inner_ProjectID
+End Property
+
+Public Property Get StructureID() As String
+  StructureID = inner_StructureID
+End Property
+
+Public Property Get DesignID() As String
+  DesignID = inner_DesignID
+End Property
+
+Public Property Get SelectedFileType() As String
+  SelectedFileType = inner_SelectedFileType
+End Property
+
+Public Property Get UseContinuousNumber() As String
+  UseContinuousNumber = inner_UseContinuousNumber
+End Property
+
+
 
 ' 業務機関コードから情報を取得する
 Private Function getCompanyID(name As String)

@@ -39,6 +39,7 @@ Private Sub ReadMokurokuInput(creater As NewNameCreater)
   Dim rowNum As Integer: rowNum = INIT_ROWNUM_MOKUROKU
   
   Dim paper As PaperObj
+  Dim paperCounter As Integer: paperCounter = 1
   Dim cadFile As FileObj
   Set cadFile = New FileObj
   Dim pdfFile As FileObj
@@ -65,12 +66,13 @@ Private Sub ReadMokurokuInput(creater As NewNameCreater)
         Call cadFile.InitFileObj(.Cells(rowNum, "H").Value)
 
         ' 図面とファイルの対応関係を記録
-        creater.SetPDFFile(pdfFile, paper.Id)
-        creater.SetCADFile(cadFile, paper.Id)
+        Call creater.SetPDFFile(pdfFile, paper.Id)
+        Call creater.SetCADFile(cadFile, paper.Id)
       End If
         
       ' 次処理に向けて値を更新
       rowNum = rowNum + 1
+      paperCounter = paperCounter + 1
     Loop
   End With
 End Sub
