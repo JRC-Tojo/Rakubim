@@ -40,7 +40,7 @@ Sub ReadFileNamesBtn_Click()
       dwgPath = matcher.GetBestFile(paper, "CAD")
       
       ' ’TõŒ‹‰Ê‚Ì‘‚«‚İ
-      WriteOldP4Mokuroku rowNum, paper.paperID, pdfPath, dwgPath
+      WriteOldP4Mokuroku rowNum, paper.GlobalNumber, pdfPath, dwgPath
     End If
        
     ' Ÿˆ—‚ÉŒü‚¯‚Ä’l‚ğXV

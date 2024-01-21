@@ -67,7 +67,7 @@ End Function
 ' –Ú˜^“ü—Í‚ÌŠù‘¶ƒtƒ@ƒCƒ‹–¼ŒQ‚É‹L“ü
 Function WriteOldP4Mokuroku( _
   rowIdx As Integer, _
-  paperID As String, _
+  paperGlobalNumber As String, _
   ByVal oldPDF As String, _
   ByVal oldDWG As String _
 )
@@ -75,7 +75,7 @@ Function WriteOldP4Mokuroku( _
   Set sheets = New SheetObj
 
   With Worksheets(sheets.MokurokuPage)
-    .Cells(rowIdx, "A").Value = paperID
+    .Cells(rowIdx, "A").Value = paperGlobalNumber
     .Cells(rowIdx, "G").Value = oldPDF
     .Cells(rowIdx, "H").Value = oldDWG
   End With

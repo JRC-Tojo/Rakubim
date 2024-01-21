@@ -27,7 +27,7 @@ Public Property Get SourceName() As String
   Set SourceName = inner_SourceName
 End Property
 
-Public Property Set SnippedName(name As String)
+Public Property Let SnippedName(name As String)
   inner_SnippedName = name
 End Property
 Public Property Get SnippedName() As String
