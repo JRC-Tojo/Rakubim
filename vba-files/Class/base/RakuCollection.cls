@@ -10,7 +10,7 @@ Attribute VB_Exposed = False
 
 Option Explicit
 
-Private Dim InnerCol As Collection
+Private InnerCol As Collection
 
 Private Sub class_initialize()
   ' ‰Šú‰»
