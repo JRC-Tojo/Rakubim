@@ -23,11 +23,15 @@ Private Function getAllFileNames(folderName As String)
 End Function
 
 ' ファイルの一覧オブジェクトを取得
-Public Function GetPDFCollection()
+Public Function GetFileCollection(folderName As String)
   Dim filePaths As Variant
   Dim returns As Collection
-  filePaths = getAllFileNames("PDF")
+  filePaths = getAllFileNames(folderName)
   Set returns = New Collection
+
+  If (UBound(filePaths) = 0) Then
+    Set GetFileCollection = returns
+  End If
   
   For Each filePath In filePaths
     If filePath <> "" Then
@@ -35,23 +39,7 @@ Public Function GetPDFCollection()
     End If
   Next filePath
   
-  Set GetPDFCollection = DropDuplicateName(returns)
-End Function
-Public Function GetDWGCollection()
-  Dim filePaths As Variant
-  Dim returns As Collection
-  filePaths = getAllFileNames("CAD")
-  Set returns = New Collection
-  
-  
-  
-  For Each filePath In filePaths
-    If filePath <> "" Then
-      returns.Add AnalyzeName(filePath)
-    End If
-  Next filePath
-  
-  Set GetDWGCollection = DropDuplicateName(returns)
+  Set GetFileCollection = DropDuplicateName(returns)
 End Function
 
 ' 与えられたFileObjのCollectionからnameの重複を削除したCollectionを返す
