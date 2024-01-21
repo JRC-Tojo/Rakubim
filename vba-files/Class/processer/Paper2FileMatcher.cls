@@ -25,13 +25,13 @@ Private Sub class_initialize()
   Set sheet = New SheetObj
   Call inner_Cleaner.AnalyzeNames(Range2Collection(sheet.MokurokuPage, "B2:B10000"))
 
-  ' ファイル群を取得
-  Set inner_PDFs = GetFileCollection("PDF")
-  Set inner_DWGs = GetFileCollection("CAD")
+  ' 処理対象とするファイル群を取得
+  Set inner_PDFs = IIf(inner_SystemIds.SelectedFileType <> "CAD", GetFileCollection("PDF"), New Collection)
+  Set inner_DWGs = IIf(inner_SystemIds.SelectedFileType <> "PDF", GetFileCollection("CAD"), New Collection)
 
   ' PDF連番処理の場合の準備
   If (inner_SystemIds.UseContinuousNumber And inner_PDFs.Count > 0) Then
-    Set inner_ContinuousPDF = SearchMostNumbersFile(inner_PDFs)
+    Set inner_ContinuousPDF = SearchMostNumbersFile()
   End If
 End Sub
 
@@ -82,6 +82,7 @@ End Function
 Private Function getMatchPath(files As Collection, paper As PaperObj) As String
   If (files.Count = 0) Then
     getMatchPath = ""
+    Exit Function
   End If
   
   Dim resultFile As FileObj
@@ -101,25 +102,30 @@ End Function
 
 ' PDFの連番処理用
 ' 最も番号を保持しているファイルオブジェクトを抽出することで、連番化されたファイル名称を導く
-Private Function SearchMostNumbersFile(files As Collection)
+Private Function SearchMostNumbersFile()
   Dim fileCounts As Collection
   Set fileCounts = New Collection
   Dim file As FileObj
   
   ' すべてのファイルに対してファイル数を算出
-  For Each file In files
+  For Each file In inner_PDFs
     fileCounts.Add file.PaperNumbers.Count
   Next file
   
   ' 最もファイル数を持つファイルオブジェクトを返す
   Dim bestIdx As Integer
   bestIdx = ArgMax(fileCounts)(1)
-  Set SearchMostNumbersFile = files.item(bestIdx)
+  Set SearchMostNumbersFile = inner_PDFs.item(bestIdx)
 End Function
 
 ' PDFの連番処理用
 ' 指定されたファイルオブジェクトから番号を抜き出して割り当てていく
 Private Function ApplyContinuousFile(indexCounter As Integer)
+  If (inner_ContinuousPDF Is Nothing) Then
+    ApplyContinuousFile = ""
+    Exit Function
+  End If
+
   If inner_ContinuousPDF.PaperPaths.Exists("idx" & indexCounter) = True Then
     ApplyContinuousFile = inner_ContinuousPDF.PaperPaths("idx" & indexCounter)
   ElseIf inner_ContinuousPDF.PaperPaths.Exists("idx-1") = True Then
