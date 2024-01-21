@@ -73,6 +73,11 @@ Public Sub InitFileObj(ByVal fileName As String)
   ' 基本情報を登録
   inner_SourceName = fileName
   Call GetFileType()
+
+  ' ファイル名が無効の時は処理を行わない
+  If (fileName = "") Then
+    Exit Sub
+  End If
   
   ' 名称の分析結果を登録
   Dim analyzerObj As Analyzer
