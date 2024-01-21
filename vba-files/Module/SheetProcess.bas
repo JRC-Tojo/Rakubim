@@ -4,31 +4,40 @@ Attribute VB_Name = "SheetProcess"
 
 ' 指定した行番号の図面名称が空欄か否かをチェックする
 Function checkSpaceRow(rowNum As Integer)
-  With Worksheets("目録入力")
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
+
+  With Worksheets(sheets.MokurokuPage)
     checkSpaceRow = .Cells(rowNum, "B").Value = ""
   End With
 End Function
 
 ' 目録入力シートのPDFファイルとDWGファイルがすべて埋まっていることを確認
 Function checkFill4Mokuroku()
-  With Worksheets("目録入力")
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
+
+  With Worksheets(sheets.MokurokuPage)
     Dim paperCounts As Integer: paperCounts = WorksheetFunction.CountA(.Range("B:B"))
     Dim pdfCounts As Integer: pdfCounts = WorksheetFunction.CountA(.Range("G:G"))
     Dim dwgCounts As Integer: dwgCounts = WorksheetFunction.CountA(.Range("H:H"))
   End With
   
-  If Sheets("入力").AllFilesBtn.Value = True Then
+  If Sheets(sheets.FirstInputPage).AllFilesBtn.Value = True Then
     checkFill4Mokuroku = Equal(paperCounts, pdfCounts, dwgCounts)
-  ElseIf Sheets("入力").OnlyCADBtn.Value = True Then
+  ElseIf Sheets(sheets.FirstInputPage).OnlyCADBtn.Value = True Then
     checkFill4Mokuroku = Equal(paperCounts, dwgCounts)
-  ElseIf Sheets("入力").OnlyPDFBtn.Value = True Then
+  ElseIf Sheets(sheets.FirstInputPage).OnlyPDFBtn.Value = True Then
     checkFill4Mokuroku = Equal(paperCounts, pdfCounts)
   End If
 End Function
 
 ' ファイル名変更シートの旧ファイル名と新ファイル名がすべて埋まっていることを確認
 Function checkFill4File()
-  With Worksheets("ファイル名変更")
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
+
+  With Worksheets(sheets.RenamePage)
     Dim oldCounts As Integer: oldCounts = WorksheetFunction.CountA(.Range("A:A"))
     Dim newCounts As Integer: newCounts = WorksheetFunction.CountA(.Range("B:B"))
   End With
@@ -62,7 +71,10 @@ Function WriteOldP4Mokuroku( _
   ByVal oldPDF As String, _
   ByVal oldDWG As String _
 )
-  With Worksheets("目録入力")
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
+
+  With Worksheets(sheets.MokurokuPage)
     .Cells(rowIdx, "A").Value = paperID
     .Cells(rowIdx, "G").Value = oldPDF
     .Cells(rowIdx, "H").Value = oldDWG
@@ -73,8 +85,11 @@ End Function
 ' 引数のpathListはFinalPaperのGenerateIndex2PathList()によって生成される図面名称とファイル名の対応
 ' 引数のlastIdxは最後に使用した連番（これをもとに書き込む位置を決定）
 Function writeName2PathList(oldPath As String, newPath As String, lastIdx As Integer)
-  Worksheets("ファイル名変更").Cells(lastIdx + 1, "A").Value = oldPath
-  Worksheets("ファイル名変更").Cells(lastIdx + 1, "B").Value = newPath
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
+  
+  Worksheets(sheets.RenamePage).Cells(lastIdx + 1, "A").Value = oldPath
+  Worksheets(sheets.RenamePage).Cells(lastIdx + 1, "B").Value = newPath
 End Function
 
 ' 指定された行番号のデータを読み取り、リネーム処理を行う
@@ -84,8 +99,10 @@ Function Renamer(ByVal rowNum As Integer)
   Dim newPath As String
   Dim extension As String
   Dim filePath As String
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
   
-  With Worksheets("ファイル名変更")
+  With Worksheets(sheets.RenamePage)
     fileName = .Cells(rowNum, "A")
     If fileName = "" Then
       Renamer = False
@@ -111,14 +128,20 @@ End Function
 
 ' リネーム対象のファイル数を返す
 Function getRanameFileCounts()
-  With Worksheets("ファイル名変更")
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
+
+  With Worksheets(sheets.RenamePage)
     getRanameFileCounts = WorksheetFunction.CountA(.Range("A:A")) - 1
   End With
 End Function
 
 ' リンク表の行数を返す
 Function getTableCols()
-  With Worksheets("リンク表")
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
+
+  With Worksheets(sheets.DataTablePage)
     getTableCols = WorksheetFunction.CountA(.Range("A:A")) - 1
   End With
 End Function
@@ -129,8 +152,10 @@ Function getRelationName2ID()
   Set returnDic = CreateObject("Scripting.Dictionary")
   Dim rowNum As Integer
   Dim spaceCounter As Integer: spaceCounter = 0
-  
-  With Worksheets("目録入力")
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
+
+  With Worksheets(sheets.MokurokuPage)
     rowNum = 2
     Do
       ' 目録データの取得
@@ -162,8 +187,10 @@ Function getRelationName2OldPath()
   Set dwgDic = CreateObject("Scripting.Dictionary")
   Dim rowNum As Integer
   Dim spaceCounter As Integer: spaceCounter = 0
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
   
-  With Worksheets("目録入力")
+  With Worksheets(sheets.MokurokuPage)
     rowNum = 2
     Do
       ' 目録データの取得
@@ -195,8 +222,10 @@ Function getRelationOld2NewPath()
   Dim rowNum As Integer
   Dim spaceCounter As Integer: spaceCounter = 0
   Dim test As Integer: test = 1
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
   
-  With Worksheets("ファイル名変更")
+  With Worksheets(sheets.RenamePage)
     rowNum = 2
     Do While .Cells(rowNum, "A").Value <> 0
       returnDic.Add .Cells(rowNum, "A").Value, .Cells(rowNum, "B").Value
@@ -219,8 +248,10 @@ Function writeLinkTable( _
   Dim writeRowNum As Integer: writeRowNum = 1
   Dim pdfPath As String
   Dim dwgPath As String
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
   
-  With Worksheets("リンク表")
+  With Worksheets(sheets.DataTablePage)
     ' データの書き出し
     For Each paperName In name2oldP(0)
       .Cells(2 * writeRowNum, 1).Value = contractID
@@ -243,8 +274,8 @@ Function writeLinkTable( _
   End With
   
   ' 罫線の描画
-  Call ResetLines("リンク表", "A1", "F1048576")
+  Call ResetLines(sheets.DataTablePage, "A1", "F1048576")
   endRow = 2 * (writeRowNum - 1) + 1
-  Call MakeLattice("リンク表", "A1", "F" & endRow)
+  Call MakeLattice(sheets.DataTablePage, "A1", "F" & endRow)
   
 End Function

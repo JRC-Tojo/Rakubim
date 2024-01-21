@@ -17,7 +17,10 @@ Public DesignID As String
 Public UseContinuousNumber As Boolean
 
 Private Sub class_initialize()
-  With Worksheets("入力")
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
+
+  With Worksheets(sheets.FirstInputPage)
     CompanyID = getCompanyID(.Range("C3"))
     ProjectID = .Range("C4")
     StructureID = .Range("C5")
@@ -28,7 +31,10 @@ End Sub
 
 ' 業務機関コードから情報を取得する
 Private Function getCompanyID(name As String)
-  With Worksheets("業務機関コード")
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
+
+  With Worksheets(sheets.TeamCodePage)
     getCompanyID = WorksheetFunction.VLookup(name, .Range("H3:I21"), 2, False)
   End With
 End Function
