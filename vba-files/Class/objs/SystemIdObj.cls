@@ -51,7 +51,7 @@ Public Property Get SelectedFileType() As String
   SelectedFileType = inner_SelectedFileType
 End Property
 
-Public Property Get UseContinuousNumber() As String
+Public Property Get UseContinuousNumber() As Boolean
   UseContinuousNumber = inner_UseContinuousNumber
 End Property
 
