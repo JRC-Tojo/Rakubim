@@ -48,6 +48,7 @@ Sub ReadFileNamesBtn_Click()
        
     ' Ÿˆ—‚ÉŒü‚¯‚Ä’l‚ğXV
     rowNum = rowNum + 1
+    paperCounter = paperCounter + 1
   Loop
 End Sub
 
