@@ -39,6 +39,7 @@ Public Property Get NewNames() As Collection
   Dim returnCol As Collection
   Set returnCol = New Collection
 
+  Dim file As FileObj
   For Each file In dictValues(inner_RenamePDFFiles)
     Call returnCol.Add(GetNewFileName(file))
   Next file
@@ -79,7 +80,7 @@ Private Function GetNewFileName(file As FileObj) As String
                     SetPaperNumberText(file) & "_" & _
                     SetPaperNameText(file) & _
                     SetPaperSpotNumbers(file) & _
-                    & "." & file.Extension
+                    "." & file.Extension
 End Function
 
 ' 新名称に含める番号の表現を作成
@@ -88,11 +89,12 @@ Private Function SetPaperNumberText(file As FileObj)
   Dim number As String
   Dim FormattedNumber As String
 
-  For Each paperID In file.MatchedPaperIds
-    number = inner_Papers.Item(paperID).GlobalNumber
+  Dim i As Integer
+  For i = 1 To file.MatchedPaperIds.Count
+    number = inner_Papers.Item(file.MatchedPaperIds(i)).GlobalNumber
     FormattedNumber = IIf(Len(number) > 4, number, Right("0000" & number, 4))
     returnText = returnText & FormattedNumber & ", "
-  Next paperID
+  Next i
 
   SetPaperNumberText = returnText
 End Function
@@ -104,18 +106,19 @@ Private Function SetPaperNameText(file As FileObj)
   Set texts = New Collection
 
   ' 図面名の重複を除外しながらユニークな図面名のリストを作成
-  For Each paperID In file.MatchedPaperIds
-    paperName = inner_Papers.Item(paperID).SnippedName
+  Dim i As Integer
+  For i = 1 To file.MatchedPaperIds.Count
+    paperName = inner_Papers.Item(file.MatchedPaperIds(i)).SnippedName
     If (Not HasItem(texts, paperName)) Then
       Call texts.Add(paperName)
     End If
-  Next paperID
+  Next i 
 
   ' カンマ区切りで図面名を結合
   Dim returnText As String
-  For Each text In texts
-    returnText = returnText & text & ", "
-  Next
+  For i = 1 To texts.Count
+    returnText = returnText & texts(i) & ", "    
+  Next i
 
   SetPaperNameText = returnText
 End Function

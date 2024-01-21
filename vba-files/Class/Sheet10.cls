@@ -82,8 +82,11 @@ Private Sub WriteOld2NewNames(creater As NewNameCreater)
   Set sheets = New SheetObj
 
   With Worksheets(sheets.RenamePage)
-    .Range("A2:A" & creater.NamesCount + 2) = WorksheetFunction.Transpose(creater.OldNames)
-    .Range("B2:B" & creater.NamesCount + 2) = WorksheetFunction.Transpose(creater.NewNames)
+    Dim i As Integer
+    For i = 1 To creater.NamesCount
+      .Range("A" & i + 1) = creater.OldNames(i)
+      .Range("B" & i + 1) = creater.NewNames(i)
+    Next i
   End With
 End Sub
 
