@@ -12,6 +12,8 @@ Option Explicit
 
 ' ファイルの種類（PDF｜CAD）
 Private inner_FileType As String
+' 拡張子
+Private inner_Extension As String
 ' ファイルの元の名前
 Private inner_SourceName As String
 ' マッチング用の処理済みのファイル名
@@ -32,6 +34,10 @@ End Sub
 
 Public Property Get FileType() As String
   FileType = inner_FileType
+End Property
+
+Public Property Get Extension() As String
+  Extension = inner_Extension
 End Property
 
 Public Property Get SourceName() As String
@@ -63,12 +69,6 @@ Public Property Get PaperNumbers() As Collection
   Set PaperNumbers = inner_PaperNumbers
 End Property
 
-Public Property Get Id() As String
-  dim calcUtil As CalcUtils
-  Set calcUtil = New CalcUtils
-  Id = calcUtil.HASH_SHA256(SourceName)
-End Sub
-
 Public Sub InitFileObj(ByVal fileName As String)
   ' 基本情報を登録
   inner_SourceName = fileName
@@ -87,7 +87,8 @@ End Sub
 
 ' ファイルの種類を特定
 Private Sub GetFileType()
-  Select Case StrConv(Right(SourceName, 3), vbLowerCase)
+  inner_Extension = Right(SourceName, 3)
+  Select Case StrConv(inner_Extension, vbLowerCase)
     Case "pdf"
       inner_FileType = "PDF"
     Case "dwg"
@@ -108,4 +109,3 @@ Private Sub SetKeyPathRelation()
     inner_PaperPaths.Add "idx" & inner_PaperNumbers(i), SourceName
   Next i
 End Sub
-
