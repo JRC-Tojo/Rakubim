@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "FileObj"
+Attribute VB_Name = "Analyzer"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -10,43 +10,17 @@ Attribute VB_Exposed = False
 
 Option Explicit
 
-' ƒNƒ‰ƒX•Ï”
-Public FileType As String
-Public paperName As String
-Public PaperNumbers As Collection
-Public PaperPaths As Scripting.Dictionary
-Private Const NumberPattern = "[[i‚»‚Ì|i][‚O-‚X]+j|[i‚»‚Ì|i][‚O-‚X]+[`||][‚O-‚X]+j|i‚»‚Ì[‚O-‚X]+j[`||]i‚»‚Ì[‚O-‚X]+j]|[‚O-‚X]+$"
-Private Const NumberPattern_new = "(i‚»‚Ì[‚O-‚X]+j(`||)i‚»‚Ì[‚O-‚X]+j)|((i‚»‚Ì|i)[‚O-‚X]+(`||)[‚O-‚X]+j)|((i‚»‚Ì|i)[‚O-‚X]+j)|([‚O-‚X]+$)"
-
-Private Sub class_initialize()
-  ' ‰Šú‰»
-  Set PaperNumbers = New Collection
-  Set PaperPaths = New Scripting.Dictionary
-End Sub
-
-Public Property Get PaperPaths() As Scripting.Dictionary
-  Set PaperPaths = PaperPaths
-End Property
-
-Public Property Get PaperNumbers() As RakuCollection
-  Set PaperNumbers = PaperNumbers
-End Property
-
-
-Public Sub Id()
-End Sub
-
-Public Sub InitFileObj(ByVal fileName As String)
-  Call Analyze(fileName)
+Public Sub SetPaperInfo(paper as PaperObj)
+  
 End Sub
 
 ' –¼Ì‚ğ•ªÍ‚µ‚ÄƒNƒ‰ƒX‚ğì¬
-Public Sub Analyze(ByVal path As String)
+Private Sub Analyze(ByVal path As String)
   ' ‚±‚Ì‡˜‚ÅÀs‚·‚é‚±‚Æ
-  GetFileType (path)
-  GetPaperNumber (path)
-  GetBluePrintName (path)
-  SetKeyPathRelation (path)
+  Call GetFileType(path)
+  Call GetPaperNumber(path)
+  Call GetBluePrintName(path)
+  Call SetKeyPathRelation(path)
 End Sub
 
 ' ƒtƒ@ƒCƒ‹‚Ìí—Ş‚ğ“Á’è
@@ -300,3 +274,4 @@ Private Sub SetKeyPathRelation(ByVal fileName As String)
   Next i
 End Sub
 
+  
