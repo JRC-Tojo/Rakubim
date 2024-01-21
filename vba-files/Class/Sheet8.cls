@@ -11,6 +11,7 @@ Attribute VB_Exposed = True
 ' 実際のファイル名を読み込み、目録の図面名称と対応させる
 Sub ReadFileNamesBtn_Click()
   Dim rowNum As Integer
+  Dim paperCounter As Integer
   Dim matcher As Paper2FileMatcher
   Set matcher = New Paper2FileMatcher
   Dim paper As PaperObj
@@ -22,6 +23,7 @@ Sub ReadFileNamesBtn_Click()
     
   ' 目録を読み込み始める行番号
   rowNum = INIT_ROWNUM_MOKUROKU
+  paperCounter = 1
   Do
     ' 目録データの取得
     If checkSpaceRow(rowNum) Then
@@ -35,12 +37,12 @@ Sub ReadFileNamesBtn_Click()
       spaceCounter = 0
       
       ' PaperObjを宣言
-      Call paper.InitPaperObj(rowNum)
+      Call paper.InitPaperObj(rowNum, paperCounter)
       pdfPath = matcher.GetBestFile(paper, "PDF")
       dwgPath = matcher.GetBestFile(paper, "CAD")
       
       ' 探索結果の書き込み
-      WriteOldP4Mokuroku rowNum, paper.paperID, pdfPath, dwgPath
+      WriteOldP4Mokuroku rowNum, paper.GlobalNumber, pdfPath, dwgPath
     End If
        
     ' 次処理に向けて値を更新

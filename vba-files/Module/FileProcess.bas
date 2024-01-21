@@ -63,7 +63,7 @@ Function FileNames2drawingNames(pdfObjs As Collection, dwgObjs As Collection)
       End If
       
       ' ’TõŒ‹‰Ê‚Ì‘‚«‚İ
-      WriteOldP4Mokuroku rowNum, paperInfo.paperID, pdfPath, dwgPath
+      WriteOldP4Mokuroku rowNum, paperInfo.GlobalNumber, pdfPath, dwgPath
       paperCounter = paperCounter + 1
     End If
        

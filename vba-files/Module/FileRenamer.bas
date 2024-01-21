@@ -128,7 +128,7 @@ Private Function GenerateIndex2NewPDFPath( _
 )
   Dim returnPath As String
   Dim paperID As String
-  paperID = IIf(Len(paperInfo.paperID) > 4, paperInfo.paperID, Right("0000" & paperInfo.paperID, 4))
+  paperID = IIf(Len(paperInfo.GlobalNumber) > 4, paperInfo.GlobalNumber, Right("0000" & paperInfo.GlobalNumber, 4))
 
   GenerateIndex2NewPDFPath = systemIds.CompanyID & "-" & _
                                systemIds.ProjectID & "-" & _
@@ -145,9 +145,9 @@ Private Function GenerateIndex2NewDWGPath( _
 )
   ' ˜A”Ô•”•ª
   Dim startNum As String
-  startNum = PaperIDFormatter(paperInfo.paperID)
+  startNum = PaperIDFormatter(paperInfo.GlobalNumber)
   Dim endNum As String
-  endNum = PaperIDFormatter(CStr(CInt(paperInfo.paperID) + dwgFileObj.PaperNumbers.Count - 1))
+  endNum = PaperIDFormatter(CStr(CInt(paperInfo.GlobalNumber) + dwgFileObj.PaperNumbers.Count - 1))
   Dim rangePart1 As String
   rangePart1 = IIf(startNum = endNum, startNum, startNum & "-" & endNum)
   
