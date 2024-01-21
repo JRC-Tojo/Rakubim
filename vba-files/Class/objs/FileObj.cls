@@ -37,7 +37,7 @@ End Property
 
 
 Public Property Get Id() As String
-
+  
 End Sub
 
 Public Sub InitFileObj(ByVal fileName As String)
