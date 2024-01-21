@@ -10,11 +10,15 @@ Attribute VB_Exposed = False
 
 Option Explicit
 
-' クラス変数
+' ファイルの種類（PDF｜CAD）
 Private inner_FileType As String
+' ファイルの元の名前
 Private inner_SourceName As String
+' マッチング用の処理済みのファイル名
 Private inner_SnippedName As String
+' 同一ファイルに格納している（その〇）に該当する番号
 Private inner_PaperNumbers As Collection
+' PaperNumbersを使って図面データと突き合わせる用の辞書
 Private inner_PaperPaths As Scripting.Dictionary
 
 Private Sub class_initialize()
@@ -23,8 +27,12 @@ Private Sub class_initialize()
   Set inner_PaperPaths = New Scripting.Dictionary
 End Sub
 
+Public Property Get FileType() As String
+  FileType = inner_FileType
+End Property
+
 Public Property Get SourceName() As String
-  Set SourceName = inner_SourceName
+  SourceName = inner_SourceName
 End Property
 
 Public Property Let SnippedName(name As String)
@@ -40,23 +48,34 @@ End Property
 Public Property Get PaperPaths() As Scripting.Dictionary
   Set PaperPaths = inner_PaperPaths
 End Property
-
-Public Property Set PaperNumbers(numbers As Collection)
-  inner_PaperNumbers = numbers
-  Call SetKeyPathRelation()
+Public Property Set PaperPaths(paths As Scripting.Dictionary)
+  Set inner_PaperPaths = paths
 End Property
-Public Property Get PaperNumbers() As RakuCollection
+
+Public Property Get PaperNumbers() As Collection
   Set PaperNumbers = inner_PaperNumbers
 End Property
 
 Public Property Get Id() As String
-  dim calcUtil As New CalcUtils
+  dim calcUtil As CalcUtils
+  Set calcUtil = New CalcUtils
   Id = calcUtil.HASH_SHA256(SourceName)
 End Sub
 
 Public Sub InitFileObj(ByVal fileName As String)
+  ' 基本情報を登録
   inner_SourceName = fileName
   Call GetFileType()
+  
+  ' 名称の分析結果を登録
+  Dim analyzerObj As Analyzer
+  Set analyzerObj = New Analyzer
+  Call analyzerObj.SetFileInfo(Me)
+
+  inner_SnippedName = analyzerObj.SnippedName
+  Set inner_PaperNumbers = analyzerObj.PaperNumbers
+  ' 登録された番号の情報をもとに図面との突き合わせ用データを作成
+  Call SetKeyPathRelation()
 End Sub
 
 ' ファイルの種類を特定

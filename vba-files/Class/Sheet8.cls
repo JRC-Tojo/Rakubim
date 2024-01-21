@@ -37,6 +37,7 @@ Sub ReadFileNamesBtn_Click()
       spaceCounter = 0
       
       ' PaperObj‚ğéŒ¾
+      Set paper = New PaperObj
       Call paper.InitPaperObj(rowNum, paperCounter)
       pdfPath = matcher.GetBestFile(paper, "PDF")
       dwgPath = matcher.GetBestFile(paper, "CAD")

@@ -20,20 +20,21 @@ Private inner_ContinuousNumber As Integer
 Private inner_GlobalNumber As String
 ' （その〇）にあたる番号
 Private inner_SpotNumber As Integer
+' PDFの列に記載されたパス
+Private inner_PDFpath As String
+' CADの列に記載されたパス
+Private inner_CADpath As String
 
 Private Sub class_initialize()
 
 End Sub
 
 Public Property Get SourceName() As String
-  Set SourceName = inner_SourceName
+  SourceName = inner_SourceName
 End Property
 
 Public Property Get SnippedName() As String
-  Set SnippedName = inner_SnippedName
-End Property
-Public Property Let SnippedName(name As String)
-  inner_SnippedName = name
+  SnippedName = inner_SnippedName
 End Property
 
 Public Property Get ContinuousNumber() As Integer
@@ -53,8 +54,8 @@ End Property
 
 ' 指定した行数にあるデータから図面Objectを作成する
 Public Sub InitPaperObj(ByVal rowNum As Integer, continuousNumber As Integer)
-  Dim analyzerObj as Analyzer
-  analyzerObj = New Analyzer
+  Dim analyzerObj As Analyzer
+  Set analyzerObj = New Analyzer
   Dim sheets As SheetObj
   Set sheets = New SheetObj
 
@@ -62,19 +63,19 @@ Public Sub InitPaperObj(ByVal rowNum As Integer, continuousNumber As Integer)
   
   With Worksheets(sheets.MokurokuPage)
     inner_SourceName = .Cells(rowNum, "B").Value
-    analyzerObj.SetPaperInfo(Me)
+    Call analyzerObj.SetPaperInfo(Me)
 
     inner_GlobalNumber = CompleteGlobalPaperNumber(rowNum)
     inner_SnippedName = Replace(StrConv(inner_SourceName, vbWide), "　", "")
-    PaperNumber = analyzerObj.PaperNumbers(1)
-    pdfPath = .Cells(rowNum, "G").Value
-    dwgPath = .Cells(rowNum, "H").Value
+    inner_SpotNumber = analyzerObj.PaperNumbers(1)
+    inner_PDFpath = .Cells(rowNum, "G").Value
+    inner_CADpath = .Cells(rowNum, "H").Value
   End With
 End Sub
 
 ' 図面番号を補完する
 ' 補完した番号を戻り値として返す
-Private Function CompleteGlobalPaperNumber(rowNum As Integer)
+Private Function CompleteGlobalPaperNumber(rowNum As Integer) As String
   Dim nowId As Variant
   Dim sheets As SheetObj
   Set sheets = New SheetObj

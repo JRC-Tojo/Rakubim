@@ -10,7 +10,7 @@ Attribute VB_Exposed = False
 
 Option Explicit
 
-Private inner_cleaner As FileNameCleaner
+Private inner_Cleaner As FileNameCleaner
 Private inner_SystemIds As SystemIdObj
 Private inner_ContinuousPDF As FileObj
 Private inner_PDFs As Collection
@@ -18,11 +18,12 @@ Private inner_DWGs As Collection
 
 Private Sub class_initialize()
   Set inner_SystemIds = New SystemIdObj
+  Set inner_Cleaner = New FileNameCleaner
 
   ' 図面目録で重複しているワードを除去するためのクリーナーを定義
   Dim sheet As SheetObj
-  sheet = New SheetObj
-  Call inner_cleaner.AnalyzeNames(Range2Collection(sheet.MokurokuPage, "B2:B10000"))
+  Set sheet = New SheetObj
+  Call inner_Cleaner.AnalyzeNames(Range2Collection(sheet.MokurokuPage, "B2:B10000"))
 
   ' ファイル群を取得
   Set inner_PDFs = GetFileCollection("PDF")
@@ -37,17 +38,18 @@ End Sub
 
 ' 引数で受けた図面に最も適当なファイルを探索する
 Public Function GetBestFile(paper As PaperObj, fileType As String)
-  if (systemIds.UseContinuousNumber And fileType = "PDF") Then
+  if (inner_SystemIds.UseContinuousNumber And fileType = "PDF") Then
     GetBestFile = ApplyContinuousFile(paper.ContinuousNumber)
   Else
+    Dim files As Collection
     Set files = IIf(fileType = "PDF", inner_PDFs, inner_DWGs)
     GetBestFile = getMatchPath(files, paper)
   End if
 End Function
 
 
-' 指定したpaperInfoに最もマッチするFileObjをobjsに指定したCollectionから探索する
-Private Function getMatchFile(objs As Collection, paperInfo As PaperObj, cleaner As FileNameCleaner) As FileObj
+' 指定したpaperに最もマッチするFileObjをobjsに指定したCollectionから探索する
+Private Function getMatchFile(objs As Collection, paper As PaperObj) As FileObj
   Dim ratios As Collection
   Set ratios = New Collection
   Dim seq As SequenceMatcher
@@ -56,11 +58,12 @@ Private Function getMatchFile(objs As Collection, paperInfo As PaperObj, cleaner
   Dim fileName As String
   
   ' すべてのファイルに対してマッチ率を算出する
+  Dim file As FileObj
   For Each file In objs
     Set seq = New SequenceMatcher
     ' 目録名称から除外すべき名称とスペースを除去
-    paperName = cleaner.NameCleaner(paperInfo.paperName)
-    fileName = cleaner.NameCleaner(StrConv(file.paperName, vbWide))
+    paperName = inner_Cleaner.NameCleaner(paper.SnippedName)
+    fileName = inner_Cleaner.NameCleaner(StrConv(file.SnippedName, vbWide))
     Call seq.set_seqs(paperName, fileName)
     
     ' マッチ率の記録
@@ -75,18 +78,18 @@ Private Function getMatchFile(objs As Collection, paperInfo As PaperObj, cleaner
   Set getMatchFile = objs.item(bestIdx)
 End Function
 
-' 指定したpaperInfoに最もマッチするファイル名を返す
-Private Function getMatchPath(files As Collection, paperInfo As PaperObj, cleaner As FileNameCleaner)
+' 指定したpaperに最もマッチするファイル名を返す
+Private Function getMatchPath(files As Collection, paper As PaperObj) As String
   If (files.Count = 0) Then
     getMatchPath = ""
   End If
   
   Dim resultFile As FileObj
-  Set resultFile = getMatchFile(files, paperInfo, cleaner)
+  Set resultFile = getMatchFile(files, paper)
   
   ' 元のファイル名を返す
-  If resultFile.PaperPaths.Exists("idx" & paperInfo.PaperNumber) = True Then
-    getMatchPath = resultFile.PaperPaths("idx" & paperInfo.PaperNumber)
+  If resultFile.PaperPaths.Exists("idx" & paper.SpotNumber) = True Then
+    getMatchPath = resultFile.PaperPaths("idx" & paper.SpotNumber)
   ElseIf resultFile.PaperPaths.Exists("idx-1") = True Then
     getMatchPath = resultFile.PaperPaths("idx-1")
   Else
@@ -98,20 +101,20 @@ End Function
 
 ' PDFの連番処理用
 ' 最も番号を保持しているファイルオブジェクトを抽出することで、連番化されたファイル名称を導く
-Private Function SearchMostNumbersFile(objs As Collection)
+Private Function SearchMostNumbersFile(files As Collection)
   Dim fileCounts As Collection
   Set fileCounts = New Collection
   Dim file As FileObj
   
   ' すべてのファイルに対してファイル数を算出
-  For Each file In objs
+  For Each file In files
     fileCounts.Add file.PaperNumbers.Count
   Next file
   
   ' 最もファイル数を持つファイルオブジェクトを返す
   Dim bestIdx As Integer
   bestIdx = ArgMax(fileCounts)(1)
-  Set SearchMostNumbersFile = objs.item(bestIdx)
+  Set SearchMostNumbersFile = files.item(bestIdx)
 End Function
 
 ' PDFの連番処理用
