@@ -63,10 +63,13 @@ Sub ResetMokuroku_Right_Click()
 End Sub
 
 ' 目録の記入データをリセット
-Function ResetMokuroku(leftRight As String)
+Private Sub ResetMokuroku(leftRight As String)
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
+
   If leftRight = "left" Then
-    Call ResetData("目録入力", "A" & INIT_ROWNUM_MOKUROKU & ":E10000")
+    Call ResetData(sheets.MokurokuPage, "A" & INIT_ROWNUM_MOKUROKU & ":E10000")
   Else
-    Call ResetData("目録入力", "G" & INIT_ROWNUM_MOKUROKU & ":H10000")
+    Call ResetData(sheets.MokurokuPage, "G" & INIT_ROWNUM_MOKUROKU & ":H10000")
   End If
-End Function
+End Sub
