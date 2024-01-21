@@ -10,10 +10,21 @@ Attribute VB_Exposed = False
 
 Option Explicit
 
-Private inner_systemIds As SystemIdObj
+Public inner_PaperNumbers As Collection
+Public inner_SnippedName As String
 Private inner_PaperPaths As Scripting.Dictionary
 Private Const inner_NumberPattern = "[[i‚»‚Ì|i][‚O-‚X]+j|[i‚»‚Ì|i][‚O-‚X]+[`||][‚O-‚X]+j|i‚»‚Ì[‚O-‚X]+j[`||]i‚»‚Ì[‚O-‚X]+j]|[‚O-‚X]+$"
 Private Const inner_NumberPattern_new = "(i‚»‚Ì[‚O-‚X]+j(`||)i‚»‚Ì[‚O-‚X]+j)|((i‚»‚Ì|i)[‚O-‚X]+(`||)[‚O-‚X]+j)|((i‚»‚Ì|i)[‚O-‚X]+j)|([‚O-‚X]+$)"
+
+
+Public Property Get PaperNumbers() As Collection
+  Set PaperNumbers = inner_PaperNumbers
+End Property
+
+Public Property Get SnippedName() As String
+  SnippedName = inner_SnippedName
+End Property
+
 
 Private Sub class_initialize()
   ' ‰Šú‰»
@@ -34,10 +45,8 @@ End Sub
 
 ' –¼Ì‚ğ•ªÍ‚µ‚ÄƒNƒ‰ƒX‚ğì¬
 Private Sub analyze(ByVal path As String, Optional fileType As String = "")
-  Dim paperNumbers As Collection
-  Dim snippedName As String
-  paperNumbers = getPaperNumber(path, fileType)
-  snippedName = getBluePrintName(path)
+  inner_PaperNumbers = getPaperNumber(path, fileType)
+  inner_SnippedName = getBluePrintName(path)
 End Sub
 
 ' ƒtƒ@ƒCƒ‹–¼‚©‚ç}–Ê‚Ì˜A”Ôi‚»‚Ì››j‚ğæ“¾
