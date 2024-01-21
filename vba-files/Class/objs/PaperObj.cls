@@ -42,8 +42,10 @@ End Sub
 Public Sub GetPaper(ByVal rowNum As Integer)
   Dim paperData As FileObj
   Dim sourcePaperName As String
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
   
-  With Worksheets("–Ú˜^“ü—Í")
+  With Worksheets(sheets.MokurokuPage)
     sourcePaperName = .Cells(rowNum, "B").Value
     Set paperData = AnalyzeName(sourcePaperName)
     paperID = CompletePaperID(rowNum)
@@ -59,8 +61,10 @@ End Sub
 ' •âŠ®‚µ‚½”Ô†‚ğ–ß‚è’l‚Æ‚µ‚Ä•Ô‚·
 Private Function CompletePaperID(rowNum As Integer)
   Dim nowId As Variant
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
 
-  With Worksheets("–Ú˜^“ü—Í")
+  With Worksheets(sheets.MokurokuPage)
     nowId = .Cells(rowNum, "A").Value
     If nowId = 0 Then
       nowId = .Cells(rowNum - 1, "A").Value + 1

@@ -16,10 +16,12 @@ Private Sub AutoIDInputBtn_Click()
   Dim companyCode As String
   companyCode = ""
   
-  With Worksheets("入力")
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
+  With Worksheets(sheets.FirstInputPage)
     inputName = .Range("E4").Value
     
-    With Worksheets("業務機関コード")
+    With Worksheets(sheets.TeamCodePage)
       companyCode = WorksheetFunction.VLookup(Left(inputName, 2), .Range("G3:H21"), 2, False)
     End With
     

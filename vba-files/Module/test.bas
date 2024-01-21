@@ -89,7 +89,10 @@ Sub printKeyValues(dict As Object)
 End Sub
 
 Sub emptyTest()
-  With Worksheets("ファイル名変更")
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
+
+  With Worksheets(sheets.RenamePage)
     Debug.Print .Cells(1, "E") = ""
     Debug.Print .Cells(1, "E") = 0
   End With
