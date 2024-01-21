@@ -11,8 +11,6 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private inner_systemIds As SystemIdObj
-Private inner_SnippedName As String
-Private inner_PaperNumbers As Collection
 Private inner_PaperPaths As Scripting.Dictionary
 Private Const inner_NumberPattern = "[[（その|（][０-９]+）|[（その|（][０-９]+[～|－][０-９]+）|（その[０-９]+）[～|－]（その[０-９]+）]|[０-９]+$"
 Private Const inner_NumberPattern_new = "(（その[０-９]+）(～|－)（その[０-９]+）)|((（その|（)[０-９]+(～|－)[０-９]+）)|((（その|（)[０-９]+）)|([０-９]+$)"
@@ -23,26 +21,23 @@ Private Sub class_initialize()
 End Sub
 
 Public Sub SetPaperInfo(paper As PaperObj)
-  Call analyze(paper.SourceName, False)
+  Call analyze(paper.SourceName)
 End Sub
 
 Public Sub SetFileInfo(file As FileObj)
   ' 拡張子を除外
   Dim stem As String
   stem = Left(file.SourceName, Len(file.SourceName) - 4)
-
-  ' 連番処理を行うか
-  Dim useContinuousNumber As Boolean
-  useContinuousNumber = inner_systemIds.UseContinuousNumber And file.FileType = "PDF"
   
-  Call analyze(stem, useContinuousNumber)
+  Call analyze(stem, file.FileType)
 End Sub
 
 ' 名称を分析してクラスを作成
-Private Sub analyze(ByVal path As String, useContinuousNumber As Boolean)
-  ' この順序で実行すること
-  Call getPaperNumber(path, useContinuousNumber)
-  Call getBluePrintName(path)
+Private Sub analyze(ByVal path As String, Optional fileType As String = "")
+  Dim paperNumbers As Collection
+  Dim snippedName As String
+  paperNumbers = getPaperNumber(path, fileType)
+  snippedName = getBluePrintName(path)
 End Sub
 
 ' ファイル名から図面の連番（その○○）を取得
@@ -51,7 +46,7 @@ End Sub
 ' 全角数字一つしか検知されない場合：その数字が図面の番号
 ' 全角数字が複数検知された場合：その数字は図面そのものに対して意味を持たない
 ' 半角数字が検知された場合：末尾の数字は連続図面の連番を示す（連番と「その〇」の対応関係は考慮しない）
-Private Sub getPaperNumber(ByVal fileName As String, useContinuousNumber As Boolean)
+Private Function getPaperNumber(ByVal fileName As String, fileType As String) As Collection
   Dim reg As RegExp
   Set reg = New RegExp
   Dim hasDateNum As Integer
@@ -71,7 +66,7 @@ Private Sub getPaperNumber(ByVal fileName As String, useContinuousNumber As Bool
   Set numReg = New RegExp
   Dim tmpMatches As MatchCollection
   With numReg
-    .Pattern = IIf(useContinuousNumber, continuousNumbersPattern, inner_NumberPattern)
+    .Pattern = IIf(systemIds.UseContinuousNumber And fileType = "PDF", continuousNumbersPattern, inner_NumberPattern)
     .Global = True
   End With
   ' ファイル名称の日本語以降を抜き出して情報抽出
@@ -102,27 +97,27 @@ Private Sub getPaperNumber(ByVal fileName As String, useContinuousNumber As Bool
   Dim sameNum As Integer
   ' 数値が何もない場合は何も返さない or 数値があっても「（その」がない場合はその数値に意味がないと考える
   If numCount = 0 Then
-    Set inner_PaperNumbers = RangeCollection(-1, -1)
+    Set getPaperNumber = RangeCollection(-1, -1)
   ' 数字が一つ見えた場合はその数字が図面そのものの番号である
   ElseIf numCount = 1 Then
     sameNum = CInt(numMatches.item(0))
-    Set inner_PaperNumbers = RangeCollection(sameNum, sameNum)
+    Set getPaperNumber = RangeCollection(sameNum, sameNum)
   ' PDFデータにおいて，数字が2つ見える場合は末尾の「1」が省略されたと考える
-  ElseIf FileType <> "CAD" And numCount = 2 Then
-    Set inner_PaperNumbers = RangeCollection(-1, -1)
+  ElseIf fileType <> "CAD" And numCount = 2 Then
+    Set getPaperNumber = RangeCollection(-1, -1)
   ' PDFデータにおいて，数字が複数見える場合は末尾の数字が図面そのものの番号である
-  ElseIf FileType <> "CAD" And numCount > 2 Then
+  ElseIf fileType <> "CAD" And numCount > 2 Then
     sameNum = CInt(numMatches.item(numMatches.Count - hasDateNum - 1))
-    Set inner_PaperNumbers = RangeCollection(sameNum, sameNum)
+    Set getPaperNumber = RangeCollection(sameNum, sameNum)
   ' CADデータにおいて，数字が複数見えた場合はその範囲すべてに対するファイルであると考える
-  ElseIf FileType = "CAD" And numCount > 1 Then
+  ElseIf fileType = "CAD" And numCount > 1 Then
     Dim lastIdx As Integer
     lastIdx = numMatches.Count - hasDateNum - 1
-    Set inner_PaperNumbers = RangeCollection(CInt(numMatches.item(lastIdx - 1)), CInt(numMatches.item(lastIdx)))
+    Set getPaperNumber = RangeCollection(CInt(numMatches.item(lastIdx - 1)), CInt(numMatches.item(lastIdx)))
   ' このほかのパターンは存在しないはずだが，念のため記述
   Else
     sameNum = CInt(numMatches.item(numMatches.Count - hasDateNum - 1))
-    Set inner_PaperNumbers = RangeCollection(sameNum, sameNum)
+    Set getPaperNumber = RangeCollection(sameNum, sameNum)
   End If
 End Sub
 
@@ -149,11 +144,6 @@ Private Sub getBluePrintName(ByVal fileName As String)
     Next i
   Else
     tmpName = StrConv(fileName, vbWide)
-  End If
-  
-  ' 拡張子を除外
-  If FileType <> "OTHER" Then
-    tmpName = Left(tmpName, Len(tmpName) - 4)
   End If
   
   ' 数値を除外

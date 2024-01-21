@@ -27,23 +27,36 @@ Public Property Get SourceName() As String
   Set SourceName = inner_SourceName
 End Property
 
+Public Property Set SnippedName(name As String)
+  inner_SnippedName = name
+End Property
+Public Property Get SnippedName() As String
+  SnippedName = inner_SnippedName
+End Property
+
+' {"idx1": path}という形式の辞書を返す
+' idxは図面が持つ番号を示しており，これを突き合わせることで（その〇）のような番号が整合してマッチングさせる
+' 番号を持たない場合は"idx-1"がキーに登録される
 Public Property Get PaperPaths() As Scripting.Dictionary
   Set PaperPaths = inner_PaperPaths
 End Property
 
+Public Property Set PaperNumbers(numbers As Collection)
+  inner_PaperNumbers = numbers
+  Call SetKeyPathRelation()
+End Property
 Public Property Get PaperNumbers() As RakuCollection
   Set PaperNumbers = inner_PaperNumbers
 End Property
 
-
 Public Property Get Id() As String
-  
+  dim calcUtil As New CalcUtils
+  Id = calcUtil.HASH_SHA256(SourceName)
 End Sub
 
 Public Sub InitFileObj(ByVal fileName As String)
   inner_SourceName = fileName
   Call GetFileType()
-  Call SetKeyPathRelation()
 End Sub
 
 ' ファイルの種類を特定
