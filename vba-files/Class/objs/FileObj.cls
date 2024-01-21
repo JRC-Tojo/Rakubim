@@ -20,11 +20,14 @@ Private inner_SnippedName As String
 Private inner_PaperNumbers As Collection
 ' PaperNumbersを使って図面データと突き合わせる用の辞書
 Private inner_PaperPaths As Scripting.Dictionary
+' このファイルがサポートしている図面のID一覧
+Private inner_MatchedPaperIds As Collection
 
 Private Sub class_initialize()
   ' 初期化
   Set inner_PaperNumbers = New Collection
   Set inner_PaperPaths = New Scripting.Dictionary
+  Set inner_MatchedPaperIds = New Collection
 End Sub
 
 Public Property Get FileType() As String
@@ -40,6 +43,10 @@ Public Property Let SnippedName(name As String)
 End Property
 Public Property Get SnippedName() As String
   SnippedName = inner_SnippedName
+End Property
+
+Public Property Get MatchedPaperIds() As Collection
+  Set MatchedPaperIds = inner_MatchedPaperIds
 End Property
 
 ' {"idx1": path}という形式の辞書を返す

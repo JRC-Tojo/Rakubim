@@ -40,3 +40,10 @@ Sub ChangeFileNamesBtn_Click()
       "ファイル名変更シートの色が塗られている箇所に新ファイル名を定義してください"
   End If
 End Sub
+
+' 入力内容のリセット
+Private Sub ResetBtn_Click()
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
+  Call ResetData(sheets.RenamePage, "A" & INIT_ROWNUM_MOKUROKU & ":B10000")
+End Sub
