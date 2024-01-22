@@ -22,7 +22,7 @@ Public Property Get PaperNumbers() As Collection
 End Property
 
 Public Property Get SnippedName() As String
-  SnippedName = inner_SnippedName
+  SnippedName = StrConv(inner_SnippedName, vbWide)
 End Property
 
 Public Sub SetPaperInfo(paper As PaperObj)

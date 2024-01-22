@@ -63,7 +63,7 @@ Private Function getMatchFile(objs As Collection, paper As PaperObj) As FileObj
     Set seq = New SequenceMatcher
     ' 目録名称から除外すべき名称とスペースを除去
     paperName = inner_Cleaner.NameCleaner(paper.SnippedName)
-    fileName = inner_Cleaner.NameCleaner(StrConv(file.SnippedName, vbWide))
+    fileName = inner_Cleaner.NameCleaner(file.SnippedName)
     Call seq.set_seqs(paperName, fileName)
     
     ' マッチ率の記録
