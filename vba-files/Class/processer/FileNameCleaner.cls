@@ -21,6 +21,10 @@ Private Sub class_initialize()
   ' 初期化
   Set WordBundle = New Scripting.Dictionary
   Set RemoveWords = New Collection
+
+  ' 極めて汎用的な語彙は除外対象とする
+  Call RemoveWords.Add("一般図")
+  Call RemoveWords.Add("詳細図")
 End Sub
 
 ' 名称一覧から除去すべき単語を学習する

@@ -65,6 +65,11 @@ Private Sub RegistPaperID( _
   file As FileObj, _
   paperID As String _
 )
+  ' 無効なファイル名は除外する
+  If (file.SourceName = "") Then
+    Exit Sub
+  End If
+
   ' リネーム対象のファイル一覧にファイルがない場合は追加
   If (Not files.Exists(file.SourceName)) Then
     Call files.Add(file.SourceName, file)
