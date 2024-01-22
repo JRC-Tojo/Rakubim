@@ -72,7 +72,7 @@ Public Sub InitPaperObj(ByVal rowNum As Integer, continuousNumber As Integer)
     Call analyzerObj.SetPaperInfo(Me)
 
     inner_GlobalNumber = CompleteGlobalPaperNumber(rowNum)
-    inner_SnippedName = Replace(StrConv(inner_SourceName, vbWide), "Å@", "")
+    inner_SnippedName = analyzerObj.SnippedName
     inner_SpotNumber = analyzerObj.PaperNumbers(1)
     inner_PDFpath = .Cells(rowNum, "G").Value
     inner_CADpath = .Cells(rowNum, "H").Value
