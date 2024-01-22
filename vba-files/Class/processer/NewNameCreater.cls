@@ -95,15 +95,30 @@ Private Function SetPaperNumberText(file As FileObj)
   Dim number As String
   Dim FormattedNumber As String
 
+  ' 「0000, 」を削除して連番「-0000」を作成するため，連番処理を実行するための最低文字数
+  Const MIN_TEXT_LEN As Integer = 6
+
+  ' 連番の初期値を保持する
+  Dim beforeNumber As Integer: beforeNumber = -1
   Dim i As Integer
   For i = 1 To file.MatchedPaperIds.Count
     number = inner_Papers.Item(file.MatchedPaperIds(i)).GlobalNumber
+
+    ' 数値の時に連続化検討処理を行う
     FormattedNumber = IIf(Len(number) > 4, number, Right("0000" & number, 4))
-    returnText = returnText & FormattedNumber & ", "
+    If (IsNumeric(number)) Then
+      If (CInt(number) - beforeNumber = 1 And Len(returnText) > MIN_TEXT_LEN) Then
+        ' すでについている「0000, 」を削除して「-」を挿入することで「01-03」の表記を作成
+        returnText = Left(returnText, Len(returnText) - MIN_TEXT_LEN) & "-"
+      End If
+      beforeNumber = CInt(number)
+    End If
+
+    returnText = returnText & FormattedNumber & ","
   Next i
 
   ' 最後の「, 」を除外して返す
-  SetPaperNumberText = Left(returnText, Len(returnText) - 2)
+  SetPaperNumberText = Left(returnText, Len(returnText) - 1)
 End Function
 
 ' 新名称に含める図面名の表現を作成
