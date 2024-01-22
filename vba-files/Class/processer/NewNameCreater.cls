@@ -51,6 +51,7 @@ Public Property Get NewNames() As Collection
 End Property
 
 
+' 図面とファイルの対応関係を記録
 Public Sub SetPDFFile(file As FileObj, paperID As String)
   Call RegistPaperID(inner_RenamePDFFiles, file, paperID)
 End Sub
@@ -96,7 +97,8 @@ Private Function SetPaperNumberText(file As FileObj)
     returnText = returnText & FormattedNumber & ", "
   Next i
 
-  SetPaperNumberText = returnText
+  ' 最後の「, 」を除外して返す
+  SetPaperNumberText = Left(returnText, Len(returnText) - 2)
 End Function
 
 ' 新名称に含める図面名の表現を作成
@@ -120,7 +122,8 @@ Private Function SetPaperNameText(file As FileObj)
     returnText = returnText & texts(i) & ", "    
   Next i
 
-  SetPaperNameText = returnText
+  ' 最後の「, 」を除外して返す
+  SetPaperNameText = Left(returnText, Len(returnText) - 2)
 End Function
 
 ' （その〇～その〇）を追加
