@@ -41,9 +41,7 @@ Private Sub ReadMokurokuInput(creater As NewNameCreater)
   Dim paper As PaperObj
   Dim paperCounter As Integer: paperCounter = 1
   Dim cadFile As FileObj
-  Set cadFile = New FileObj
   Dim pdfFile As FileObj
-  Set pdfFile = New FileObj
   With Worksheets(sheets.MokurokuPage)
     Do
       ' 目録データの取得
@@ -62,7 +60,9 @@ Private Sub ReadMokurokuInput(creater As NewNameCreater)
         Call paper.InitPaperObj(rowNum, paperCounter)
         Call creater.Papers.Add(paper.Id, paper)
         ' FileObjを構築
+        Set pdfFile = New FileObj
         Call pdfFile.InitFileObj(.Cells(rowNum, "G").Value)
+        Set cadFile = New FileObj
         Call cadFile.InitFileObj(.Cells(rowNum, "H").Value)
 
         ' 図面とファイルの対応関係を記録
