@@ -98,7 +98,8 @@ Private Function SetPaperNumberText(file As FileObj)
   ' 「0000, 」を削除して連番「-0000」を作成するため，連番処理を実行するための最低文字数
   Const MIN_TEXT_LEN As Integer = 6
 
-  ' 連番の初期値を保持する
+  ' 連番のひとつ前の値を保持する
+  ' TODO: 01-03,05-08のようなとび番があるケースに対応
   Dim beforeNumber As Integer: beforeNumber = -1
   Dim i As Integer
   For i = 1 To file.MatchedPaperIds.Count
@@ -138,8 +139,14 @@ Private Function SetPaperNameText(file As FileObj)
 
   ' カンマ区切りで図面名を結合
   Dim returnText As String
+  Dim nowText As String
+  Dim beforeText As String
   For i = 1 To texts.Count
-    returnText = returnText & texts(i) & ", "    
+    nowText = Trim(texts(i))
+    If (beforeText <> nowText) Then
+      returnText = returnText & nowText & ", "    
+    End If
+    beforeText = nowText
   Next i
 
   ' 最後の「, 」を除外して返す
