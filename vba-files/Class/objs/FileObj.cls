@@ -92,8 +92,8 @@ End Sub
 
 ' ƒtƒ@ƒCƒ‹‚ÌŽí—Þ‚ð“Á’è
 Private Sub GetFileType()
-  inner_Extension = Right(SourceName, 3)
-  Select Case StrConv(inner_Extension, vbLowerCase)
+  inner_Extension = StrConv(Right(SourceName, 3), vbLowerCase)
+  Select Case inner_Extension
     Case "pdf"
       inner_FileType = "PDF"
     Case "dwg"
