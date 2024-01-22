@@ -14,7 +14,7 @@ Public inner_PaperNumbers As Collection
 Public inner_SnippedName As String
 Private inner_PaperPaths As Scripting.Dictionary
 Private Const inner_NumberPattern = "[[ÅiÇªÇÃ|Åi][ÇO-ÇX]+Åj|[ÅiÇªÇÃ|Åi][ÇO-ÇX]+[Å`|Å|][ÇO-ÇX]+Åj|ÅiÇªÇÃ[ÇO-ÇX]+Åj[Å`|Å|]ÅiÇªÇÃ[ÇO-ÇX]+Åj]|[ÇO-ÇX]+$"
-Private Const inner_NumberPattern_new = "(ÅiÇªÇÃ[ÇO-ÇX]+Åj(Å`|Å|)ÅiÇªÇÃ[ÇO-ÇX]+Åj)|((ÅiÇªÇÃ|Åi)[ÇO-ÇX]+(Å`|Å|)[ÇO-ÇX]+Åj)|((ÅiÇªÇÃ|Åi)[ÇO-ÇX]+Åj)|([ÇO-ÇX]+$)"
+Private Const inner_RemoveNumbersPattern = "(((ÅiÇªÇÃ)|Åi)[ÇO-ÇX]+Åj|((ÅiÇªÇÃ)|Åi)[ÇO-ÇX]+[Å`|Å|][ÇO-ÇX]+Åj|ÅiÇªÇÃ[ÇO-ÇX]+Åj[Å`|Å|]ÅiÇªÇÃ[ÇO-ÇX]+Åj)|[ÇO-ÇX]+$"
 
 
 Public Property Get PaperNumbers() As Collection
@@ -153,7 +153,7 @@ Private Function getBluePrintName(ByVal fileName As String) As String
   Dim numReg As RegExp
   Set numReg = New RegExp
   With numReg
-    .Pattern = ".+(?=" & inner_NumberPattern & ")"
+    .Pattern = ".+(?=" & inner_RemoveNumbersPattern & ")"
     .Global = True
   End With
   Set matches = numReg.Execute(tmpName)
