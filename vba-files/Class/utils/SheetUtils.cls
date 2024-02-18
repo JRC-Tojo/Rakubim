@@ -29,9 +29,10 @@ End Function
 
 ' 指定した配列の値を指定したセルを１つ目として下方向に記述する
 Public Sub Collection2Cell(col As Collection, sheetName As String, startCell As String)
-  Dim arr As Variant: ReDim arr(1 To col.Count)
+  Dim arr As Variant: ReDim arr(1 To col.Count + 2)
   Dim i As Long: i = 1
   
+  Dim colVal As Variant
   For Each colVal In col
     arr(i) = colVal
     i = i + 1
