@@ -79,15 +79,12 @@ End Sub
 
 Private Sub WriteOld2NewNames(creater As NewNameCreater)
   Dim sheets As SheetObj
+  Dim sUtils As SheetUtils
   Set sheets = New SheetObj
+  Set sUtils = New SheetUtils
 
-  With Worksheets(sheets.RenamePage)
-    Dim i As Integer
-    For i = 1 To creater.NamesCount
-      .Range("A" & i + 1) = creater.OldNames(i)
-      .Range("B" & i + 1) = creater.NewNames(i)
-    Next i
-  End With
+  Call sUtils.Collection2Cell(creater.OldNames, sheets.RenamePage, "A2")
+  Call sUtils.Collection2Cell(creater.NewNames, sheets.RenamePage, "B2")
 End Sub
 
 ' 最終的なファイル名にリネーム

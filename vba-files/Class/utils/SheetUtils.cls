@@ -27,6 +27,26 @@ Public Function Range2Collection(sheetName As String, rangeArg As String) As Col
   Set Range2Collection = coll
 End Function
 
+' 指定した配列の値を指定したセルを１つ目として下方向に記述する
+Public Sub Collection2Cell(col As Collection, sheetName As String, startCell As String)
+  Dim arr As Variant: ReDim arr(1 To col.Count)
+  Dim i As Long: i = 1
+  
+  For Each colVal In col
+    arr(i) = colVal
+    i = i + 1
+  Next colVal
+  
+  Call Variants2Cell(arr, sheetName, startCell)
+End Sub
+
+' 指定した配列の値を指定したセルを１つ目として下方向に記述する
+Public Sub Variants2Cell(arr As Variant, sheetName As String, startCell As String)
+  with Worksheets(sheetName)
+    .Range(startCell, Cells(UBound(arr), 1)).Value = WorksheetFunction.Transpose(arr)
+  End With
+End Sub
+
 
 ' 指定した範囲に格子を描画する
 Public Function MakeLattice(workSheetName As String, startCell As String, endCell As String)
