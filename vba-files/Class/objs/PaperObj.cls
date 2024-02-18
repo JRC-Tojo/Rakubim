@@ -30,7 +30,7 @@ Private Sub class_initialize()
 End Sub
 
 Public Property Get Id() As String
-  dim calcUtil As CalcUtils
+  Dim calcUtil As CalcUtils
   Set calcUtil = New CalcUtils
   Id = calcUtil.HASH_SHA256(inner_SourceName)
 End Sub

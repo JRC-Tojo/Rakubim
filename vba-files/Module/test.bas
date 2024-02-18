@@ -55,9 +55,9 @@ End Sub
 
 Sub PrintHash()
   Dim hash As String
-  dim calcUtil As New CalcUtils
+  Dim calcUtil As New CalcUtils
   hash = calcUtil.HASH_SHA256("test")
-  MsgBox hash,,"testのハッシュ値" 
+  MsgBox hash, , "testのハッシュ値"
 End Sub
 
 Sub numberTest()
