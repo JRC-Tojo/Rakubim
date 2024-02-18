@@ -57,6 +57,9 @@ Private Function DropDuplicateName(fileObjCollection As Collection)
       For Each tmpKey In dictKeys(file.PaperPaths)
         Set tmpDict(file.SnippedName).PaperPaths = JointPaperPaths(tmpDict(file.SnippedName).PaperPaths, tmpKey, file.PaperPaths(tmpKey))
       Next tmpKey
+      For Each num In file.PaperNumbers
+        tmpDict(file.SnippedName).PaperNumbers.Add num
+      Next num 
     Else
       tmpDict.Add file.SnippedName, file
     End If
