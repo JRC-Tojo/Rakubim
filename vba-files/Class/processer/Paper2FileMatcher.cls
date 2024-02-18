@@ -38,13 +38,13 @@ End Sub
 
 ' 引数で受けた図面に最も適当なファイルを探索する
 Public Function GetBestFile(paper As PaperObj, fileType As String)
-  if (inner_SystemIds.UseContinuousNumber And fileType = "PDF") Then
-    GetBestFile = ApplyContinuousFile(paper.ContinuousNumber)
+  If (inner_SystemIds.UseContinuousNumber And fileType = "PDF") Then
+    GetBestFile = ApplyContinuousFile(paper.continuousNumber)
   Else
     Dim files As Collection
     Set files = IIf(fileType = "PDF", inner_PDFs, inner_DWGs)
     GetBestFile = getMatchPath(files, paper)
-  End if
+  End If
 End Function
 
 

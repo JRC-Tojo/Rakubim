@@ -30,7 +30,8 @@ Public Property Get Papers() As Scripting.Dictionary
 End Property
 
 Public Property Get NamesCount() As Integer
-  NamesCount = Ubound(inner_RenamePDFFiles.Keys) + Ubound(inner_RenameCADFiles.Keys)
+  ' TODO: 個数が正しいか要確認
+  NamesCount = UBound(inner_RenamePDFFiles.Keys) + UBound(inner_RenameCADFiles.Keys) + 2
 End Property
 Public Property Get OldNames() As Collection
   Set OldNames = CombineCols(dictKeys(inner_RenamePDFFiles), dictKeys(inner_RenameCADFiles))
@@ -156,7 +157,7 @@ Private Function SetPaperNameText(file As FileObj)
 End Function
 
 ' （その〇～その〇）を追加
-Private  Function SetPaperSpotNumbers(file As FileObj, title As String)
+Private Function SetPaperSpotNumbers(file As FileObj, title As String)
   Dim paperIds As Collection
   Set paperIds = file.MatchedPaperIds
   Dim firstNumber As Integer
@@ -165,10 +166,10 @@ Private  Function SetPaperSpotNumbers(file As FileObj, title As String)
   lastNumber = inner_Papers.Item(paperIds(paperIds.Count)).SpotNumber
 
   If (InStr(title, ", ") = 0 And firstNumber <> -1) Then
-    If (firstNumber <> lastNumber) Then 
-      SetPaperSpotNumbers = "（その" & StrConv(Cstr(firstNumber), vbWide) & "～その" & StrConv(Cstr(lastNumber), vbWide) & "）"
+    If (firstNumber <> lastNumber) Then
+      SetPaperSpotNumbers = "（その" & StrConv(CStr(firstNumber), vbWide) & "～その" & StrConv(CStr(lastNumber), vbWide) & "）"
     Else
-      SetPaperSpotNumbers = "（その" & StrConv(Cstr(firstNumber), vbWide) & "）"
+      SetPaperSpotNumbers = "（その" & StrConv(CStr(firstNumber), vbWide) & "）"
     End If
   Else
     SetPaperSpotNumbers = ""

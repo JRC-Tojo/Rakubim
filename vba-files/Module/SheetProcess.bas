@@ -281,3 +281,10 @@ Function writeLinkTable( _
   Call MakeLattice(sheets.DataTablePage, "A1", "F" & endRow)
   
 End Function
+
+' スプラッシュ画面を閉じる
+Private Sub KillForm()
+    Unload SplashScreen
+End Sub
+
+
