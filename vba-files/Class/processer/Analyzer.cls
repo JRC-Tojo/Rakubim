@@ -13,8 +13,7 @@ Option Explicit
 Public inner_PaperNumbers As Collection
 Public inner_SnippedName As String
 Private inner_PaperPaths As Scripting.Dictionary
-Private Const inner_NumberPattern = "[[（その|（][０-９]+）|[（その|（][０-９]+[～|－][０-９]+）|（その[０-９]+）[～|－]（その[０-９]+）]|[０-９]+$"
-Private Const inner_RemoveNumbersPattern = "(((（その)|（)[０-９]+）|((（その)|（)[０-９]+[～|－][０-９]+）|（その[０-９]+）[～|－]（その[０-９]+）)|[０-９]+$"
+Private Const inner_NumberPattern = "(((（その[０-９]+）[～－]（その[０-９]+）)|((（その|（)[０-９]+[～－][０-９]+）)|(（その|（)[０-９]+）))|[０-９]+$"
 
 
 Public Property Get PaperNumbers() As Collection
@@ -98,17 +97,17 @@ Private Function getPaperNumber(ByVal fileName As String, fileType As String) As
   End If
   
   Dim sameNum As Integer
-  ' 数値が何もない場合は何も返さない or 数値があっても「（その」がない場合はその数値に意味がないと考える
+  ' 数値が何もない場合は何も返さない
   If numCount = 0 Then
     Set getPaperNumber = RangeCollection(-1, -1)
   ' 数字が一つ見えた場合はその数字が図面そのものの番号である
   ElseIf numCount = 1 Then
     sameNum = CInt(numMatches.item(0))
     Set getPaperNumber = RangeCollection(sameNum, sameNum)
-  ' PDFデータにおいて，数字が2つ見える場合は末尾の「1」が省略されたと考える
+  ' PDFデータ or 図面名 において，数字が2つ見える場合は末尾の「1」が省略されたと考える
   ElseIf fileType <> "CAD" And numCount = 2 Then
     Set getPaperNumber = RangeCollection(-1, -1)
-  ' PDFデータにおいて，数字が複数見える場合は末尾の数字が図面そのものの番号である
+  ' PDFデータ or 図面名 において，数字が複数見える場合は末尾の数字が図面そのものの番号である
   ElseIf fileType <> "CAD" And numCount > 2 Then
     sameNum = CInt(numMatches.item(numMatches.Count - hasDateNum - 1))
     Set getPaperNumber = RangeCollection(sameNum, sameNum)
@@ -153,15 +152,9 @@ Private Function getBluePrintName(ByVal fileName As String) As String
   Dim numReg As RegExp
   Set numReg = New RegExp
   With numReg
-    .Pattern = ".+(?=" & inner_RemoveNumbersPattern & ")"
+    .Pattern = inner_NumberPattern
     .Global = True
   End With
-  Set matches = numReg.Execute(tmpName)
-  
-  ' 図名を確定
-  If matches.Count > 0 Then
-    getBluePrintName = matches.item(0)
-  Else
-    getBluePrintName = tmpName
-  End If
+
+  getBluePrintName = numReg.Replace(tmpName, "")
 End Function
