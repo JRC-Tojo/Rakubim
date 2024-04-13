@@ -39,7 +39,8 @@ Public Function GetFileCollection(folderName As String) As Collection
     If filePath <> "" Then
       Set file = New FileObj
       Call file.InitFileObj(filePath)
-      If (file.FileType <> "OTHER") Then
+      ' TODO: WAKUを除外しなくてもマッチングに失敗しない手法の確立
+      If (file.FileType <> "OTHER" And InStr(file.SourceName, "WAKU") = 0) Then
         returns.Add file
       End If
     End If
