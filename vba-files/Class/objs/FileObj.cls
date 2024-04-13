@@ -44,9 +44,6 @@ Public Property Get SourceName() As String
   SourceName = inner_SourceName
 End Property
 
-Public Property Let SnippedName(name As String)
-  inner_SnippedName = name
-End Property
 Public Property Get SnippedName() As String
   SnippedName = inner_SnippedName
 End Property
