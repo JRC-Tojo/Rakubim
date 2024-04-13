@@ -135,6 +135,7 @@ Private Function SetPaperNameText(file As FileObj)
   Dim i As Integer
   For i = 1 To file.MatchedPaperIds.Count
     paperName = inner_Papers.Item(file.MatchedPaperIds(i)).SnippedName
+    paperName = TitleFormatter(paperName)
     If (Not HasItem(texts, paperName)) Then
       Call texts.Add(paperName)
     End If
@@ -174,4 +175,15 @@ Private Function SetPaperSpotNumbers(file As FileObj, title As String)
   Else
     SetPaperSpotNumbers = ""
   End If
+End Function
+
+' 新規図面に入るタイトル文字のフォーマット
+Private  Function TitleFormatter(title As String)
+  Dim i As Integer
+  For i = 1 To Len(title)
+    If Mid(title, i, 1) Like "[ａ-ｚＡ-Ｚ０-９　]" Then
+      Mid(title, i, 1) = StrConv(Mid(title, i, 1), vbNarrow)
+    End If
+  Next
+  TitleFormatter = title
 End Function
