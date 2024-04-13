@@ -20,6 +20,17 @@ Sub ReadFileNamesBtn_Click()
   
   ' 何回空欄の行が連続したのか
   Dim spaceCounter As Integer: spaceCounter = 0
+
+  ' ファイルが存在しない場合はエラーを表示して終了
+  If (Not matcher.ExistFiles) Then
+    MsgBox "読み込むファイルが見つかりません．" & vbCrLf & _
+              "以下のポイントを確認したうえで再度ボタンを押してください．" & vbCrLf & vbCrLf & _
+              "1. 【半角英文字で】「CAD」「PDF」という名前のフォルダを作成する" & vbCrLf & _
+              "2. 上記フォルダにファイルが格納されている" & vbCrLf & _
+              "3. 「入力」シートで設定した処理するファイルの種類に対応したファイルを格納している" _
+              ,,"らくびむ　- 探索エラー -"
+    Exit Sub
+  End If
     
   ' 目録を読み込み始める行番号
   rowNum = INIT_ROWNUM_MOKUROKU

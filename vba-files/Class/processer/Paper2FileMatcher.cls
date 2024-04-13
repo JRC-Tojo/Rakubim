@@ -36,6 +36,18 @@ Private Sub class_initialize()
 End Sub
 
 
+' 読み込むべきフォルダが存在していることを確認
+Public Property Get ExistFiles() As Boolean
+  Dim pdfMode As Boolean: pdfMode = (inner_SystemIds.SelectedFileType = "PDF")
+  Dim cadMode As Boolean: cadMode = (inner_SystemIds.SelectedFileType = "CAD")
+  Dim hasPDFs As Boolean: hasPDFs = (inner_PDFs.Count > 0)
+  Dim hasDWGs As Boolean: hasDWGs = (inner_DWGs.Count > 0)
+  ExistFiles = (hasPDFs And hasDWGs) _
+                Or (hasDWGs And cadMode) _
+                Or (hasPDFs And pdfMode)
+End Property
+
+
 ' 引数で受けた図面に最も適当なファイルを探索する
 Public Function GetBestFile(paper As PaperObj, fileType As String)
   If (inner_SystemIds.UseContinuousNumber And fileType = "PDF") Then
