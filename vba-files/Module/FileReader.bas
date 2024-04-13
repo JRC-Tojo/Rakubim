@@ -39,7 +39,9 @@ Public Function GetFileCollection(folderName As String) As Collection
     If filePath <> "" Then
       Set file = New FileObj
       Call file.InitFileObj(filePath)
-      returns.Add file
+      If (file.FileType <> "OTHER") Then
+        returns.Add file
+      End If
     End If
   Next filePath
   
