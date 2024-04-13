@@ -2,7 +2,7 @@ Attribute VB_Name = "FileReader"
 ' ディレクトリ内のファイル名一覧を取得
 Private Function getAllFileNames(folderName As String)
   Dim i As Integer: i = 0
-  Dim returnVals() As String: Redim returnVals(1)
+  Dim returnVals() As String: ReDim returnVals(1)
 
   ' 先頭のファイル名の取得
   Dim strFileName As String: strFileName = Dir(ActiveWorkbook.path & "\" & folderName & "\", vbNormal)
@@ -59,7 +59,7 @@ Private Function DropDuplicateName(fileObjCollection As Collection)
       Next tmpKey
       For Each num In file.PaperNumbers
         tmpDict(file.SnippedName).PaperNumbers.Add num
-      Next num 
+      Next num
     Else
       tmpDict.Add file.SnippedName, file
     End If

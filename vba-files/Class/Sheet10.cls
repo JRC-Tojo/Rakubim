@@ -106,3 +106,4 @@ Private Sub ResetBtn_Click()
   Set sheets = New SheetObj
   Call ResetData(sheets.RenamePage, "A" & INIT_ROWNUM_MOKUROKU & ":B10000")
 End Sub
+
