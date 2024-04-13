@@ -44,7 +44,7 @@ Private Sub OutputData_Click()
   Set systemIds = New SystemIdObj
   
   ' ②範囲指定
-  Sheets("リンク表").Range("A:F").Select
+  sheets("リンク表").Range("A:F").Select
   Set tmpRng = Selection
   
   ' ③ファイルの新規作成
@@ -64,5 +64,6 @@ Private Sub OutputData_Click()
   
   ' ⑦ファイルを閉じる
   ActiveWorkbook.Close
-  Sheets("リンク表").Range("A1").Select
+  sheets("リンク表").Range("A1").Select
 End Sub
+

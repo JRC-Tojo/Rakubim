@@ -66,7 +66,7 @@ Sub numberTest()
 
   Dim data As Variant
 
-  data = GetPaperNumber(dummyName)
+  data = getPaperNumber(dummyName)
 
   Debug.Print data(0)
   Debug.Print data(1)
@@ -122,7 +122,7 @@ Sub fileObjTest()
   Dim file As FileObj
   Set file = New FileObj
 
-  file.Analyze ("471-20011_設計図（P3-P4ラーメン） 0目録1.pdf")
+  file.analyze ("471-20011_設計図（P3-P4ラーメン） 0目録1.pdf")
   Debug.Print file.paperName
   Call printCollectionItems(file.PaperNumbers)
 End Sub
