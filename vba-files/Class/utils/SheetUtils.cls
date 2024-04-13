@@ -44,7 +44,7 @@ End Sub
 ' 指定した配列の値を指定したセルを１つ目として下方向に記述する
 Public Sub Variants2Cell(arr As Variant, sheetName As String, startCell As String)
   with Worksheets(sheetName)
-    .Range(startCell, Cells(UBound(arr), 1)).Value = WorksheetFunction.Transpose(arr)
+    .Range(startCell, .Range(startCell).Offset(UBound(arr) - 1, 0)).Value = WorksheetFunction.Transpose(arr)
   End With
 End Sub
 
