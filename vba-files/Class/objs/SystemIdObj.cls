@@ -26,8 +26,10 @@ Private Sub class_initialize()
     inner_ProjectID = .Range("C4")
     inner_StructureID = .Range("C5")
     inner_DesignID = .Range("C6")
-    inner_SelectedFileType = SetFileType()
     inner_UseContinuousNumber = CBool(.useContinuousNumberCheck.Value)
+    ' 下記は「処理するデータの種類」という項目が入力シートにあった際に利用していた変数
+    ' 現在は使っていないため，すべての種類を処理対象とする「ALL」を指定している
+    inner_SelectedFileType = "ALL"
   End With
 End Sub
 
@@ -64,22 +66,5 @@ Private Function getCompanyID(name As String)
 
   With Worksheets(sheets.TeamCodePage)
     getCompanyID = WorksheetFunction.VLookup(name, .Range("H3:I21"), 2, False)
-  End With
-End Function
-
-Private Function SetFileType() As String
-  Dim sheets As SheetObj
-  Set sheets = New SheetObj
-
-  With Worksheets(sheets.FirstInputPage)
-    If (.AllFilesBtn.Value = True) Then
-      SetFileType = "ALL"
-    ElseIf (.OnlyPDFBtn.Value = True) Then
-      SetFileType = "PDF"
-    ElseIf (.OnlyCADBtn.Value = True) Then
-      SetFileType = "CAD"
-    Else
-      SetFileType = "undefined"
-    End If
   End With
 End Function
