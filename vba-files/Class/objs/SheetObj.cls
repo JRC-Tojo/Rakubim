@@ -23,7 +23,7 @@ Public Property Get RenamePage() As String
 End Property
 
 Public Property Get DataTablePage() As String
-  DataTablePage = "リンク表"
+  DataTablePage = "データファイル説明書"
 End Property
 
 Public Property Get TeamCodePage() As String

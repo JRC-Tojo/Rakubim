@@ -138,7 +138,7 @@ Function getRanameFileCounts()
   End With
 End Function
 
-' リンク表の行数を返す
+' データファイル説明書の行数を返す
 Function getTableCols()
   Dim sheets As SheetObj
   Set sheets = New SheetObj

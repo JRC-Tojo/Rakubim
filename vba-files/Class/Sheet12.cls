@@ -7,9 +7,9 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
-' 最終的な成果物であるリンク表の作成
+' 最終的な成果物であるデータファイル説明書の作成
 Sub GenerateTableBtn_Click()
-  ' name2oldPは0番目がPDFのリンク表、1番目がDWGのリンク表となっている
+  ' name2oldPは0番目がPDFのデータファイル説明書、1番目がDWGのデータファイル説明書となっている
   Dim name2oldP As Variant
   Dim name2ID As Object
   Dim oldP2newP As Object
@@ -20,7 +20,7 @@ Sub GenerateTableBtn_Click()
   
   If checkFill4File() And checkFill4Mokuroku() Then
     ' 前のデータをリセット
-    Call ResetData("リンク表", "A2:F" & getTableCols() + 2)
+    Call ResetData("データファイル説明書", "A2:F" & getTableCols() + 2)
     
     name2oldP = getRelationName2OldPath()
     Set name2ID = getRelationName2ID()
@@ -34,7 +34,7 @@ Sub GenerateTableBtn_Click()
   End If
 End Sub
 
-' 生成したリンク表を別のExcelに吐き出す
+' 生成したデータファイル説明書を別のExcelに吐き出す
 Private Sub OutputData_Click()
   ' ①変数定義
   Dim tmpRng As Range
@@ -44,7 +44,7 @@ Private Sub OutputData_Click()
   Set systemIds = New SystemIdObj
   
   ' ②範囲指定
-  sheets("リンク表").Range("A:F").Select
+  sheets("データファイル説明書").Range("A:F").Select
   Set tmpRng = Selection
   
   ' ③ファイルの新規作成
@@ -64,6 +64,6 @@ Private Sub OutputData_Click()
   
   ' ⑦ファイルを閉じる
   ActiveWorkbook.Close
-  sheets("リンク表").Range("A1").Select
+  sheets("データファイル説明書").Range("A1").Select
 End Sub
 
