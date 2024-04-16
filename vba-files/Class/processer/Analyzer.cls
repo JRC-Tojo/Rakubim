@@ -13,7 +13,7 @@ Option Explicit
 Public inner_PaperNumbers As Collection
 Public inner_SnippedName As String
 Private inner_PaperPaths As Scripting.Dictionary
-Private Const inner_NumberPattern = "(((i‚»‚Ì[‚O-‚X]+j[`|]i‚»‚Ì[‚O-‚X]+j)|((i‚»‚Ì|i)[‚O-‚X]+[`|][‚O-‚X]+j)|(i‚»‚Ì|i)[‚O-‚X]+j))|[‚O-‚X]+$"
+Private Const inner_NumberPattern = "(((i‚»‚Ì[‚O-‚X]+j*[`|]i*‚»‚Ì[‚O-‚X]+j)|((i‚»‚Ì|i)[‚O-‚X]+[`|][‚O-‚X]+j)|(i‚»‚Ì|i)[‚O-‚X]+j))|[‚O-‚X]+$"
 
 
 Public Property Get PaperNumbers() As Collection
@@ -21,7 +21,7 @@ Public Property Get PaperNumbers() As Collection
 End Property
 
 Public Property Get SnippedName() As String
-  SnippedName = StrConv(inner_SnippedName, vbWide)
+  SnippedName = StrConv(inner_SnippedName, vbUpperCase)
 End Property
 
 Public Sub SetPaperInfo(paper As PaperObj)
@@ -33,13 +33,13 @@ Public Sub SetFileInfo(file As FileObj)
   Dim stem As String
   stem = Left(file.SourceName, Len(file.SourceName) - 4)
   
-  Call analyze(stem, file.FileType)
+  Call analyze(stem, file.fileType)
 End Sub
 
 ' –¼Ì‚ğ•ªÍ‚µ‚ÄƒNƒ‰ƒX‚ğì¬
 Private Sub analyze(ByVal path As String, Optional fileType As String = "")
   Set inner_PaperNumbers = getPaperNumber(path, fileType)
-  inner_SnippedName = getBluePrintName(path)
+  inner_SnippedName = getBluePrintName(StrConv(path, vbWide))
 End Sub
 
 ' ƒtƒ@ƒCƒ‹–¼‚©‚ç}–Ê‚Ì˜A”Ôi‚»‚Ì››j‚ğæ“¾
@@ -126,33 +126,20 @@ End Function
 Private Function getBluePrintName(ByVal fileName As String) As String
   Dim reg As RegExp
   Set reg = New RegExp
-  Dim matches As MatchCollection
+  Dim tmpName As String
   
-  ' •¶š‹æØ‚è
+  ' –`“ª‚Ì˜A”Ô‚ğœŠO
   With reg
-    .Pattern = "[Q@][^Q@]+"
+    .Pattern = "^([‚O-‚X]+[|Q@`]*)+"
     .Global = True
   End With
-  Set matches = reg.Execute(StrConv(fileName, vbWide))
+  tmpName = reg.Replace(fileName, "")
   
-  ' }–¼Œó•â‚ğ’Šo
-  Dim tmpName As String
-  If matches.Count > 0 Then
-    Dim i As Integer
-    For i = 0 To matches.Count - 1
-      If Not IsNumeric(matches(i)) Then
-        tmpName = tmpName & matches(i)
-      End If
-    Next i
-  Else
-    tmpName = StrConv(fileName, vbWide)
-  End If
-  
-  ' ”’l‚ğœŠO
+  ' ”’l‚Æ‚»‚ÌŒã‚ë‚É‚ ‚é•¶š‚ğœŠO
   Dim numReg As RegExp
   Set numReg = New RegExp
   With numReg
-    .Pattern = inner_NumberPattern
+    .Pattern = "(" & inner_NumberPattern & ").*"
     .Global = True
   End With
 
