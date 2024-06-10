@@ -1,9 +1,9 @@
 {
-  "files.encoding": "shiftjis",
   "files.exclude": {
     "**/~$*": true
   },
-  "[json]": {
-    "files.encoding": "utf8",
-  }
+  "[cls]": {
+    "files.encoding": "shiftjis",
+  },
+  "files.autoGuessEncoding": true
 }
