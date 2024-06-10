@@ -14,6 +14,8 @@ Sub ReadFileNamesBtn_Click()
   Dim paperCounter As Integer
   Dim matcher As Paper2FileMatcher
   Set matcher = New Paper2FileMatcher
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
   Dim paper As PaperObj
   Dim pdfPath As String
   Dim dwgPath As String
@@ -29,6 +31,11 @@ Sub ReadFileNamesBtn_Click()
               "2. 上記フォルダにファイルが格納されている" _
               ,,"らくびむ　- 探索エラー -"
     Exit Sub
+  End If
+
+  ' 図面番号が全く入っていないときには，一番最初を１番で補完する
+  If (Worksheets(sheets.MokurokuPage).Range("A2").Value = "") Then
+    Worksheets(sheets.MokurokuPage).Range("A2").Value = 1
   End If
     
   ' 目録を読み込み始める行番号
@@ -60,6 +67,13 @@ Sub ReadFileNamesBtn_Click()
     rowNum = rowNum + 1
     paperCounter = paperCounter + 1
   Loop
+
+  If (paper.GlobalNumber = "") Then
+    MsgBox "図面番号の補完に失敗しました．" & vbCrLf & _ 
+              "【番号をすべて入力】した後，「ファイル名変更」シートへ移動してください" _ 
+              ,,"らくびむ  - 補完エラー -"
+    End
+  End If
 End Sub
 
 
