@@ -82,14 +82,18 @@ End Sub
 ' }–Ê”Ô†‚ğ•âŠ®‚·‚é
 ' •âŠ®‚µ‚½”Ô†‚ğ–ß‚è’l‚Æ‚µ‚Ä•Ô‚·
 Private Function CompleteGlobalPaperNumber(rowNum As Integer) As String
+  Dim backId As Variant
   Dim nowId As Variant
   Dim sheets As SheetObj
   Set sheets = New SheetObj
 
   With Worksheets(sheets.MokurokuPage)
+    backId = .Cells(rowNum - 1, "A").Value
     nowId = .Cells(rowNum, "A").Value
-    If nowId = 0 Then
-      nowId = .Cells(rowNum - 1, "A").Value + 1
+    If nowId = "" Then
+      If IsNumeric(backId) And backId <> "" Then
+        nowId = backId + 1  
+      End If
     End If
   End With
   
