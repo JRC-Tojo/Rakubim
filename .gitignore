@@ -4,5 +4,6 @@ logs
 .gitignore
 secret/
 ~$*
+*.tmp
 
 /releases/
