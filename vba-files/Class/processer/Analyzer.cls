@@ -11,7 +11,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Public inner_PaperNumbers As Collection
-Public inner_AnalyzeName As String
+Private inner_SnippedName As String
 Private inner_PaperPaths As Scripting.Dictionary
 Private Const inner_NumberPattern = "(((i‚»‚Ì[‚O-‚X]+j*[`|]i*‚»‚Ì[‚O-‚X]+j)|((i‚»‚Ì|i)[‚O-‚X]+[`|][‚O-‚X]+j)|(i‚»‚Ì|i)[‚O-‚X]+j))|[‚O-‚X]+$"
 
@@ -21,13 +21,11 @@ Public Property Get PaperNumbers() As Collection
 End Property
 
 Public Property Get AnalyzeName() As String
-  ' –¼Ì‚Ì•ªÍ‚É—p‚¢‚é–¼Ì
-  AnalyzeName = StrConv(inner_AnalyzeName, vbUpperCase)
+  AnalyzeName = StrConv(StrConv(inner_SnippedName, vbUpperCase), vbWide)
 End Property
 
 Public Property Get SnippedName() As String
-  ' Œ³‚Ì–¼Ì‚©‚ç}–Ê–¼‚Ì‚İ‚ğØ‚èo‚µ‚½–¼Ì
-
+  SnippedName = inner_SnippedName
 End Property
 
 Public Sub SetPaperInfo(paper As PaperObj)
@@ -45,7 +43,7 @@ End Sub
 ' –¼Ì‚ğ•ªÍ‚µ‚ÄƒNƒ‰ƒX‚ğì¬
 Private Sub analyze(ByVal path As String, Optional fileType As String = "")
   Set inner_PaperNumbers = getPaperNumber(path, fileType)
-  inner_AnalyzeName = getBluePrintName(StrConv(path, vbWide))
+  inner_SnippedName = getBluePrintName(path)
 End Sub
 
 ' ƒtƒ@ƒCƒ‹–¼‚©‚ç}–Ê‚Ì˜A”Ôi‚»‚Ì››j‚ğæ“¾
@@ -136,7 +134,7 @@ Private Function getBluePrintName(ByVal fileName As String) As String
   
   ' –`“ª‚Ì˜A”Ô‚ğœŠO
   With reg
-    .Pattern = "^([‚O-‚X]+[|Q@`]*)+"
+    .Pattern = "^([‚O-‚X0-9]+[|Q@`\-_\s~]*)+"
     .Global = True
   End With
   tmpName = reg.Replace(fileName, "")
