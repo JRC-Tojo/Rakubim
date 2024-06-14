@@ -56,15 +56,15 @@ Private Function DropDuplicateName(fileObjCollection As Collection)
   Dim file As FileObj
   
   For Each file In fileObjCollection
-    If tmpDict.Exists(file.SnippedName) = True Then
+    If tmpDict.Exists(file.AnalyzeName) = True Then
       For Each tmpKey In dictKeys(file.PaperPaths)
-        Set tmpDict(file.SnippedName).PaperPaths = JointPaperPaths(tmpDict(file.SnippedName).PaperPaths, tmpKey, file.PaperPaths(tmpKey))
+        Set tmpDict(file.AnalyzeName).PaperPaths = JointPaperPaths(tmpDict(file.AnalyzeName).PaperPaths, tmpKey, file.PaperPaths(tmpKey))
       Next tmpKey
       For Each num In file.PaperNumbers
-        tmpDict(file.SnippedName).PaperNumbers.Add num
+        tmpDict(file.AnalyzeName).PaperNumbers.Add num
       Next num
     Else
-      tmpDict.Add file.SnippedName, file
+      tmpDict.Add file.AnalyzeName, file
     End If
   Next file
   

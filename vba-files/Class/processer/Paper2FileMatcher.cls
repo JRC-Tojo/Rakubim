@@ -74,8 +74,8 @@ Private Function getMatchFile(objs As Collection, paper As PaperObj) As FileObj
   For Each file In objs
     Set seq = New SequenceMatcher
     ' 目録名称から除外すべき名称とスペースを除去
-    paperName = inner_Cleaner.NameCleaner(paper.SnippedName)
-    fileName = inner_Cleaner.NameCleaner(file.SnippedName)
+    paperName = inner_Cleaner.NameCleaner(paper.AnalyzeName)
+    fileName = inner_Cleaner.NameCleaner(file.AnalyzeName)
     Call seq.set_seqs(paperName, fileName)
     
     ' マッチ率の記録
