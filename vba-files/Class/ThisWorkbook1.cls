@@ -35,14 +35,14 @@ Private Function CheckUpdate() As Boolean
   End If
 End Function
 
-  Private Function IsExecutable() As Boolean
-    If (ActiveWorkbook.path = UpdateCheckTargetPath) Then
-      Dim res As Long
-      res = MsgBox("「らくびむ」を配布元のフォルダで実行することはできません" & vbCrLf & _
-                    "作業中のフォルダやサーバーにコピーしてご利用ください", vbCritical, "らくびむ - 実行できません -")
-      
-      ' 保存確認のメッセージを表示せずにExcelを閉じる
-      Application.DisplayAlerts = False 
-      Application.Quit
-    End If
-  End Function
+Private Function IsExecutable() As Boolean
+  If (ActiveWorkbook.path = UpdateCheckTargetPath) Then
+    Dim res As Long
+    res = MsgBox("「らくびむ」を配布元のフォルダで実行することはできません" & vbCrLf & _
+                  "作業中のフォルダやサーバーにコピーしてご利用ください", vbCritical, "らくびむ - 実行できません -")
+    
+    ' 保存確認のメッセージを表示せずにExcelを閉じる
+    Application.DisplayAlerts = False 
+    Application.Quit
+  End If
+End Function
