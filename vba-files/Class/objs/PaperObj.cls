@@ -14,6 +14,8 @@ Option Explicit
 Private inner_SourceName As String
 ' 処理済みでマッチングに使う名称
 Private inner_AnalyzeName As String
+' 元の名称から図面名のみを切り出した名称
+Private inner_SnippedName As String
 ' 図面の連番
 Private inner_ContinuousNumber As Integer
 ' 図面番号
@@ -41,6 +43,10 @@ End Property
 
 Public Property Get AnalyzeName() As String
   AnalyzeName = inner_AnalyzeName
+End Property
+
+Public Property Get SnippedName() As String
+  SnippedName = inner_SnippedName
 End Property
 
 Public Property Get ContinuousNumber() As Integer
@@ -73,6 +79,7 @@ Public Sub InitPaperObj(ByVal rowNum As Integer, continuousNumber As Integer)
 
     inner_GlobalNumber = CompleteGlobalPaperNumber(rowNum)
     inner_AnalyzeName = analyzerObj.AnalyzeName
+    inner_SnippedName = analyzerObj.SnippedName
     inner_SpotNumber = analyzerObj.PaperNumbers(1)
     inner_PDFpath = .Cells(rowNum, "G").Value
     inner_CADpath = .Cells(rowNum, "H").Value
