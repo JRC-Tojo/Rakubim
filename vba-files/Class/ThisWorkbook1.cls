@@ -11,6 +11,8 @@ Attribute VB_Exposed = True
 Private Const UpdateCheckTargetPath = "L:\○鋼構造設計部共通フォルダ\業務改善ＷＳ\2023年度\■リリース版"
 
 Sub Workbook_Open()
+  Call IsExecutable
+
   SplashScreen.Show
 
   If (CheckUpdate() = True) Then
@@ -32,3 +34,15 @@ Private Function CheckUpdate() As Boolean
     CheckUpdate = False
   End If
 End Function
+
+  Private Function IsExecutable() As Boolean
+    If (ActiveWorkbook.path = UpdateCheckTargetPath) Then
+      Dim res As Long
+      res = MsgBox("「らくびむ」を配布元のフォルダで実行することはできません" & vbCrLf & _
+                    "作業中のフォルダやサーバーにコピーしてご利用ください", vbCritical, "らくびむ - 実行できません -")
+      
+      ' 保存確認のメッセージを表示せずにExcelを閉じる
+      Application.DisplayAlerts = False 
+      Application.Quit
+    End If
+  End Function
