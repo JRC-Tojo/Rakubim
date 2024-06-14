@@ -17,7 +17,7 @@ Private inner_Extension As String
 ' ファイルの元の名前
 Private inner_SourceName As String
 ' マッチング用の処理済みのファイル名
-Private inner_SnippedName As String
+Private inner_AnalyzeName As String
 ' 同一ファイルに格納している（その〇）に該当する番号
 Private inner_PaperNumbers As Collection
 ' PaperNumbersを使って図面データと突き合わせる用の辞書
@@ -44,8 +44,8 @@ Public Property Get SourceName() As String
   SourceName = inner_SourceName
 End Property
 
-Public Property Get SnippedName() As String
-  SnippedName = inner_SnippedName
+Public Property Get AnalyzeName() As String
+  AnalyzeName = inner_AnalyzeName
 End Property
 
 Public Property Get MatchedPaperIds() As Collection
@@ -81,7 +81,7 @@ Public Sub InitFileObj(ByVal fileName As String)
   Set analyzerObj = New Analyzer
   Call analyzerObj.SetFileInfo(Me)
 
-  inner_SnippedName = analyzerObj.SnippedName
+  inner_AnalyzeName = analyzerObj.AnalyzeName
   Set inner_PaperNumbers = analyzerObj.PaperNumbers
   ' 登録された番号の情報をもとに図面との突き合わせ用データを作成
   Call SetKeyPathRelation()

@@ -134,7 +134,7 @@ Private Function SetPaperNameText(file As FileObj)
   ' 図面名の重複を除外しながらユニークな図面名のリストを作成
   Dim i As Integer
   For i = 1 To file.MatchedPaperIds.Count
-    paperName = inner_Papers.Item(file.MatchedPaperIds(i)).SnippedName
+    paperName = inner_Papers.Item(file.MatchedPaperIds(i)).AnalyzeName
     paperName = TitleFormatter(paperName)
     If (Not HasItem(texts, paperName)) Then
       Call texts.Add(paperName)
