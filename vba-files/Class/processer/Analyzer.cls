@@ -13,7 +13,8 @@ Option Explicit
 Public inner_PaperNumbers As Collection
 Private inner_SnippedName As String
 Private inner_PaperPaths As Scripting.Dictionary
-Private Const inner_NumberPattern = "(((i‚»‚Ì[‚O-‚X]+j*[`|]i*‚»‚Ì[‚O-‚X]+j)|((i‚»‚Ì|i)[‚O-‚X]+[`|][‚O-‚X]+j)|(i‚»‚Ì|i)[‚O-‚X]+j))|[‚O-‚X]+$"
+' ‘SŠp”¼Šp—¼•û‚É‘Î‰‚µ‚½––”ö‚Ì”’lƒpƒ^[ƒ“
+Private Const inner_NumberPattern = "((([i(]‚»‚Ì[‚O-‚X0-9]+[j)]*[`|~-][i(]*‚»‚Ì[‚O-‚X0-9]+[j)])|(([i(]‚»‚Ì|[i(])[‚O-‚X0-9]+[`|~-][‚O-‚X0-9]+[j)])|([i(]‚»‚Ì|[i(])[‚O-‚X0-9]+[j)]))|[‚O-‚X0-9]+$"
 
 
 Public Property Get PaperNumbers() As Collection
@@ -134,7 +135,7 @@ Private Function getBluePrintName(ByVal fileName As String) As String
   
   ' –`“ª‚Ì˜A”Ô‚ğœŠO
   With reg
-    .Pattern = "^([‚O-‚X0-9]+[|Q@`\-_\s~]*)+"
+    .Pattern = "^([0-9‚O-‚X]+[|Q@`_\s~-]*)+"
     .Global = True
   End With
   tmpName = reg.Replace(fileName, "")
