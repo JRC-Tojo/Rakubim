@@ -8,7 +8,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 
-Private Const UpdateCheckTargetPath = "L:\○鋼構造設計部共通フォルダ\業務改善ＷＳ\2023年度\■リリース版"
+Private Const UpdateCheckTargetPath = "\\sv01f02\本社_技術本部共通\◆01　照査室\05_設計ツール\■09_成果品ファイル一括整理ツール"
 
 Sub Workbook_Open()
   Call IsExecutable
