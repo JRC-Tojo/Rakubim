@@ -15,7 +15,7 @@ Sub Workbook_Open()
 
   SplashScreen.Show
 
-  If (CheckUpdate() = True) Then
+  If (RequireUpdate() = True) Then
     Dim res As Long
     res = MsgBox("「らくびむ」の最新版がリリースされました" & vbCrLf & _ 
             "以下のフォルダから最新版をコピーしてご利用ください" & vbCrLf & vbCrLf & _ 
@@ -27,11 +27,20 @@ Sub Workbook_Open()
   End If
 End Sub
 
-Private Function CheckUpdate() As Boolean
-  If (Dir(UpdateCheckTargetPath & "\" & ActiveWorkBook.Name) = "") Then
-    CheckUpdate = True
+Private Function RequireUpdate() As Boolean
+  Dim objFSO As FileSystemObject
+  Set objFSO = New FileSystemObject
+  ' アップデートの保存先が見つからない場合はアップデートチェックを行わない
+  If Not objFSO.FolderExists(UpdateCheckTargetPath) Then
+    RequireUpdate = False
+    Exit Function
+  End If
+
+  ' アップデートの保存先に自分自身と同じ名前のファイルがないときには，新しいバージョンが来たと判断する
+  If Not objFSO.FileExists(UpdateCheckTargetPath & "\" & ActiveWorkbook.name) Then
+    RequireUpdate = True
   Else
-    CheckUpdate = False
+    RequireUpdate = False
   End If
 End Function
 
