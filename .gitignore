@@ -7,3 +7,9 @@ secret/
 *.tmp
 
 /releases/
+
+# ignore test case files
+/CAD/
+/PDF/
+/_CAD/
+/_PDF/
