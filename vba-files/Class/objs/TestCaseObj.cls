@@ -91,7 +91,10 @@ Private Sub CreateTestCaseFiles()
       Case "dwg"
         objFSO.CreateTextFile(ActiveWorkbook.path & "\CAD\" & fileName)
       Case Else 
-        Debug.Print("Unkown extension")
+        ' どこからも使わないであろうファイルはPDF，CADの両方に記載しておいて，
+        ' 「マッチングしないこと」を確認する
+        objFSO.CreateTextFile(ActiveWorkbook.path & "\PDF\" & fileName)
+        objFSO.CreateTextFile(ActiveWorkbook.path & "\CAD\" & fileName)
     End Select
   Next fileName 
 End Sub
