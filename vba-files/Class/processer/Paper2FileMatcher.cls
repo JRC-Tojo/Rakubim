@@ -23,7 +23,7 @@ Private Sub class_initialize()
   ' 図面目録で重複しているワードを除去するためのクリーナーを定義
   Dim sheet As SheetObj
   Set sheet = New SheetObj
-  Call inner_Cleaner.AnalyzeNames(Range2Collection(sheet.MokurokuPage, "B2:B10000"))
+  Call inner_Cleaner.AnalyzeNames(Range2Collection(Worksheets(sheet.MokurokuPage), "B2:B10000"))
 
   ' 処理対象とするファイル群を取得
   Set inner_PDFs = IIf(inner_SystemIds.SelectedFileType <> "CAD", GetFileCollection("PDF"), New Collection)

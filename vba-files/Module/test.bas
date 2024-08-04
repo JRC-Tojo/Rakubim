@@ -130,7 +130,7 @@ End Sub
 Sub CleanerTest()
   Dim cleaner As FileNameCleaner
   Set cleaner = New FileNameCleaner
-  Call cleaner.AnalyzeNames(Range2Collection("–Ú˜^“ü—Í", "B2:B1000"))
+  Call cleaner.AnalyzeNames(Range2Collection(Worksheets("–Ú˜^“ü—Í"), "B2:B1000"))
 
   Debug.Print cleaner.NameCleaner("P3-P4ƒ‰[ƒƒ“ P4‹´‹r ’†‘w—ÀÚ×}i‚»‚Ì‚Pj")
 End Sub
