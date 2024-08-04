@@ -12,7 +12,7 @@ Option Explicit
 
 ' ファイルの種類（PDF｜CAD）
 Private inner_FileType As String
-' 拡張子
+' 拡張子（ex: anyFile.pdf -> pdf）
 Private inner_Extension As String
 ' ファイルの元の名前
 Private inner_SourceName As String
