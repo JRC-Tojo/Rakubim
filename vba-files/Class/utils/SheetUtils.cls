@@ -11,15 +11,17 @@ Attribute VB_Exposed = False
 Option Explicit
 
 ' ”ÍˆÍw’è‚µ‚½ƒZƒ‹‚ÉŠi”[‚³‚ê‚½î•ñ‚ğCollection‚Å•Ô‚·
-Public Function Range2Collection(sheetName As String, rangeArg As String) As Collection
+Public Function Range2Collection(ws As Worksheet, rangeArg As String, Optional ignoreEmptyCell As Boolean = True) As Collection
   Dim coll As Collection
   Set coll = New Collection
 
   Dim item As Variant
-  With Worksheets(sheetName)
+  With ws
     For Each item In .Range(rangeArg)
       If item <> "" Then
         coll.Add item
+      ElseIf Not ignoreEmptyCell Then
+        coll.Add ""
       End If
     Next
   End With

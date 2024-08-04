@@ -72,7 +72,7 @@ Public Function dwgRenamer(writeIdx As Integer)
   Set dwgObjs = GetDWGCollection()
   
   ' 図面目録で重複しているワードを除去する
-  Call cleaner.AnalyzeNames(Range2Collection("目録入力", "B2:B1000"))
+  Call cleaner.AnalyzeNames(Range2Collection(Worksheets("目録入力"), "B2:B1000"))
   
   ' 目録を読み込み始める行番号
   readIdx = INIT_ROWNUM_MOKUROKU
