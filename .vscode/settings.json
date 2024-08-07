@@ -2,5 +2,6 @@
   "files.exclude": {
     "**/~$*": true
   },
+  "files.encoding": "shiftjis",
   "files.autoGuessEncoding": true
 }
