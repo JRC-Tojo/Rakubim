@@ -34,6 +34,9 @@ Sub ReadFileNamesBtn_Click()
     Exit Sub
   End If
 
+  ' Matcher‚É•K—v‚È}–Ê–¼Ì‚Ìˆê——‚ğ“o˜^‚·‚é
+  matcher.InitMatcher(Range2Collection(Worksheets(sheets.MokurokuPage), "B2:B10000"))
+
   ' }–Ê”Ô†‚ª‘S‚­“ü‚Á‚Ä‚¢‚È‚¢‚Æ‚«‚É‚ÍCˆê”ÔÅ‰‚ğ‚P”Ô‚Å•âŠ®‚·‚é
   If (Worksheets(sheets.MokurokuPage).Range("A2").Value = "") Then
     Worksheets(sheets.MokurokuPage).Range("A2").Value = 1

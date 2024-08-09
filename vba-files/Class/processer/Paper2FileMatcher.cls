@@ -18,12 +18,6 @@ Private inner_DWGs As Collection
 
 Private Sub class_initialize()
   Set inner_SystemIds = New SystemIdObj
-  Set inner_Cleaner = New FileNameCleaner
-
-  ' 図面目録で重複しているワードを除去するためのクリーナーを定義
-  Dim sheet As SheetObj
-  Set sheet = New SheetObj
-  Call inner_Cleaner.AnalyzeNames(Range2Collection(Worksheets(sheet.MokurokuPage), "B2:B10000"))
 
   ' 処理対象とするファイル群を取得
   Set inner_PDFs = IIf(inner_SystemIds.SelectedFileType <> "CAD", GetFileCollection("PDF"), New Collection)
@@ -34,6 +28,14 @@ Private Sub class_initialize()
     Set inner_ContinuousPDF = SearchMostNumbersFile()
   End If
 End Sub
+
+' Matcherが初期化で必要とする情報を登録
+Public Function InitMatcher(paperNames As Collection)
+  Set inner_Cleaner = New FileNameCleaner
+
+  ' 図面目録で重複しているワードを除去するためのクリーナーを定義
+  Call inner_Cleaner.AnalyzeNames(paperNames)
+End Function
 
 
 ' 読み込むべきフォルダが存在していることを確認
