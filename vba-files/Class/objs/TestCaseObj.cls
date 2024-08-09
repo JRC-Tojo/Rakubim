@@ -10,65 +10,72 @@ Attribute VB_Exposed = False
 
 Option Explicit
 
-' ƒeƒXƒgƒP[ƒX–¼
+' ãƒ†ã‚¹ãƒˆã‚±ãƒ¼ã‚¹å
 Private inner_testCaseFileName As String
-' ‹Œ–¼Ì‚Ìƒtƒ@ƒCƒ‹ˆê——
-Private inner_oldFileNames As Collection
-' V–¼Ì‚Ìƒtƒ@ƒCƒ‹ˆê——
-Private inner_newFileNames As Collection
-' }–¼ˆê——
+' æ—§åç§°ã®ãƒ•ã‚¡ã‚¤ãƒ«ä¸€è¦§
+Private inner_oldPdfNames As Collection
+Private inner_oldDwgNames As Collection
+' æ–°åç§°ã®ãƒ•ã‚¡ã‚¤ãƒ«ä¸€è¦§
+Private inner_newPdfNames As Collection
+Private inner_newDwgNames As Collection
+' å›³åä¸€è¦§
 Private inner_paperNames As Collection
 
-' TestCaseObj‚Ì‰Šú‰»
+' TestCaseObjã®åˆæœŸåŒ–
 Public Function InitTestCase(testCaseFileName As String)
   inner_testCaseFileName = testCaseFileName
   
-  ' ƒeƒXƒgƒP[ƒX‚ğæ“¾
+  ' ãƒ†ã‚¹ãƒˆã‚±ãƒ¼ã‚¹ã‚’å–å¾—
   Call SetInnerVals()
-  ' ƒeƒXƒgƒP[ƒX‚ğ‘‚«o‚µ
+  ' ãƒ†ã‚¹ãƒˆã‚±ãƒ¼ã‚¹ã‚’æ›¸ãå‡ºã—
   Call CreateTestCaseFiles()
 End Function
 
-' ƒeƒXƒgŒ‹‰Ê‚ğ•\¦
+' ãƒ†ã‚¹ãƒˆçµæœã‚’è¡¨ç¤º
 Private  Function GetSummary()
-  ' ƒ}ƒbƒ`ƒ“ƒO
+  ' ãƒãƒƒãƒãƒ³ã‚°
   Call MatchPaper2File()
-  ' ƒŠƒl[ƒ€
+  ' ãƒªãƒãƒ¼ãƒ 
   Call CorrectRenameFiles()
 End Function
 
 
-' ƒtƒ@ƒCƒ‹–¼ˆê——‚â}–¼ˆê——‚ğæ“¾
+' ãƒ•ã‚¡ã‚¤ãƒ«åä¸€è¦§ã‚„å›³åä¸€è¦§ã‚’å–å¾—
 Private Sub SetInnerVals()
   Dim ExcelApp As New Application
   Dim wb As Workbook
 
-  'ƒGƒNƒZƒ‹‚ğ•s‰Â‹‚ÅŠJ‚­
-  ExcelApp.Visible = False      'ƒGƒNƒZƒ‹‰Â‹/•s‰Â‹İ’è
-  ExcelApp.DisplayAlerts = False      'ŒxƒƒbƒZ[ƒW‚ğƒIƒt
+  'ã‚¨ã‚¯ã‚»ãƒ«ã‚’ä¸å¯è¦–ã§é–‹ã
+  ExcelApp.Visible = False      'ã‚¨ã‚¯ã‚»ãƒ«å¯è¦–/ä¸å¯è¦–è¨­å®š
+  ExcelApp.DisplayAlerts = False      'è­¦å‘Šãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ã‚ªãƒ•
   Set wb = ExcelApp.Workbooks.Open(ActiveWorkbook.path & "\testCases\" & inner_testCaseFileName, , True)
 
   ' utils
   Dim sUtill As SheetUtils
   Set sUtill = New SheetUtils
 
-  ' ‹Œ–¼Ì‚Ìƒtƒ@ƒCƒ‹ˆê——
-  Set inner_oldFileNames = sUtill.Range2Collection(wb.Worksheets("sheet1"), "A2:A10000")
+  ' å›³é¢ã¨ãƒ•ã‚¡ã‚¤ãƒ«ã®å¯¾å¿œé–¢ä¿‚ã‚’è¨˜éŒ²ã—ã¦ã„ã‚‹ã‚·ãƒ¼ãƒˆ
+  Const targetSheetName = "å›³é¢ãƒ•ã‚¡ã‚¤ãƒ«å¯¾å¿œä¸€è¦§"
 
-  ' }–¼ˆê——
-  Set inner_paperNames = sUtill.Range2Collection(wb.Worksheets("sheet1"), "B2:B" & inner_oldFileNames.Count + 1, False)
+  ' æ—§åç§°ã®ãƒ•ã‚¡ã‚¤ãƒ«ä¸€è¦§ï¼ˆç¢ºå®Ÿã«ã™ã¹ã¦ã®ãƒ‡ãƒ¼ã‚¿ãŒåŸ‹ã¾ã£ã¦ã„ã‚‹ãŸã‚ï¼Œå…ˆè¡Œã—ã¦å–å¾—ã™ã‚‹ï¼‰
+  Set inner_oldPdfNames = sUtill.Range2Collection(wb.Worksheets(targetSheetName), "B2:B10000")
+  Set inner_oldDwgNames = sUtill.Range2Collection(wb.Worksheets(targetSheetName), "D2:D" & inner_oldPdfNames.Count + 1, False)
   
-  ' V–¼Ì‚Ìƒtƒ@ƒCƒ‹ˆê——
-  Set inner_newFileNames = sUtill.Range2Collection(wb.Worksheets("sheet1"), "C2:C" & inner_oldFileNames.Count + 1, False)
+  ' æ–°åç§°ã®ãƒ•ã‚¡ã‚¤ãƒ«ä¸€è¦§
+  Set inner_newPdfNames = sUtill.Range2Collection(wb.Worksheets(targetSheetName), "C2:C" & inner_oldPdfNames.Count + 1, False)
+  Set inner_newDwgNames = sUtill.Range2Collection(wb.Worksheets(targetSheetName), "E2:E" & inner_oldPdfNames.Count + 1, False)
+
+  ' å›³åä¸€è¦§
+  Set inner_paperNames = sUtill.Range2Collection(wb.Worksheets(targetSheetName), "A2:A" & inner_oldPdfNames.Count + 1, False)
 End Sub
 
-' ƒeƒXƒgƒP[ƒXˆê——‚©‚çÀÛ‚Ìƒtƒ@ƒCƒ‹‚ğ¶¬
-' ¶¬‚ÉŠù‘¶‚Ìƒtƒ@ƒCƒ‹‚ª‚ ‚éê‡‚Í‚±‚ê‚ç‚ğíœ
+' ãƒ†ã‚¹ãƒˆã‚±ãƒ¼ã‚¹ä¸€è¦§ã‹ã‚‰å®Ÿéš›ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ç”Ÿæˆ
+' ç”Ÿæˆæ™‚ã«æ—¢å­˜ã®ãƒ•ã‚¡ã‚¤ãƒ«ãŒã‚ã‚‹å ´åˆã¯ã“ã‚Œã‚‰ã‚’å‰Šé™¤
 Private Sub CreateTestCaseFiles()
   Dim objFSO As FileSystemObject
   Set objFSO = New FileSystemObject
 
-  ' Šù‘¶‚ÌƒeƒXƒgƒP[ƒX‚ğíœ
+  ' æ—¢å­˜ã®ãƒ†ã‚¹ãƒˆã‚±ãƒ¼ã‚¹ã‚’å‰Šé™¤
   If (objFSO.FolderExists(ActiveWorkbook.path & "\PDF")) Then
     objFSO.DeleteFolder(ActiveWorkbook.path & "\PDF")
   End If
@@ -79,35 +86,25 @@ Private Sub CreateTestCaseFiles()
   End If
   objFSO.CreateFolder(ActiveWorkbook.path & "\CAD")
 
-  ' ƒtƒ@ƒCƒ‹‚ğV‹Kì¬
+  ' ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æ–°è¦ä½œæˆ
   Dim fileName As Variant
-  For Each fileName In inner_oldFileNames
-    Dim fileExt As String
-    fileExt = StrConv(Right(fileName, 3), vbLowerCase)
-
-    Select Case fileExt 
-      Case "pdf" 
-        objFSO.CreateTextFile(ActiveWorkbook.path & "\PDF\" & fileName)
-      Case "dwg"
-        objFSO.CreateTextFile(ActiveWorkbook.path & "\CAD\" & fileName)
-      Case Else 
-        ' ‚Ç‚±‚©‚ç‚àg‚í‚È‚¢‚Å‚ ‚ë‚¤ƒtƒ@ƒCƒ‹‚ÍPDFCCAD‚Ì—¼•û‚É‹LÚ‚µ‚Ä‚¨‚¢‚ÄC
-        ' uƒ}ƒbƒ`ƒ“ƒO‚µ‚È‚¢‚±‚Æv‚ğŠm”F‚·‚é
-        objFSO.CreateTextFile(ActiveWorkbook.path & "\PDF\" & fileName)
-        objFSO.CreateTextFile(ActiveWorkbook.path & "\CAD\" & fileName)
-    End Select
+  For Each fileName In inner_oldPdfNames
+    objFSO.CreateTextFile(ActiveWorkbook.path & "\PDF\" & fileName)
+  Next fileName 
+  For Each fileName In inner_oldDwgNames
+    objFSO.CreateTextFile(ActiveWorkbook.path & "\CAD\" & fileName)
   Next fileName 
 End Sub
 
 
 
-' }–Ê–¼‚ÆÀÛ‚Ìƒtƒ@ƒCƒ‹‚ª³‚µ‚­ƒ}ƒbƒ`‚·‚é‚©
+' å›³é¢åã¨å®Ÿéš›ã®ãƒ•ã‚¡ã‚¤ãƒ«ãŒæ­£ã—ããƒãƒƒãƒã™ã‚‹ã‹
 Private Sub MatchPaper2File(matcher As Paper2FileMatcher, paper As PaperObj, correctFile As String)
-  ' TODO: À‘•
+  ' TODO: å®Ÿè£…
 End Sub
 
   
-' ƒtƒ@ƒCƒ‹‚ª³‚µ‚­ƒŠƒl[ƒ€‚³‚ê‚é‚©
+' ãƒ•ã‚¡ã‚¤ãƒ«ãŒæ­£ã—ããƒªãƒãƒ¼ãƒ ã•ã‚Œã‚‹ã‹
 Private Sub CorrectRenameFiles()
-  ' TODO: À‘•
+  ' TODO: å®Ÿè£…
 End Sub
