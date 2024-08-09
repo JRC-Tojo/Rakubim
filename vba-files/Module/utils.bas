@@ -19,23 +19,6 @@ Function Equal(ParamArray arr() As Variant) As Boolean
   Equal = True
 End Function
 
-' ”ÍˆÍw’è‚µ‚½ƒZƒ‹‚ÉŠi”[‚³‚ê‚½î•ñ‚ğCollection‚Å•Ô‚·
-Function Range2Collection(sheetName As String, rangeArg As String) As Collection
-  Dim coll As Collection
-  Set coll = New Collection
-
-  Dim item As Variant
-  With Worksheets(sheetName)
-    For Each item In .Range(rangeArg)
-      If item <> "" Then
-        coll.Add item
-      End If
-    Next
-  End With
-
-  Set Range2Collection = coll
-End Function
-
 
 ' w’è‚µ‚½”ÍˆÍ‚ÉŠiq‚ğ•`‰æ‚·‚é
 Function MakeLattice(workSheetName As String, startCell As String, endCell As String)
