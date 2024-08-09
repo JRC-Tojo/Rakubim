@@ -22,10 +22,6 @@ Private inner_ContinuousNumber As Integer
 Private inner_GlobalNumber As String
 ' （その〇）にあたる番号
 Private inner_SpotNumber As Integer
-' PDFの列に記載されたパス
-Private inner_PDFpath As String
-' CADの列に記載されたパス
-Private inner_CADpath As String
 
 Private Sub class_initialize()
 
@@ -65,44 +61,16 @@ Public Property Get SpotNumber() As Integer
 End Property
 
 ' 指定した行数にあるデータから図面Objectを作成する
-Public Sub InitPaperObj(ByVal rowNum As Integer, continuousNumber As Integer)
+Public Sub InitPaperObj(paperName As String, continuousNumber As Integer, globalNumber As String)
   Dim analyzerObj As Analyzer
   Set analyzerObj = New Analyzer
-  Dim sheets As SheetObj
-  Set sheets = New SheetObj
 
-  inner_ContinuousNumber = continuousNumber
+  inner_SourceName = paperName
+  inner_ContinuousNumber = continuousNumber  
+  inner_GlobalNumber = globalNumber
   
-  With Worksheets(sheets.MokurokuPage)
-    inner_SourceName = .Cells(rowNum, "B").Value
-    Call analyzerObj.SetPaperInfo(Me)
-
-    inner_GlobalNumber = CompleteGlobalPaperNumber(rowNum)
-    inner_AnalyzeName = analyzerObj.AnalyzeName
-    inner_SnippedName = analyzerObj.SnippedName
-    inner_SpotNumber = analyzerObj.PaperNumbers(1)
-    inner_PDFpath = .Cells(rowNum, "G").Value
-    inner_CADpath = .Cells(rowNum, "H").Value
-  End With
+  Call analyzerObj.SetPaperInfo(Me)
+  inner_AnalyzeName = analyzerObj.AnalyzeName
+  inner_SnippedName = analyzerObj.SnippedName
+  inner_SpotNumber = analyzerObj.PaperNumbers(1)
 End Sub
-
-' 図面番号を補完する
-' 補完した番号を戻り値として返す
-Private Function CompleteGlobalPaperNumber(rowNum As Integer) As String
-  Dim backId As Variant
-  Dim nowId As Variant
-  Dim sheets As SheetObj
-  Set sheets = New SheetObj
-
-  With Worksheets(sheets.MokurokuPage)
-    backId = .Cells(rowNum - 1, "A").Value
-    nowId = .Cells(rowNum, "A").Value
-    If nowId = "" Then
-      If IsNumeric(backId) And backId <> "" Then
-        nowId = backId + 1  
-      End If
-    End If
-  End With
-  
-  CompleteGlobalPaperNumber = CStr(nowId)
-End Function
