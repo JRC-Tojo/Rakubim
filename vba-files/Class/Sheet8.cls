@@ -16,6 +16,8 @@ Sub ReadFileNamesBtn_Click()
   Set matcher = New Paper2FileMatcher
   Dim sheets As SheetObj
   Set sheets = New SheetObj
+  Dim sUtill As SheetUtils
+  Set sUtill = New SheetUtils
   Dim paper As PaperObj
   Dim paperNumber As String
   Dim pdfPath As String
@@ -35,7 +37,7 @@ Sub ReadFileNamesBtn_Click()
   End If
 
   ' Matcher‚É•K—v‚È}–Ê–¼Ì‚Ìˆê——‚ğ“o˜^‚·‚é
-  matcher.InitMatcher(Range2Collection(Worksheets(sheets.MokurokuPage), "B2:B10000"))
+  Call matcher.InitMatcher(sUtill.Range2Collection(Worksheets(sheets.MokurokuPage), "B2:B10000"))
 
   ' }–Ê”Ô†‚ª‘S‚­“ü‚Á‚Ä‚¢‚È‚¢‚Æ‚«‚É‚ÍCˆê”ÔÅ‰‚ğ‚P”Ô‚Å•âŠ®‚·‚é
   If (Worksheets(sheets.MokurokuPage).Range("A2").Value = "") Then
