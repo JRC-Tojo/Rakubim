@@ -14,6 +14,6 @@ Public Sub SummaryMatchingTests()
     testObj.InitTestCase(objFile.Name)
 
     ' テスト結果をDebug.Printで表示する
-    ' testObj.GetSummary()
+    Call testObj.GetSummary
   Next
 End Sub
