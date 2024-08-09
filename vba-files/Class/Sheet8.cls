@@ -17,6 +17,7 @@ Sub ReadFileNamesBtn_Click()
   Dim sheets As SheetObj
   Set sheets = New SheetObj
   Dim paper As PaperObj
+  Dim paperNumber As String
   Dim pdfPath As String
   Dim dwgPath As String
   
@@ -52,10 +53,13 @@ Sub ReadFileNamesBtn_Click()
       If spaceCounter = 3 Then Exit Do
     Else
       spaceCounter = 0
+
+      ' }–Ê”Ô†‚ğ•âŠ®
+      paperNumber = CompleteGlobalPaperNumber(rowNum)
       
       ' PaperObj‚ğéŒ¾
       Set paper = New PaperObj
-      Call paper.InitPaperObj(rowNum, paperCounter)
+      Call paper.InitPaperObj(Worksheets(sheets.MokurokuPage).Cells(rowNum, "B").Value, paperCounter, paperNumber)
       pdfPath = matcher.GetBestFile(paper, "PDF")
       dwgPath = matcher.GetBestFile(paper, "CAD")
       
@@ -98,3 +102,25 @@ Private Sub ResetMokuroku(leftRight As String)
     Call ResetData(sheets.MokurokuPage, "G" & INIT_ROWNUM_MOKUROKU & ":H10000")
   End If
 End Sub
+
+
+' }–Ê”Ô†‚ğ•âŠ®‚·‚é
+' •âŠ®‚µ‚½”Ô†‚ğ–ß‚è’l‚Æ‚µ‚Ä•Ô‚·
+Private Function CompleteGlobalPaperNumber(rowNum As Integer) As String
+  Dim backId As Variant
+  Dim nowId As Variant
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
+
+  With Worksheets(sheets.MokurokuPage)
+    backId = .Cells(rowNum - 1, "A").Value
+    nowId = .Cells(rowNum, "A").Value
+    If nowId = "" Then
+      If IsNumeric(backId) And backId <> "" Then
+        nowId = backId + 1  
+      End If
+    End If
+  End With
+  
+  CompleteGlobalPaperNumber = CStr(nowId)
+End Function

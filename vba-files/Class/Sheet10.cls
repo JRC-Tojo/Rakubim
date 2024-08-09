@@ -57,7 +57,7 @@ Private Sub ReadMokurokuInput(creater As NewNameCreater)
         
         ' PaperObj‚ğéŒ¾
         Set paper = New PaperObj
-        Call paper.InitPaperObj(rowNum, paperCounter)
+        Call paper.InitPaperObj(.Cells(rowNum, "B").Value, paperCounter, .Cells(rowNum, "A").Value)
         Call creater.Papers.Add(paper.Id, paper)
         ' FileObj‚ğ\’z
         Set pdfFile = New FileObj
