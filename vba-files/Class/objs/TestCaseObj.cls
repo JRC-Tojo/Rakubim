@@ -205,20 +205,28 @@ End Function
 ' ファイルが正しくリネームされるか
 Private Sub CorrectRenameFiles(creater As NewNameCreater)
   Dim i As Integer
-  Dim targetFileName As String
-  
-  ' 先にPDFの一覧が来た後にCADの一覧がNewNamesに格納されている
-  For i = 1 To creater.NewNames.Count
-    ' 正解となる新規名称を指定
-    If (i <= inner_newPdfNames.Count) Then
-      targetFileName = inner_newPdfNames.Item(i)
-    Else
-      targetFileName = inner_newDwgNames.Item(i - inner_newPdfNames.Count)
-    End If
+  Dim old2newNames As Scripting.Dictionary
+  Set old2newNames = New Scripting.Dictionary
+  Dim oldNames As Collection
+  Set oldNames = creater.OldNames
+  Dim newNames As Collection
+  Set newNames = creater.NewNames
 
-    ' チェック
-    If (creater.NewNames.Item(i) <> targetFileName) Then
-      Debug.Print "Invalid Rename (" & targetFileName & ") : Expected -> " & targetFileName & " | Received -> " & creater.NewNames.Item(i)
+  ' 旧ファイル名 -> 新ファイル名 の辞書を作成
+  For i = 1 To oldNames.Count
+    Call old2newNames.Add(oldNames.Item(i), newNames.Item(i))
+  Next i
+  
+  ' PDFのリネームチェック
+  For i = 1 To inner_oldPdfNames.Count
+    If (inner_newPdfNames.Item(i) <> old2newNames(CStr(inner_oldPdfNames.Item(i)))) Then
+      Debug.Print "Invalid Rename (" & inner_newPdfNames.Item(i) & ") : Expected -> " & inner_newPdfNames.Item(i) & " | Received -> " & old2newNames(CStr(inner_oldPdfNames.Item(i)))
+    End If
+  Next i
+  ' CADのリネームチェック
+  For i = 1 To inner_oldDwgNames.Count
+    If (inner_newDwgNames.Item(i) <> old2newNames(CStr(inner_oldDwgNames.Item(i)))) Then
+      Debug.Print "Invalid Rename (" & inner_newDwgNames.Item(i) & ") : Expected -> " & inner_newDwgNames.Item(i) & " | Received -> " & old2newNames(CStr(inner_oldDwgNames.Item(i)))
     End If
   Next i
 End Sub
