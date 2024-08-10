@@ -11,7 +11,7 @@ Public Sub SummaryMatchingTests()
     Set testObj = New TestCaseObj
 
     ' テストの準備
-    testObj.InitTestCase(objFile.Name)
+    Call testObj.InitTestCase(objFile.Name)
 
     ' テスト結果をDebug.Printで表示する
     Call testObj.GetSummary
