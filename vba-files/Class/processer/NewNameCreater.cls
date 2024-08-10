@@ -19,11 +19,12 @@ Private Sub class_initialize()
   Set inner_RenamePDFFiles = New Scripting.Dictionary
   Set inner_RenameCADFiles = New Scripting.Dictionary
   Set inner_Papers = New Scripting.Dictionary
-
-  Dim systemObj As SystemIdObj
-  Set systemObj = New SystemIdObj
-  inner_FixedHeadName = systemObj.CompanyID & "-" & systemObj.ProjectID & "-" & systemObj.StructureID
 End Sub
+
+' Creater‚ª‰Šú‰»‚Å•K—v‚Æ‚·‚éî•ñ‚ğ“o˜^
+Public Function InitCreater(companyId As String, projectId As String, structureId As String)
+  inner_FixedHeadName = companyId & "-" & projectId & "-" & structureId
+End Function
 
 Public Property Get Papers() As Scripting.Dictionary
   Set Papers = inner_Papers

@@ -9,15 +9,20 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 ' ファイル名変更タブを作成
 Sub GetFileNamesBtn_Click()
+  Dim systemSettings As SystemIdObj
+  Set systemSettings = New SystemIdObj
   Dim lastIdx As Integer: lastIdx = 1
   
   If checkFill4Mokuroku() Then
     ' 前のデータをリセット
     Call ResetData("ファイル名変更", "A2:B10000")
 
-    ' 入力情報の読み取り
+    ' 新ファイル名称の生成器を宣言
     Dim creater As NewNameCreater
     Set creater = New NewNameCreater
+    Call creater.InitCreater(systemSettings.CompanyID, systemSettings.ProjectID, systemSettings.StructureID)
+
+    ' 入力情報の読み取り
     Call ReadMokurokuInput(creater)
 
     ' 書き出し

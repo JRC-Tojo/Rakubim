@@ -42,27 +42,50 @@ End Function
 Public Function GetSummary()
   Dim matcher As Paper2FileMatcher
   Set matcher = New Paper2FileMatcher
+  Dim creater As NewNameCreater
+  Set creater = New NewNameCreater
 
   ' 図面一覧をMatcherに登録
   Call matcher.InitMatcher(inner_paperNames)
 
-  ' マッチング
+  ' createrに必要な情報を登録
+  Call creater.InitCreater(innerInfo_companyID, innerInfo_projectID, innerInfo_structureID)
+
   Dim i As Integer
+  Dim paper As PaperObj
   For i = 1 To inner_paperNames.Count
-    Call MatchPaper2File( _
-      matcher, _
-      inner_paperNames.Item(i), _
-      inner_paperNumbers.Item(i), _
-      i, _
-      inner_oldPdfNames.Item(i), _
-      inner_oldDwgNames.Item(i) _
-    )
+    ' 無効な図面以外をテスト
+    If (inner_paperNames.Item(i) <> "") Then
+      ' 図面データを宣言
+      Set paper = New PaperObj
+      Call paper.InitPaperObj( _
+        inner_paperNames.Item(i), _
+        i, _
+        inner_paperNumbers.Item(i) _
+      )
+    
+      ' マッチング
+      Call MatchPaper2File( _
+        matcher, _
+        paper, _
+        inner_oldPdfNames.Item(i), _
+        inner_oldDwgNames.Item(i) _
+      )
+    
+      ' リネームのためのCreaterを定義
+      Call SetDataForCreater( _
+        creater, _
+        paper, _
+        inner_oldPdfNames.Item(i), _
+        inner_oldDwgNames.Item(i) _
+      )
+    End If
   Next i
 
-  ' リネーム
-  ' Call CorrectRenameFiles()
+  ' リネーム結果の確認
+  Call CorrectRenameFiles(creater)
 
-  Debug.Print "All test cases are done"
+  Debug.Print "All test cases in " & inner_testCaseFileName & " are done"
 End Function
 
 
@@ -136,23 +159,10 @@ End Sub
 ' 図面名と実際のファイルが正しくマッチするか
 Private Sub MatchPaper2File( _
   matcher As Paper2FileMatcher, _
-  paperName As String, _
-  paperNumber As String, _
-  continuousNumber As Integer, _
+  paper As PaperObj, _
   correctPdfName As String, _
   correctDwgName As String _
 )
-  Dim paper As PaperObj
-  Set paper = New PaperObj
-
-  ' 無効な図面を除外
-  If (paperName = "") Then
-    Exit Sub
-  End If
-
-  ' 図面データを整理
-  Call paper.InitPaperObj(paperName, continuousNumber, paperNumber)
-
   ' マッチング結果を取得
   Dim pdfRes As String
   Dim dwgRes As String
@@ -161,15 +171,54 @@ Private Sub MatchPaper2File( _
 
   ' マッチング結果が間違っていた場合は当該ログを表示
   If (pdfRes <> correctPdfName) Then
-    Debug.Print "Invalid Matching (" & paperName & ") : Expected -> " & correctPdfName & " | Received -> " & pdfRes
+    Debug.Print "Invalid Matching (" & paper.SourceName & ") : Expected -> " & correctPdfName & " | Received -> " & pdfRes
   End If
   If (dwgRes <> correctDwgName) Then
-    Debug.Print "Invalid Matching (" & paperName & ") : Expected -> " & correctDwgName & " | Received -> " & dwgRes
+    Debug.Print "Invalid Matching (" & paper.SourceName & ") : Expected -> " & correctDwgName & " | Received -> " & dwgRes
   End If
 End Sub
 
   
+' リネームのためのオブジェクトにデータを登録
+Private Function SetDataForCreater( _
+  creater As NewNameCreater, _
+  paper As PaperObj, _
+  oldPdfName As String, _
+  oldDwgName As String _
+)
+  ' 図面を登録
+  Call creater.Papers.Add(paper.Id, paper)
+  
+  ' ファイルを登録
+  Dim cadFile As FileObj
+  Dim pdfFile As FileObj
+  Set pdfFile = New FileObj
+  Set cadFile = New FileObj
+  Call pdfFile.InitFileObj(oldPdfName)
+  Call cadFile.InitFileObj(oldDwgName)
+
+  Call creater.SetPDFFile(pdfFile, paper.Id)
+  Call creater.SetCADFile(cadFile, paper.Id)
+End Function
+
+
 ' ファイルが正しくリネームされるか
-Private Sub CorrectRenameFiles()
-  ' TODO: 実装
+Private Sub CorrectRenameFiles(creater As NewNameCreater)
+  Dim i As Integer
+  Dim targetFileName As String
+  
+  ' 先にPDFの一覧が来た後にCADの一覧がNewNamesに格納されている
+  For i = 1 To creater.NewNames.Count
+    ' 正解となる新規名称を指定
+    If (i <= inner_newPdfNames.Count) Then
+      targetFileName = inner_newPdfNames.Item(i)
+    Else
+      targetFileName = inner_newDwgNames.Item(i - inner_newPdfNames.Count)
+    End If
+
+    ' チェック
+    If (creater.NewNames.Item(i) <> targetFileName) Then
+      Debug.Print "Invalid Rename (" & targetFileName & ") : Expected -> " & targetFileName & " | Received -> " & creater.NewNames.Item(i)
+    End If
+  Next i
 End Sub
