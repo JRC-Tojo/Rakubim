@@ -10,6 +10,12 @@ Attribute VB_Exposed = False
 
 Option Explicit
 
+' 基本情報
+Private innerInfo_companyID As String
+Private innerInfo_projectID As String
+Private innerInfo_structureID As String
+Private innerInfo_designID As String
+Private innerInfo_useContinuousNumber As Boolean
 ' テストケース名
 Private inner_testCaseFileName As String
 ' 旧名称のファイル一覧
@@ -19,6 +25,7 @@ Private inner_oldDwgNames As Collection
 Private inner_newPdfNames As Collection
 Private inner_newDwgNames As Collection
 ' 図名一覧
+Private inner_paperNumbers As Collection
 Private inner_paperNames As Collection
 
 ' TestCaseObjの初期化
@@ -42,11 +49,20 @@ Public Function GetSummary()
   ' マッチング
   Dim i As Integer
   For i = 1 To inner_paperNames.Count
-    Call MatchPaper2File(matcher, inner_paperNames.Item(i), i, inner_oldPdfNames.Item(i), inner_oldDwgNames.Item(i))
+    Call MatchPaper2File( _
+      matcher, _
+      inner_paperNames.Item(i), _
+      inner_paperNumbers.Item(i), _
+      i, _
+      inner_oldPdfNames.Item(i), _
+      inner_oldDwgNames.Item(i) _
+    )
   Next i
 
   ' リネーム
   ' Call CorrectRenameFiles()
+
+  Debug.Print "All test cases are done"
 End Function
 
 
@@ -64,19 +80,28 @@ Private Sub SetInnerVals()
   Dim sUtill As SheetUtils
   Set sUtill = New SheetUtils
 
+  ' 基本情報を取得
+  With wb.Worksheets("基本情報")
+    innerInfo_companyID = .Range("B1")
+    innerInfo_projectID = .Range("B2")
+    innerInfo_structureID = .Range("B3")
+    innerInfo_useContinuousNumber = .Range("B4")
+  End With
+
   ' 図面とファイルの対応関係を記録しているシート
   Const targetSheetName = "図面ファイル対応一覧"
 
   ' 旧名称のファイル一覧（確実にすべてのデータが埋まっているため，先行して取得する）
-  Set inner_oldPdfNames = sUtill.Range2Collection(wb.Worksheets(targetSheetName), "B2:B10000")
-  Set inner_oldDwgNames = sUtill.Range2Collection(wb.Worksheets(targetSheetName), "D2:D" & inner_oldPdfNames.Count + 1, False)
+  Set inner_oldPdfNames = sUtill.Range2Collection(wb.Worksheets(targetSheetName), "C2:C10000")
+  Set inner_oldDwgNames = sUtill.Range2Collection(wb.Worksheets(targetSheetName), "E2:E" & inner_oldPdfNames.Count + 1, False)
   
   ' 新名称のファイル一覧
-  Set inner_newPdfNames = sUtill.Range2Collection(wb.Worksheets(targetSheetName), "C2:C" & inner_oldPdfNames.Count + 1, False)
-  Set inner_newDwgNames = sUtill.Range2Collection(wb.Worksheets(targetSheetName), "E2:E" & inner_oldPdfNames.Count + 1, False)
+  Set inner_newPdfNames = sUtill.Range2Collection(wb.Worksheets(targetSheetName), "D2:D" & inner_oldPdfNames.Count + 1, False)
+  Set inner_newDwgNames = sUtill.Range2Collection(wb.Worksheets(targetSheetName), "F2:F" & inner_oldPdfNames.Count + 1, False)
 
   ' 図名一覧
-  Set inner_paperNames = sUtill.Range2Collection(wb.Worksheets(targetSheetName), "A2:A" & inner_oldPdfNames.Count + 1, False)
+  Set inner_paperNumbers = sUtill.Range2Collection(wb.Worksheets(targetSheetName), "A2:A" & inner_oldPdfNames.Count + 1, False)
+  Set inner_paperNames = sUtill.Range2Collection(wb.Worksheets(targetSheetName), "B2:B" & inner_oldPdfNames.Count + 1, False)
 End Sub
 
 ' テストケース一覧から実際のファイルを生成
@@ -109,7 +134,14 @@ End Sub
 
 
 ' 図面名と実際のファイルが正しくマッチするか
-Private Sub MatchPaper2File(matcher As Paper2FileMatcher, paperName As String, continuousNumber As Integer, correctPdfName As String, correctDwgName As String)
+Private Sub MatchPaper2File( _
+  matcher As Paper2FileMatcher, _
+  paperName As String, _
+  paperNumber As String, _
+  continuousNumber As Integer, _
+  correctPdfName As String, _
+  correctDwgName As String _
+)
   Dim paper As PaperObj
   Set paper = New PaperObj
 
@@ -119,15 +151,13 @@ Private Sub MatchPaper2File(matcher As Paper2FileMatcher, paperName As String, c
   End If
 
   ' 図面データを整理
-  Call paper.InitPaperObj(paperName, continuousNumber, CStr(continuousNumber))
+  Call paper.InitPaperObj(paperName, continuousNumber, paperNumber)
 
   ' マッチング結果を取得
   Dim pdfRes As String
   Dim dwgRes As String
-  ' TODO: GetBestFileの引数にUseContinuousNumberを追加
-  ' 関数内部でシステム設定を呼びに行く形式では，Excelで設定された連番設定ではないテストケースに対応できない
-  pdfRes = matcher.GetBestFile(paper, "PDF")
-  dwgRes = matcher.GetBestFile(paper, "CAD")
+  pdfRes = matcher.GetBestFile(paper, "PDF", innerInfo_useContinuousNumber)
+  dwgRes = matcher.GetBestFile(paper, "CAD", False)
 
   ' マッチング結果が間違っていた場合は当該ログを表示
   If (pdfRes <> correctPdfName) Then

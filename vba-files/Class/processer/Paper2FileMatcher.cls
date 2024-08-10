@@ -51,8 +51,8 @@ End Property
 
 
 ' 引数で受けた図面に最も適当なファイルを探索する
-Public Function GetBestFile(paper As PaperObj, fileType As String)
-  If (inner_SystemIds.UseContinuousNumber And fileType = "PDF") Then
+Public Function GetBestFile(paper As PaperObj, fileType As String, useContinuousNumber As Boolean)
+  If (useContinuousNumber And fileType = "PDF") Then
     GetBestFile = ApplyContinuousFile(paper.continuousNumber)
   Else
     Dim files As Collection

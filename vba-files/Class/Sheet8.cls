@@ -18,6 +18,8 @@ Sub ReadFileNamesBtn_Click()
   Set sheets = New SheetObj
   Dim sUtill As SheetUtils
   Set sUtill = New SheetUtils
+  Dim systemSettings As SystemIdObj
+  Set systemSettings = New SystemIdObj
   Dim paper As PaperObj
   Dim paperNumber As String
   Dim pdfPath As String
@@ -65,8 +67,8 @@ Sub ReadFileNamesBtn_Click()
       ' PaperObj‚ğéŒ¾
       Set paper = New PaperObj
       Call paper.InitPaperObj(Worksheets(sheets.MokurokuPage).Cells(rowNum, "B").Value, paperCounter, paperNumber)
-      pdfPath = matcher.GetBestFile(paper, "PDF")
-      dwgPath = matcher.GetBestFile(paper, "CAD")
+      pdfPath = matcher.GetBestFile(paper, "PDF", systemSettings.UseContinuousNumber)
+      dwgPath = matcher.GetBestFile(paper, "CAD", False)
       
       ' ’TõŒ‹‰Ê‚Ì‘‚«‚İ
       WriteOldP4Mokuroku rowNum, paper.GlobalNumber, pdfPath, dwgPath
