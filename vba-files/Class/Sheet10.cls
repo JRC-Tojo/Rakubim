@@ -95,9 +95,27 @@ End Sub
 ' 最終的なファイル名にリネーム
 Sub ChangeFileNamesBtn_Click()
   If checkFill4File() And checkFill4Mokuroku() Then
+    Dim skippedPaths As Collection
+    Set skippedPaths = New Collection
+    Dim oldFileName As String
+    Dim newFileName As String
     For rowNum = 2 To getRanameFileCounts() + 1
-      Call Renamer(rowNum)
+      oldFileName = ""
+      newFileName = ""
+      Call Renamer(rowNum, oldFileName, newFileName)
+      If (newFileName = "") Then
+        skippedPaths.Add(oldFileName)
+      End If
     Next rowNum
+
+    If (skippedPaths.Count > 0) Then
+      Dim pathTxts As String
+      For Each p In skippedPaths
+        pathTxts = pathTxts & "・" & p & vbCrLf
+      Next p 
+
+      MsgBox "以下のファイルは存在しなかった、または既に開かれていたため、リネーム処理が行われませんでした。" & vbCrLf & pathTxts,,"らくびむ - 存在しないパス -" 
+    End If
   Else
     MsgBox _
       "旧ファイル名に対応する新ファイル名がすべての項目に対して定義されていません" & vbCrLf & _

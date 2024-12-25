@@ -95,32 +95,38 @@ Function writeName2PathList(oldPath As String, newPath As String, lastIdx As Int
 End Function
 
 ' 指定された行番号のデータを読み取り、リネーム処理を行う
-Function Renamer(ByVal rowNum As Integer)
+Function Renamer(ByVal rowNum As Integer, ByRef oldFileName As String, ByRef newFileName As String)
   Dim folderName As String
-  Dim fileName As String
-  Dim newPath As String
   Dim extension As String
   Dim filePath As String
   Dim sheets As SheetObj
   Set sheets = New SheetObj
+  Dim objFSO As FileSystemObject
+  Set objFSO = New FileSystemObject
   
   With Worksheets(sheets.RenamePage)
-    fileName = .Cells(rowNum, "A")
-    If fileName = "" Then
+    oldFileName = .Cells(rowNum, "A")
+    If oldFileName = "" Then
       Renamer = False
     Else
-      'Debug.Print fileName & "|" & StrConv(Right(fileName, 3), vbUpperCase) & "|" & .Cells(rowNum, "B")
+      'Debug.Print oldFileName & "|" & StrConv(Right(oldFileName, 3), vbUpperCase) & "|" & .Cells(rowNum, "B")
       
-      extension = Right(fileName, 3)
+      extension = Right(oldFileName, 3)
       folderName = IIf(extension = "pdf", "PDF", IIf(extension = "dwg", "CAD", ""))
-      filePath = ActiveWorkbook.path & "\" & folderName & "\" & .Cells(rowNum, "A")
-      If Dir(filePath) <> "" Then
-        newPath = ActiveWorkbook.path & "\" & folderName & "\" & .Cells(rowNum, "B")
-        If Dir(newPath) = "" Then
-          Name filePath As newPath
-        Else
-          Debug.Print newPath & "は既に存在しています"
+      filePath = ActiveWorkbook.path & "\" & folderName & "\" & oldFileName
+      If objFSO.FileExists(filePath) Then
+        newFileName = .Cells(rowNum, "B")
+        newPath = ActiveWorkbook.path & "\" & folderName & "\" & newFileName
+        
+        ' リネームでエラーが出た（既に開かれていた）際にはダイアログを出す
+        On Error Resume Next
+        Name filePath As newPath
+        If Err.Number > 0 Then
+          Debug.Print oldFileName & "はファイルが開かれていたため、リネームに失敗しました。　エラーコード：" & Err.Number
+          newFileName = ""
         End If
+      Else
+        Debug.Print oldFileName & "は存在しないため、リネームできませんでした。"
       End If
     End If
   End With
