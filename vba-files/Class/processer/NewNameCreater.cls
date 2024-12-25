@@ -93,37 +93,58 @@ Private Function GetNewFileName(file As FileObj) As String
                     "." & file.Extension
 End Function
 
-' 新名称に含める番号の表現を作成
-Private Function SetPaperNumberText(file As FileObj)
-  Dim returnText As String: returnText = ""
-  Dim number As String
-  Dim FormattedNumber As String
-
-  ' 「0000, 」を削除して連番「-0000」を作成するため，連番処理を実行するための最低文字数
-  Const MIN_TEXT_LEN As Integer = 6
-
-  ' 連番のひとつ前の値を保持する
-  ' TODO: 01-03,05-08のようなとび番があるケースに対応
-  Dim beforeNumber As Integer: beforeNumber = -1
+Private  Function SetPaperNumberText(file As FileObj)
+  Dim result As String
   Dim i As Integer
-  For i = 1 To file.MatchedPaperIds.Count
-    number = inner_Papers.Item(file.MatchedPaperIds(i)).GlobalNumber
-
-    ' 数値の時に連続化検討処理を行う
-    FormattedNumber = IIf(Len(number) > 4, number, Right("0000" & number, 4))
-    If (IsNumeric(number)) Then
-      If (CInt(number) - beforeNumber = 1 And Len(returnText) > MIN_TEXT_LEN) Then
-        ' すでについている「0000, 」を削除して「-」を挿入することで「01-03」の表記を作成
-        returnText = Left(returnText, Len(returnText) - MIN_TEXT_LEN) & "-"
+  Dim startRange As Integer
+  Dim endRange As Integer
+  Dim tmpNumber As String
+  Dim formattedStartNumber As String
+  Dim formattedEndNumber As String
+  
+  ' 初期化
+  result = ""
+  startRange = Val(inner_Papers.Item(file.MatchedPaperIds(1)).GlobalNumber)
+  endRange = startRange
+  
+  For i = 2 To file.MatchedPaperIds.Count
+    tmpNumber = inner_Papers.Item(file.MatchedPaperIds(i)).GlobalNumber
+      If IsNumeric(tmpNumber) And Val(tmpNumber) = endRange + 1 Then
+        ' 連続している場合
+        endRange = Val(tmpNumber)
+      Else
+        ' 連続が途切れた場合
+        formattedStartNumber = IIf(Len(startRange) > 4, startRange, Right("0000" & startRange, 4))
+        formattedEndNumber = IIf(Len(endRange) > 4, endRange, Right("0000" & endRange, 4))
+        If startRange = endRange Then
+          result = result & formattedStartNumber & ","
+        ElseIf endRange = startRange + 1 Then
+            result = result & formattedStartNumber & "," & formattedEndNumber & ","
+        Else
+          result = result & formattedStartNumber & "-" & formattedEndNumber & ","
+        End If
+        startRange = Val(tmpNumber)
+        endRange = Val(tmpNumber)
       End If
-      beforeNumber = CInt(number)
-    End If
-
-    returnText = returnText & FormattedNumber & ","
   Next i
-
-  ' 最後の「, 」を除外して返す
-  SetPaperNumberText = Left(returnText, Len(returnText) - 1)
+  
+  ' 最後の範囲を追加
+  formattedStartNumber = IIf(Len(startRange) > 4, startRange, Right("0000" & startRange, 4))
+  formattedEndNumber = IIf(Len(endRange) > 4, endRange, Right("0000" & endRange, 4))
+  If startRange = endRange Then
+      result = result & formattedStartNumber
+  ElseIf endRange = startRange + 1 Then
+      result = result & formattedStartNumber & "," & formattedEndNumber
+  Else
+      result = result & formattedStartNumber & "-" & formattedEndNumber
+  End If
+  
+  ' 末尾のカンマを削除
+  If Right(result, 1) = "," Then
+      result = Left(result, Len(result) - 1)
+  End If
+  
+  SetPaperNumberText = result
 End Function
 
 ' 新名称に含める図面名の表現を作成
