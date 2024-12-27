@@ -44,8 +44,10 @@ Private Function RequireUpdate() As Boolean
   End If
 End Function
 
-Private Function IsExecutable() As Boolean
-  If (ActiveWorkbook.path = UpdateCheckTargetPath) Then
+Private Function IsExecutable()
+  ' フォルダの開き方によって「M:/」だったり「//sv01f02/」になったりするため、パスの末尾３階層分のみをチェックする
+  Const checkLetterCount = 35
+  If (Right(ActiveWorkbook.path, checkLetterCount) = Right(UpdateCheckTargetPath, checkLetterCount)) Then
     Dim res As Long
     res = MsgBox("「らくびむ」を配布元のフォルダで実行することはできません" & vbCrLf & _
                   "作業中のフォルダやサーバーにコピーしてご利用ください", vbCritical, "らくびむ - 実行できません -")
