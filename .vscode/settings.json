@@ -3,5 +3,17 @@
     "**/~$*": true
   },
   "files.encoding": "shiftjis",
-  "files.autoGuessEncoding": true
+  "files.autoGuessEncoding": true,
+  "[python]": {
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "ms-python.autopep8",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    },
+  },
+  "autopep8.args": [
+    "--indent-size",
+    "2",
+  ]
 }
