@@ -29,6 +29,39 @@ Private Sub class_initialize()
   End If
 End Sub
 
+' フォルダ内のPDF一覧を返す
+Public Property Get loadedPdfPaths() As Collection
+  Dim tmpCol As Collection
+  Set tmpCol = New Collection
+  
+  ' FileObj -> File name
+  Dim file As FileObj
+  For Each file In inner_PDFs
+    tmpCol.Add file.SourceName
+  Next file
+
+  ' 連番としてまとめられたファイル群も連結する
+  If Not (inner_ContinuousPDF Is Nothing) Then
+    Set tmpCol = CombineCols(tmpCol, dictValues(inner_ContinuousPDF.PaperPaths))
+  End If
+  
+  Set loadedPdfPaths = tmpCol
+End Property
+
+' フォルダ内のDWG一覧を返す
+Public Property Get loadedDwgPaths() As Collection
+  Dim tmpCol As Collection
+  Set tmpCol = New Collection
+  
+  ' FileObj -> File name
+  Dim file As FileObj
+  For Each file In inner_DWGs
+    tmpCol.Add file.SourceName
+  Next file
+
+  Set loadedDwgPaths = tmpCol
+End Property
+
 ' Matcherが初期化で必要とする情報を登録
 Public Function InitMatcher(paperNames As Collection)
   Set inner_Cleaner = New FileNameCleaner
