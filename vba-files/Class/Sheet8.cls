@@ -47,6 +47,7 @@ Sub ReadFileNamesBtn_Click()
   End If
     
   ' 目録を読み込み始める行番号
+  Const LIMITED_SPACE_COUNTER = 3
   rowNum = INIT_ROWNUM_MOKUROKU
   paperCounter = 1
   Do
@@ -57,7 +58,7 @@ Sub ReadFileNamesBtn_Click()
       ' ・目録二行空け：次のページから目録を再開
       ' という規則にする予定のため、spaceCount = 3までは容認
       spaceCounter = spaceCounter + 1
-      If spaceCounter = 3 Then Exit Do
+      If spaceCounter = LIMITED_SPACE_COUNTER Then Exit Do
     Else
       spaceCounter = 0
 
@@ -78,6 +79,12 @@ Sub ReadFileNamesBtn_Click()
     rowNum = rowNum + 1
     paperCounter = paperCounter + 1
   Loop
+
+  ' 格納されたファイル名一覧をプルダウンで選択できるようにする
+  With Worksheets(sheets.MokurokuPage)
+    Call SetPulldownMenu(.Range("G2:G" & rowNum - LIMITED_SPACE_COUNTER), matcher.loadedPdfPaths, 1)
+    Call SetPulldownMenu(.Range("H2:H" & rowNum - LIMITED_SPACE_COUNTER), matcher.loadedDwgPaths, 2)
+  End With
 
   If (paper.GlobalNumber = "") Then
     MsgBox "図面番号の補完に失敗しました．" & vbCrLf & _ 
@@ -130,4 +137,34 @@ Private Function CompleteGlobalPaperNumber(rowNum As Integer) As String
   End With
   
   CompleteGlobalPaperNumber = CStr(nowId)
+End Function
+
+
+' 指定した配列の要素をプルダウンで選択できるようにする
+' @param: targetCells -> プルダウンを設定するセル範囲
+' @param: files -> プルダウンに記載するファイル名のリスト
+' @param: z -> プルダウンのID（Pulldownsシートに書き込む際の列番号になる）
+Private  Function SetPulldownMenu(targetCells As Range, fileNames As Collection, z As Integer)
+  Dim sUtils As SheetUtils
+  Set sUtils = New SheetUtils
+  Dim targetRowName As String
+  targetRowName = sUtils.ColumnIdx2Name(z)
+
+  ' プルダウンシートにプルダウンで表示する内容の一覧を書き込む
+  Call sUtils.Collection2Cell(fileNames, "Pulldowns", targetRowName & "1")
+
+  With targetCells.Validation
+    .Delete
+    .Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Operator:= _
+    xlBetween, Formula1:="=Pulldowns!$" & targetRowName & "$1:$" & targetRowName & "$" & fileNames.Count
+    .IgnoreBlank = True
+    .InCellDropdown = True
+    .InputTitle = ""
+    .ErrorTitle = "らくびむ  - 入力エラー -"
+    .InputMessage = ""
+    .ErrorMessage = "フォルダ内に存在しないファイル名は入力できません。"
+    .IMEMode = xlIMEModeNoControl
+    .ShowInput = True
+    .ShowError = True
+  End With
 End Function
