@@ -147,16 +147,16 @@ End Function
 Private  Function SetPulldownMenu(targetCells As Range, fileNames As Collection, z As Integer)
   Dim sUtils As SheetUtils
   Set sUtils = New SheetUtils
-  Dim targetRowName As String
-  targetRowName = sUtils.ColumnIdx2Name(z)
+  Dim targetColName As String
+  targetColName = sUtils.ColumnIdx2Name(z)
 
   ' プルダウンシートにプルダウンで表示する内容の一覧を書き込む
-  Call sUtils.Collection2Cell(fileNames, "Pulldowns", targetRowName & "1")
+  Call sUtils.Collection2Cell(fileNames, "Pulldowns", targetColName & "1")
 
   With targetCells.Validation
     .Delete
     .Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Operator:= _
-    xlBetween, Formula1:="=Pulldowns!$" & targetRowName & "$1:$" & targetRowName & "$" & fileNames.Count
+    xlBetween, Formula1:="=Pulldowns!$" & targetColName & "$1:$" & targetColName & "$" & fileNames.Count
     .IgnoreBlank = True
     .InCellDropdown = True
     .InputTitle = ""
