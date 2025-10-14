@@ -8,6 +8,7 @@ def setNewTestFiles(targetFolderName: str, names: pd.Series):
   指定したフォルダにテストファイルを作成する
   """
   targetPath = Path(__file__).parent/targetFolderName
+  if not targetPath.exists(): targetPath.mkdir()
 
   # フォルダのリセット
   for fPath in targetPath.iterdir():
