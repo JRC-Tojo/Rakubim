@@ -10,10 +10,13 @@
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.organizeImports": "explicit"
-    },
+    }
   },
   "autopep8.args": [
     "--indent-size",
-    "2",
-  ]
+    "2"
+  ],
+  "[markdown]": {
+    "files.encoding": "utf8"
+  }
 }
