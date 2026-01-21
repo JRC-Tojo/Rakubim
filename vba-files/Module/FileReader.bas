@@ -1,11 +1,11 @@
 Attribute VB_Name = "FileReader"
 ' ディレクトリ内のファイル名一覧を取得
-Private Function getAllFileNames(folderName As String)
+Private Function getAllFileNames(targetPath As String, folderName As String)
   Dim i As Integer: i = 0
   Dim returnVals() As String: ReDim returnVals(1)
 
   ' 先頭のファイル名の取得
-  Dim strFileName As String: strFileName = Dir(ActiveWorkbook.path & "\" & folderName & "\", vbNormal)
+  Dim strFileName As String: strFileName = Dir(targetPath & "\" & folderName & "\", vbNormal)
   
   ' ファイルが見つからなくなるまで繰り返す
   Do While strFileName <> ""
@@ -23,9 +23,9 @@ Private Function getAllFileNames(folderName As String)
 End Function
 
 ' ファイルの一覧オブジェクトを取得
-Public Function GetFileCollection(folderName As String) As Collection
+Public Function GetFileCollection(targetPath As String, folderName As String) As Collection
   Dim filePaths As Variant
-  filePaths = getAllFileNames(folderName)
+  filePaths = getAllFileNames(targetPath, folderName)
   Dim file As FileObj
   Dim returns As Collection
   Set returns = New Collection

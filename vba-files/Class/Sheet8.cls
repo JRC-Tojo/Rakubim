@@ -28,6 +28,9 @@ Sub ReadFileNamesBtn_Click()
   ' 何回空欄の行が連続したのか
   Dim spaceCounter As Integer: spaceCounter = 0
 
+  ' マッチング機構の初期化
+  Call matcher.BaseInitMatcher(systemSettings.TargetPath)
+
   ' ファイルが存在しない場合はエラーを表示して終了
   If (Not matcher.ExistFiles) Then
     MsgBox "読み込むファイルが見つかりません．" & vbCrLf & _

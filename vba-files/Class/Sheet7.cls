@@ -7,6 +7,23 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
+
+' 入力シートにおける処理対象のフォルダを選択する
+Private Sub FolderSelectBtn_Click()
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
+
+  Dim folderPath As Variant
+  With Application.FileDialog(msoFileDialogFolderPicker)
+   .Show
+   folderPath = .SelectedItems(1)
+  End With
+
+  With WorkSheets(sheets.FirstInputPage)
+    .Range("E3").Value = folderPath 
+  End With
+End Sub
+
 ' 入力シートにおける「業務機関名」「契約番号」を自動で補完
 Private Sub AutoIDInputBtn_Click()
   Dim matches As Object
@@ -19,7 +36,7 @@ Private Sub AutoIDInputBtn_Click()
   Dim sheets As SheetObj
   Set sheets = New SheetObj
   With Worksheets(sheets.FirstInputPage)
-    inputName = .Range("E4").Value
+    inputName = .Range("E7").Value
     
     With Worksheets(sheets.TeamCodePage)
       companyCode = WorksheetFunction.VLookup(Left(inputName, 2), .Range("G3:H21"), 2, False)
@@ -31,8 +48,8 @@ Private Sub AutoIDInputBtn_Click()
     End With
     Set matches = reg.Execute(inputName)
     
-    .Range("C3").Value = companyCode
-    .Range("C4").Value = Format(Wareki2Seireki(matches.item(0)), "00") & Format(matches.item(1), "000")
+    .Range("C6").Value = companyCode
+    .Range("C7").Value = Format(Wareki2Seireki(matches.item(0)), "00") & Format(matches.item(1), "000")
   End With
 End Sub
 

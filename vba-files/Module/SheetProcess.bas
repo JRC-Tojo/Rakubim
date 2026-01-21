@@ -104,6 +104,8 @@ Function Renamer(ByVal rowNum As Integer, ByRef oldFileName As String, ByRef new
   Set sheets = New SheetObj
   Dim objFSO As FileSystemObject
   Set objFSO = New FileSystemObject
+  Dim systemIds As SystemIdObj
+  Set systemIds = New SystemIdObj
   
   With Worksheets(sheets.RenamePage)
     oldFileName = .Cells(rowNum, "A")
@@ -114,10 +116,10 @@ Function Renamer(ByVal rowNum As Integer, ByRef oldFileName As String, ByRef new
       
       extension = Right(oldFileName, 3)
       folderName = IIf(extension = "pdf", "PDF", IIf(extension = "dwg", "CAD", ""))
-      filePath = ActiveWorkbook.path & "\" & folderName & "\" & oldFileName
+      filePath = systemIds.TargetPath & "\" & folderName & "\" & oldFileName
       If objFSO.FileExists(filePath) Then
         newFileName = .Cells(rowNum, "B")
-        newPath = ActiveWorkbook.path & "\" & folderName & "\" & newFileName
+        newPath = systemIds.TargetPath & "\" & folderName & "\" & newFileName
         
         ' リネームでエラーが出た（既に開かれていた）際にはダイアログを出す
         On Error Resume Next

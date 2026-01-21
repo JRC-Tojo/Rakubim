@@ -39,9 +39,9 @@ Private Sub OutputData_Click()
   ' ①変数定義
   Dim tmpRng As Range
   Dim basePath As String
-  basePath = ActiveWorkbook.path
   Dim systemIds As SystemIdObj
   Set systemIds = New SystemIdObj
+  basePath = systemIds.TargetPath
   
   ' ②範囲指定
   sheets("データファイル説明書").Range("A:F").Select

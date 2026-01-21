@@ -46,6 +46,7 @@ Public Function GetSummary()
   Set creater = New NewNameCreater
 
   ' }–Êˆê——‚ğMatcher‚É“o˜^
+  Call matcher.BaseInitMatcher(ActiveWorkbook.path)
   Call matcher.InitMatcher(inner_paperNames)
 
   ' creater‚É•K—v‚Èî•ñ‚ğ“o˜^
