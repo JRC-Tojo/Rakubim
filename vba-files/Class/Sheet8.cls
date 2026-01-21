@@ -13,7 +13,7 @@ Sub ReadFileNamesBtn_Click()
   Dim rowNum As Integer
   Dim paperCounter As Integer
   Dim matcher As Paper2FileMatcher
-  Set matcher = New Paper2FileMatcher
+  Set matcher = GetMatcher()
   Dim sheets As SheetObj
   Set sheets = New SheetObj
   Dim sUtill As SheetUtils
@@ -28,11 +28,8 @@ Sub ReadFileNamesBtn_Click()
   ' 何回空欄の行が連続したのか
   Dim spaceCounter As Integer: spaceCounter = 0
 
-  ' マッチング機構の初期化
-  Call matcher.BaseInitMatcher(systemSettings.TargetPath)
-
   ' ファイルが存在しない場合はエラーを表示して終了
-  If (Not matcher.ExistFiles) Then
+  If (matcher Is Nothing) Then
     MsgBox "読み込むファイルが見つかりません．" & vbCrLf & _
               "以下のポイントを確認したうえで再度ボタンを押してください．" & vbCrLf & vbCrLf & _
               "1. 【半角英文字で】「CAD」「PDF」という名前のフォルダを作成する" & vbCrLf & _
@@ -50,7 +47,6 @@ Sub ReadFileNamesBtn_Click()
   End If
     
   ' 目録を読み込み始める行番号
-  Const LIMITED_SPACE_COUNTER = 3
   rowNum = INIT_ROWNUM_MOKUROKU
   paperCounter = 1
   Do
@@ -84,10 +80,7 @@ Sub ReadFileNamesBtn_Click()
   Loop
 
   ' 格納されたファイル名一覧をプルダウンで選択できるようにする
-  With Worksheets(sheets.MokurokuPage)
-    Call SetPulldownMenu(.Range("G2:G" & rowNum - LIMITED_SPACE_COUNTER), matcher.loadedPdfPaths, 1)
-    Call SetPulldownMenu(.Range("H2:H" & rowNum - LIMITED_SPACE_COUNTER), matcher.loadedDwgPaths, 2)
-  End With
+  Call SetFilePulldownMenu(matcher, rowNum - LIMITED_SPACE_COUNTER)
 
   If (paper.GlobalNumber = "") Then
     MsgBox "図面番号の補完に失敗しました．" & vbCrLf & _ 
@@ -140,34 +133,4 @@ Private Function CompleteGlobalPaperNumber(rowNum As Integer) As String
   End With
   
   CompleteGlobalPaperNumber = CStr(nowId)
-End Function
-
-
-' 指定した配列の要素をプルダウンで選択できるようにする
-' @param: targetCells -> プルダウンを設定するセル範囲
-' @param: files -> プルダウンに記載するファイル名のリスト
-' @param: z -> プルダウンのID（Pulldownsシートに書き込む際の列番号になる）
-Private  Function SetPulldownMenu(targetCells As Range, fileNames As Collection, z As Integer)
-  Dim sUtils As SheetUtils
-  Set sUtils = New SheetUtils
-  Dim targetColName As String
-  targetColName = sUtils.ColumnIdx2Name(z)
-
-  ' プルダウンシートにプルダウンで表示する内容の一覧を書き込む
-  Call sUtils.Collection2Cell(fileNames, "Pulldowns", targetColName & "1")
-
-  With targetCells.Validation
-    .Delete
-    .Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Operator:= _
-    xlBetween, Formula1:="=Pulldowns!$" & targetColName & "$1:$" & targetColName & "$" & fileNames.Count
-    .IgnoreBlank = True
-    .InCellDropdown = True
-    .InputTitle = ""
-    .ErrorTitle = "らくびむ  - 入力エラー -"
-    .InputMessage = ""
-    .ErrorMessage = "フォルダ内に存在しないファイル名は入力できません。"
-    .IMEMode = xlIMEModeNoControl
-    .ShowInput = True
-    .ShowError = True
-  End With
 End Function

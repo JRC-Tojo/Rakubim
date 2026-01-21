@@ -12,6 +12,7 @@ Private Const UpdateCheckTargetPath = "\\sv01f02\ñ{é–_ãZèpñ{ïîã§í \Åü01Å@è∆ç∏é∫\
 
 Sub Workbook_Open()
   Call IsExecutable
+  Call SetPulldown
 
   SplashScreen.Show
 
@@ -25,6 +26,17 @@ Sub Workbook_Open()
       Shell "C:\windows\explorer.exe " & UpdateCheckTargetPath & "\", vbNormalFocus
     End If
   End If
+End Sub
+
+Private Sub SetPulldown()
+  Dim matcher As Paper2FileMatcher
+  Set matcher = GetMatcher()
+  If (matcher Is Nothing) Then Exit Sub
+
+  Dim rowNum As Integer
+  rowNum = getLastPaperRows()
+
+  Call SetFilePulldownMenu(matcher, rowNum - LIMITED_SPACE_COUNTER)
 End Sub
 
 Private Function RequireUpdate() As Boolean
