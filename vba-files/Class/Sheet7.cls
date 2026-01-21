@@ -15,8 +15,13 @@ Private Sub FolderSelectBtn_Click()
 
   Dim folderPath As Variant
   With Application.FileDialog(msoFileDialogFolderPicker)
-   .Show
-   folderPath = .SelectedItems(1)
+    .Title = "らくびむ　- 成果品フォルダを選択してください -"
+    .AllowMultiSelect = False
+
+    ' ダイアログを表示し，キャンセルされた場合は処理を終了
+    If (.Show <> True) Then Exit Sub
+    
+    folderPath = .SelectedItems(1)
   End With
 
   With WorkSheets(sheets.FirstInputPage)
