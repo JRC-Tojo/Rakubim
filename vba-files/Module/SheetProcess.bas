@@ -2,6 +2,9 @@ Attribute VB_Name = "SheetProcess"
 ' WorkSheetに対する処理を記載
 ' WorkSheetから読み込む処理をすべてここに記載することで、Sheetに変更が入った場合に対応しやすくする
 
+' 目録入力シートでスキップしてよい空白行の数
+Public Const LIMITED_SPACE_COUNTER = 3
+
 ' 指定した行番号の図面名称が空欄か否かをチェックする
 Function checkSpaceRow(rowNum As Integer)
   Dim sheets As SheetObj
@@ -114,7 +117,7 @@ Function Renamer(ByVal rowNum As Integer, ByRef oldFileName As String, ByRef new
     Else
       'Debug.Print oldFileName & "|" & StrConv(Right(oldFileName, 3), vbUpperCase) & "|" & .Cells(rowNum, "B")
       
-      extension = Right(oldFileName, 3)
+      extension = StrConv(Right(oldFileName, 3), vbLowerCase)
       folderName = IIf(extension = "pdf", "PDF", IIf(extension = "dwg", "CAD", ""))
       filePath = systemIds.TargetPath & "\" & folderName & "\" & oldFileName
       If objFSO.FileExists(filePath) Then
@@ -137,6 +140,36 @@ Function Renamer(ByVal rowNum As Integer, ByRef oldFileName As String, ByRef new
   Renamer = True
 End Function
 
+' 「目録入力」シートの一番下の要素の行番号を取得する
+Function getLastPaperRows()
+  Dim rowNum As Integer
+  Dim paperCounter As Integer
+  
+  ' 何回空欄の行が連続したのか
+  Dim spaceCounter As Integer: spaceCounter = 0
+
+  rowNum = INIT_ROWNUM_MOKUROKU
+  Do
+    ' 目録データの取得
+    If checkSpaceRow(rowNum) Then
+      ' 将来的に
+      ' ・目録一行空け：次の列から目録を再開
+      ' ・目録二行空け：次のページから目録を再開
+      ' という規則にする予定のため、spaceCount = 3までは容認
+      spaceCounter = spaceCounter + 1
+      If spaceCounter = LIMITED_SPACE_COUNTER Then Exit Do
+    Else
+      spaceCounter = 0
+    End If
+       
+    ' 次処理に向けて値を更新
+    rowNum = rowNum + 1
+    paperCounter = paperCounter + 1
+  Loop
+
+  getLastPaperRows = rowNum
+End Function
+
 ' リネーム対象のファイル数を返す
 Function getRanameFileCounts()
   Dim sheets As SheetObj
@@ -154,6 +187,70 @@ Function getTableCols()
 
   With Worksheets(sheets.DataTablePage)
     getTableCols = WorksheetFunction.CountA(.Range("A:A")) - 1
+  End With
+End Function
+
+' マッチング器の初期化
+Public Function GetMatcher() As Paper2FileMatcher
+  Dim matcher As Paper2FileMatcher
+  Set matcher = New Paper2FileMatcher
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
+  Dim sUtill As SheetUtils
+  Set sUtill = New SheetUtils
+  Dim systemIds As SystemIdObj
+  Set systemIds = New SystemIdObj
+
+  ' マッチング機構の初期化
+  Call matcher.BaseInitMatcher(systemIds.TargetPath)
+
+  ' ファイルが存在しない場合はmatcherを返さずに終了
+  If (Not matcher.ExistFiles) Then Exit Function
+
+  ' Matcherに必要な図面名称の一覧を登録する
+  Call matcher.InitMatcher(sUtill.Range2Collection(Worksheets(sheets.MokurokuPage), "B2:B10000"))
+
+  Set GetMatcher = matcher
+End Function
+
+' 各セルに実在ファイルのプルダウンを設定する
+Public Sub SetFilePulldownMenu(matcher As Paper2FileMatcher, lastRowNum As Integer)
+  Dim sheets As SheetObj
+  Set sheets = New SheetObj
+
+  With Worksheets(sheets.MokurokuPage)
+    Call SetPulldownMenu(.Range("G2:G" & lastRowNum), matcher.loadedPdfPaths, 1)
+    Call SetPulldownMenu(.Range("H2:H" & lastRowNum), matcher.loadedDwgPaths, 2)
+  End With
+End Sub
+
+
+' 指定した配列の要素をプルダウンで選択できるようにする
+' @param: targetCells -> プルダウンを設定するセル範囲
+' @param: files -> プルダウンに記載するファイル名のリスト
+' @param: z -> プルダウンのID（Pulldownsシートに書き込む際の列番号になる）
+Private  Function SetPulldownMenu(targetCells As Range, fileNames As Collection, z As Integer)
+  Dim sUtils As SheetUtils
+  Set sUtils = New SheetUtils
+  Dim targetColName As String
+  targetColName = sUtils.ColumnIdx2Name(z)
+
+  ' プルダウンシートにプルダウンで表示する内容の一覧を書き込む
+  Call sUtils.Collection2Cell(fileNames, "Pulldowns", targetColName & "1")
+
+  With targetCells.Validation
+    .Delete
+    .Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Operator:= _
+    xlBetween, Formula1:="=Pulldowns!$" & targetColName & "$1:$" & targetColName & "$" & fileNames.Count
+    .IgnoreBlank = True
+    .InCellDropdown = True
+    .InputTitle = ""
+    .ErrorTitle = "らくびむ  - 入力エラー -"
+    .InputMessage = ""
+    .ErrorMessage = "フォルダ内に存在しないファイル名は入力できません。"
+    .IMEMode = xlIMEModeNoControl
+    .ShowInput = True
+    .ShowError = True
   End With
 End Function
 
