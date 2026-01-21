@@ -10,6 +10,7 @@ Attribute VB_Exposed = False
 
 Option Explicit
 
+Private inner_TargetPath As String
 Private inner_CompanyID As String
 Private inner_ProjectID As String
 Private inner_StructureID As String
@@ -22,16 +23,21 @@ Private Sub class_initialize()
   Set sheets = New SheetObj
 
   With Worksheets(sheets.FirstInputPage)
-    inner_CompanyID = getCompanyID(.Range("C3"))
-    inner_ProjectID = .Range("C4")
-    inner_StructureID = .Range("C5")
-    inner_DesignID = .Range("C6")
+    inner_TargetPath = .Range("E3")
+    inner_CompanyID = getCompanyID(.Range("C6"))
+    inner_ProjectID = .Range("C7")
+    inner_StructureID = .Range("C8")
+    inner_DesignID = .Range("C9")
     inner_UseContinuousNumber = CBool(.useContinuousNumberCheck.Value)
     ' 下記は「処理するデータの種類」という項目が入力シートにあった際に利用していた変数
     ' 現在は使っていないため，すべての種類を処理対象とする「ALL」を指定している
     inner_SelectedFileType = "ALL"
   End With
 End Sub
+
+Public Property Get TargetPath() As String
+  TargetPath = inner_TargetPath
+End Property
 
 Public Property Get CompanyID() As String
   CompanyID = inner_CompanyID

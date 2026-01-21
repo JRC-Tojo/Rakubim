@@ -16,18 +16,18 @@ Private inner_ContinuousPDF As FileObj
 Private inner_PDFs As Collection
 Private inner_DWGs As Collection
 
-Private Sub class_initialize()
+Public Function BaseInitMatcher(targetPath As String)
   Set inner_SystemIds = New SystemIdObj
 
   ' 処理対象とするファイル群を取得
-  Set inner_PDFs = IIf(inner_SystemIds.SelectedFileType <> "CAD", GetFileCollection("PDF"), New Collection)
-  Set inner_DWGs = IIf(inner_SystemIds.SelectedFileType <> "PDF", GetFileCollection("CAD"), New Collection)
+  Set inner_PDFs = IIf(inner_SystemIds.SelectedFileType <> "CAD", GetFileCollection(targetPath, "PDF"), New Collection)
+  Set inner_DWGs = IIf(inner_SystemIds.SelectedFileType <> "PDF", GetFileCollection(targetPath, "CAD"), New Collection)
 
   ' PDF連番処理の場合の準備
   If (inner_SystemIds.UseContinuousNumber And inner_PDFs.Count > 0) Then
     Set inner_ContinuousPDF = SearchMostNumbersFile()
   End If
-End Sub
+End Function
 
 ' フォルダ内のPDF一覧を返す
 Public Property Get loadedPdfPaths() As Collection
