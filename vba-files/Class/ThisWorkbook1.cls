@@ -8,10 +8,10 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 
-Private Const UpdateCheckTargetPath = "\\sv01f02\本社_技術本部共通\◆01　照査室\05_設計ツール\■09_成果品ファイル一括整理ツール"
+Private Const ReleaseFilePath = "https://jrcjregroup.app.box.com/folder/348645297166"
+Private Const ThisVersion = "v1.0.2"
 
 Sub Workbook_Open()
-  Call IsExecutable
   Call SetPulldown
 
   SplashScreen.Show
@@ -19,11 +19,11 @@ Sub Workbook_Open()
   If (RequireUpdate() = True) Then
     Dim res As Long
     res = MsgBox("「らくびむ」の最新版がリリースされました" & vbCrLf & _ 
-            "以下のフォルダから最新版をコピーしてご利用ください" & vbCrLf & vbCrLf & _ 
-            UpdateCheckTargetPath & vbCrLf & vbCrLf & _ 
-            "上記のフォルダを開きますか？",vbInformation + vbYesNo + vbDefaultButton2, "らくびむ - アップデート -")
+            "以下の配布先から最新版をコピーしてご利用ください" & vbCrLf & vbCrLf & _ 
+            ReleaseFilePath & vbCrLf & vbCrLf & _ 
+            "上記の配布先をブラウザで開きますか？",vbInformation + vbYesNo + vbDefaultButton2, "らくびむ - アップデート -")
     If (res = vbYes) Then
-      Shell "C:\windows\explorer.exe " & UpdateCheckTargetPath & "\", vbNormalFocus
+      ActiveWorkbook.FollowHyperlink Address:=ReleaseFilePath, SubAddress:="", NewWindow:=True
     End If
   End If
 End Sub
@@ -40,32 +40,69 @@ Private Sub SetPulldown()
 End Sub
 
 Private Function RequireUpdate() As Boolean
-  Dim objFSO As FileSystemObject
-  Set objFSO = New FileSystemObject
-  ' アップデートの保存先が見つからない場合はアップデートチェックを行わない
-  If Not objFSO.FolderExists(UpdateCheckTargetPath) Then
-    RequireUpdate = False
-    Exit Function
-  End If
-
-  ' アップデートの保存先に自分自身と同じ名前のファイルがないときには，新しいバージョンが来たと判断する
-  If Not objFSO.FileExists(UpdateCheckTargetPath & "\" & ActiveWorkbook.name) Then
+  Dim latestVersion As String
+  On Error GoTo ErrHandler
+  latestVersion = LoadLatestGhReleaseVersion("JRC-Chorus", "RakubimPublic")
+  If (latestVersion <> ThisVersion) Then
     RequireUpdate = True
   Else
     RequireUpdate = False
   End If
+  Exit Function
+ErrHandler:
+  ' エラーが発生した場合はアップデート不要とみなす
+  RequireUpdate = False
 End Function
 
-Private Function IsExecutable()
-  ' フォルダの開き方によって「M:/」だったり「//sv01f02/」になったりするため、パスの末尾３階層分のみをチェックする
-  Const checkLetterCount = 35
-  If (Right(ActiveWorkbook.path, checkLetterCount) = Right(UpdateCheckTargetPath, checkLetterCount)) Then
-    Dim res As Long
-    res = MsgBox("「らくびむ」を配布元のフォルダで実行することはできません" & vbCrLf & _
-                  "作業中のフォルダやサーバーにコピーしてご利用ください", vbCritical, "らくびむ - 実行できません -")
-    
-    ' 保存確認のメッセージを表示せずにExcelを閉じる
-    Application.DisplayAlerts = False 
-    Application.Quit
+' GitHub ReleasesのAPIにアクセスし、最新のリリースバージョンを取得する
+' 引数:
+'   accountName (String) - GitHub アカウント名（または組織名）
+'   repoName    (String) - リポジトリ名
+' 戻り値:
+'   String - tag_name（例: "v1.0.2"）
+' 例外:
+'   HTTP エラーや tag_name が見つからない場合はエラーを発生させる
+Private  Function LoadLatestGhReleaseVersion(accountName As String, repoName As String) As String
+  Dim http As Object
+  Dim resp As String
+  Dim url As String
+  On Error GoTo ErrHandler
+
+  If Len(Trim$(accountName)) = 0 Or Len(Trim$(repoName)) = 0 Then
+    Err.Raise vbObjectError + 540, "LoadLatestGhReleaseVersion", "accountName または repoName が空です。"
   End If
+
+  url = "https://api.github.com/repos/" & accountName & "/" & repoName & "/releases/latest"
+
+  Set http = CreateObject("MSXML2.XMLHTTP")
+  http.Open "GET", url, False
+  http.setRequestHeader "Accept", "application/vnd.github.v3+json"
+  ' http.setRequestHeader "User-Agent", "VBA-JsonUtils"
+  http.send
+
+  If http.Status < 200 Or http.Status >= 300 Then
+    Err.Raise vbObjectError + 541, "LoadLatestGhReleaseVersion", "HTTP error: " & http.Status & " - " & http.statusText
+  End If
+
+  resp = http.responseText
+  Set http = Nothing
+
+  ' 正規表現で "tag_name": "値" を抽出（簡易）
+  Dim re As Object
+  Dim matches As Object
+  Set re = CreateObject("VBScript.RegExp")
+  re.Pattern = """tag_name""\s*:\s*""([^""]+)"""
+  re.IgnoreCase = True
+  re.Global = False
+
+  Set matches = re.Execute(resp)
+  If matches.Count > 0 Then
+    LoadLatestGhReleaseVersion = matches(0).SubMatches(0)
+  Else
+    Err.Raise vbObjectError + 542, "LoadLatestGhReleaseVersion", "tag_name がレスポンスに見つかりませんでした。"
+  End If
+
+  Exit Function
+ErrHandler:
+  Err.Raise Err.Number, "LoadLatestGhReleaseVersion", Err.Description
 End Function
