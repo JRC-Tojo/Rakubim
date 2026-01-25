@@ -44,7 +44,13 @@ Private Sub AutoIDInputBtn_Click()
     inputName = .Range("E7").Value
     
     With Worksheets(sheets.TeamCodePage)
-      companyCode = WorksheetFunction.VLookup(Left(inputName, 2), .Range("G3:H21"), 2, False)
+      On Error Resume Next
+      companyCode = WorksheetFunction.VLookup(Left(inputName, 2), .Range("G3:H22"), 2, False)
+      If (Err.Number > 0) Then
+        MsgBox "業務機関名称の取得に失敗しました．" & vbCrLf & _
+                "業務機関コードのセルを選択し，契約先の業務機関をプルダウンメニューから選択してください．" _
+                ,,"らくびむ　- 業務機関取得エラー -"
+      End If
     End With
     
     With reg
@@ -54,22 +60,27 @@ Private Sub AutoIDInputBtn_Click()
     Set matches = reg.Execute(inputName)
     
     .Range("C6").Value = companyCode
-    .Range("C7").Value = Format(Wareki2Seireki(matches.item(0)), "00") & Format(matches.item(1), "000")
+    .Range("C7").Value = Format(ClipSeireki(matches.item(0)), "00") & Format(matches.item(1), "000")
   End With
 End Sub
 
 ' 和暦から西暦の下２桁を取得する
-Private Function Wareki2Seireki(year As String)
+Private Function ClipSeireki(year As String)
   Dim intYear As Integer
   intYear = CInt(year)
-  
-  If HeiseiBtn.Value = True Then
-    Wareki2Seireki = IIf(intYear - 12 >= 0, intYear - 12, 100 + intYear - 12)
-  ElseIf ReiwaBtn.Value = True Then
-    Wareki2Seireki = intYear + 18
-  ElseIf SeirekiBtn.Value = True Then
-    Wareki2Seireki = Right(year, 2)
+
+  Dim yearConverter As YearConverter
+  Set yearConverter = New YearConverter
+
+  Dim resultSeireki As Integer
+  resultSeireki = yearConverter.GetSeireki(intYear)
+
+  If (resultSeireki = -1) Then
+    MsgBox "年号の読み込みに失敗しました．" & vbCrLf & _
+              "契約番号の上２桁は「00」で出力されるため，適切な番号を設定してください．" _
+              ,,"らくびむ　- 年号取得エラー -"
+    ClipSeireki = 0
   Else
-    Wareki2Seireki = 0
+    ClipSeireki = resultSeireki Mod 100
   End If
 End Function

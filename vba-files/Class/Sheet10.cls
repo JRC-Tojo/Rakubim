@@ -12,6 +12,23 @@ Sub GetFileNamesBtn_Click()
   Dim systemSettings As SystemIdObj
   Set systemSettings = New SystemIdObj
   Dim lastIdx As Integer: lastIdx = 1
+
+  ' 必要なシステム設定が抜けていないか確認する
+  If (systemSettings.CompanyID = "") Then
+    MsgBox "業務機関名が入力されていません．" & vbCrLf & _
+              "入力シートの業務機関コードのセルを選択し，契約先の業務機関をプルダウンメニューから選択してください．" _
+              ,,"らくびむ　- 入力情報エラー -"
+  End If
+  If (systemSettings.ProjectID = "") Then
+    MsgBox "契約番号が入力されていません．" & vbCrLf & _
+              "入力シートの契約番号セルに契約番号となる5桁の数字を入力してください．" _
+              ,,"らくびむ　- 入力情報エラー -"
+  End If
+  If (systemSettings.StructureID = "") Then
+    MsgBox "構造物通し番号が入力されていません．" & vbCrLf & _
+              "入力シートの構造物通し番号のセルを選択して番号を入力してください．" _
+              ,,"らくびむ　- 入力情報エラー -"
+  End If
   
   If checkFill4Mokuroku() Then
     ' 前のデータをリセット
