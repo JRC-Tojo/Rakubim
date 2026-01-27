@@ -135,7 +135,7 @@ Private Function getBluePrintName(ByVal fileName As String) As String
   
   ' –`“ª‚Ì˜A”Ô‚ğœŠO
   With reg
-    .Pattern = "^([0-9‚O-‚X]+[|Q@`_\s~-]*)+"
+    .Pattern = "^([0-9‚O-‚X]+[|CQ@`_,\s~-]*)+"
     .Global = True
   End With
   tmpName = reg.Replace(fileName, "")
