@@ -26,6 +26,21 @@ Function HasItem(objCol As Collection, checkItem As Variant)
   End If
 End Function
 
+' Collectionの最小値を取得
+Function ColMin(col As Collection)
+  Dim minVal As Variant
+  minVal = 9999
+  
+  Dim i As Integer
+  For i = 1 To col.Count
+    If col(i) < minVal Then
+      minVal = col(i)
+    End If
+  Next i
+  
+  ColMin = minVal
+End Function
+
 ' 最大値のインデックスを取得
 Function ArgMax(col As Collection)
   Dim maxVal As Variant

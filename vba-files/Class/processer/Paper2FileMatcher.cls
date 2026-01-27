@@ -167,14 +167,25 @@ End Function
 
 ' PDFの連番処理用
 ' 指定されたファイルオブジェクトから番号を抜き出して割り当てていく
-Private Function ApplyContinuousFile(indexCounter As Integer)
+' `forceFixCounter` をTrueにすることでPaperPathsの最も小さい番号が１でない場合にIndexCounterを修正する
+Private Function ApplyContinuousFile(indexCounter As Integer, Optional forceFixCounter As Boolean = True)
   If (inner_ContinuousPDF Is Nothing) Then
     ApplyContinuousFile = ""
     Exit Function
   End If
 
-  If inner_ContinuousPDF.PaperPaths.Exists("idx" & indexCounter) = True Then
-    ApplyContinuousFile = inner_ContinuousPDF.PaperPaths("idx" & indexCounter)
+  ' 探索しようとするPDFファイルの番号を確認する
+  ' PDF連番の最小値が１ではない場合，探索しようとする番号`indexCounter`を最小値だけ嵩増しさせる
+  Dim minPaperNum As Integer
+  Dim targetCounter As Integer
+  targetCounter = indexCounter
+  minPaperNum = ColMin(inner_ContinuousPDF.PaperNumbers)
+  If (forceFixCounter And minPaperNum <> 1) Then
+    targetCounter = indexCounter + minPaperNum - 1
+  End If
+
+  If inner_ContinuousPDF.PaperPaths.Exists("idx" & targetCounter) = True Then
+    ApplyContinuousFile = inner_ContinuousPDF.PaperPaths("idx" & targetCounter)
   ElseIf inner_ContinuousPDF.PaperPaths.Exists("idx-1") = True Then
     ApplyContinuousFile = inner_ContinuousPDF.PaperPaths("idx-1")
   Else
