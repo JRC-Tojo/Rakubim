@@ -9,7 +9,7 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 
 Private Const ReleaseFilePath = "https://jrcjregroup.app.box.com/folder/348645297166"
-Private Const ThisVersion = "v1.0.2"
+Private Const ThisVersion = "v1.1.0"
 
 Sub Workbook_Open()
   Call SetPulldown
