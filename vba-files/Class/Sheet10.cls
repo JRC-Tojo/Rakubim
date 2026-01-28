@@ -12,38 +12,43 @@ Sub GetFileNamesBtn_Click()
   Dim systemSettings As SystemIdObj
   Set systemSettings = New SystemIdObj
   Dim lastIdx As Integer: lastIdx = 1
+  Dim isReadSuccess As Boolean
 
   ' 必要なシステム設定が抜けていないか確認する
   If (systemSettings.CompanyID = "") Then
     MsgBox "業務機関名が入力されていません．" & vbCrLf & _
               "入力シートの業務機関コードのセルを選択し，契約先の業務機関をプルダウンメニューから選択してください．" _
               ,,"らくびむ　- 入力情報エラー -"
+    Exit Sub
   End If
   If (systemSettings.ProjectID = "") Then
     MsgBox "契約番号が入力されていません．" & vbCrLf & _
               "入力シートの契約番号セルに契約番号となる5桁の数字を入力してください．" _
               ,,"らくびむ　- 入力情報エラー -"
+    Exit Sub
   End If
   If (systemSettings.StructureID = "") Then
     MsgBox "構造物通し番号が入力されていません．" & vbCrLf & _
               "入力シートの構造物通し番号のセルを選択して番号を入力してください．" _
               ,,"らくびむ　- 入力情報エラー -"
+    Exit Sub
   End If
   
   If checkFill4Mokuroku() Then
-    ' 前のデータをリセット
-    Call ResetData("ファイル名変更", "A2:B10000")
-
     ' 新ファイル名称の生成器を宣言
     Dim creater As NewNameCreater
     Set creater = New NewNameCreater
     Call creater.InitCreater(systemSettings.CompanyID, systemSettings.ProjectID, systemSettings.StructureID)
 
     ' 入力情報の読み取り
-    Call ReadMokurokuInput(creater)
+    isReadSuccess = ReadMokurokuInput(creater)
 
-    ' 書き出し
-    Call WriteOld2NewNames(creater)
+    If (isReadSuccess) Then
+      ' 前のデータをリセット
+      Call ResetData("ファイル名変更", "A2:B10000")
+      ' 書き出し
+      Call WriteOld2NewNames(creater)
+    End If
   Else
     MsgBox _
       "図面名とPDF、DWGファイルの対応がすべての図面に対して定義されていません" & vbCrLf & _
@@ -52,7 +57,8 @@ Sub GetFileNamesBtn_Click()
 End Sub
 
 ' 目録入力で入力された情報でデータを構築
-Private Sub ReadMokurokuInput(creater As NewNameCreater)
+' 読み取りに失敗した場合はFalseが返される
+Private Function ReadMokurokuInput(creater As NewNameCreater) As Boolean
   Dim sheets As SheetObj
   Set sheets = New SheetObj
   ' 何回空欄の行が連続したのか
@@ -80,7 +86,16 @@ Private Sub ReadMokurokuInput(creater As NewNameCreater)
         ' PaperObjを宣言
         Set paper = New PaperObj
         Call paper.InitPaperObj(.Cells(rowNum, "B").Value, paperCounter, .Cells(rowNum, "A").Value)
+        If (creater.Papers.Exists(paper.Id)) Then
+          MsgBox "目録入力シート内の図面名称に重複が含まれます．" & vbCrLf & _
+            "同一名称の図面は処理できないため，図面名称を変更して再度お試しください" & vbCrLf & vbCrLf & _
+            "【重複が確認された図面名称】　" & paper.SourceName _
+            , vbExclamation, "らくびむ　- 図面名称の重複エラー -"
+          ReadMokurokuInput = False
+          Exit Function
+        End If
         Call creater.Papers.Add(paper.Id, paper)
+
         ' FileObjを構築
         Set pdfFile = New FileObj
         Call pdfFile.InitFileObj(.Cells(rowNum, "G").Value)
@@ -97,7 +112,8 @@ Private Sub ReadMokurokuInput(creater As NewNameCreater)
       paperCounter = paperCounter + 1
     Loop
   End With
-End Sub
+  ReadMokurokuInput = True
+End Function
 
 Private Sub WriteOld2NewNames(creater As NewNameCreater)
   Dim sheets As SheetObj
@@ -112,6 +128,16 @@ End Sub
 ' 最終的なファイル名にリネーム
 Sub ChangeFileNamesBtn_Click()
   If checkFill4File() And checkFill4Mokuroku() Then
+    Dim duplicatedFileName As String
+    duplicatedFileName = checkDuplicate4File()
+    If (duplicatedFileName <> "") Then
+      MsgBox _
+        "変更後ファイル名「" & duplicatedFileName & "」が重複していたため，名前変更を行いませんでした．" & vbCrLf & _
+        "変更後ファイル名称を修正して再度お試しください．" _
+        , vbExclamation, "らくびむ - 変更後ファイル名の重複 -"
+      Exit Sub
+    End If
+
     Dim skippedPaths As Collection
     Set skippedPaths = New Collection
     Dim oldFileName As String
@@ -131,12 +157,16 @@ Sub ChangeFileNamesBtn_Click()
         pathTxts = pathTxts & "・" & p & vbCrLf
       Next p 
 
-      MsgBox "以下のファイルは存在しなかった、または既に開かれていたため、リネーム処理が行われませんでした。" & vbCrLf & pathTxts,,"らくびむ - 存在しないパス -" 
+      MsgBox _
+        "以下のファイルは存在しなかった、または既に開かれていたため、リネーム処理が行われませんでした。" & vbCrLf & _
+        "成果品フォルダが正しく設定されていることを確認し、問題が解決しない場合はご自身のデスクトップ上に成果品ファイルをダウンロードしてお試しください。" & vbCrLf & pathTxts _
+        , vbExclamation, "らくびむ - 存在しないパス -" 
     End If
   Else
     MsgBox _
       "旧ファイル名に対応する新ファイル名がすべての項目に対して定義されていません" & vbCrLf & _
-      "ファイル名変更シートの色が塗られている箇所に新ファイル名を定義してください"
+      "ファイル名変更シートの色が塗られている箇所に新ファイル名を定義してください" _
+      , vbExclamation, "らくびむ - 新ファイル定義エラー -"
   End If
 End Sub
 

@@ -50,6 +50,32 @@ Function checkFill4File()
   checkFill4File = Equal(oldCounts, newCounts)
 End Function
 
+' ファイル名変更シートの新ファイル名に重複が含まれないことを確認
+Function checkDuplicate4File() As String
+  Dim sheets As SheetObj: Set sheets = New SheetObj
+  Dim sUtils As SheetUtils: Set sUtils = New SheetUtils
+  Dim calcUtil As CalcUtils: Set calcUtil = New CalcUtils
+
+  ' 新ファイル一覧を取得
+  Dim newFiles As Collection
+  Set newFiles = sUtils.Range2Collection(Worksheets(sheets.RenamePage), "B2:B10000")
+
+  ' Dictに登録していき，重複が発生した場合は重複したファイル名を返す
+  Dim i As Integer
+  dim fId As String
+  Dim testDict As Dictionary: Set testDict = New Dictionary
+  checkDuplicate4File = ""
+  For i = 1 To newFiles.Count
+    fId = calcUtil.HASH_SHA256(newFiles.item(i))
+    If (testDict.Exists(fId) = False) Then
+      Call testDict.Add(fId, "dummy")
+    Else
+      checkDuplicate4File = newFiles.item(i)
+      Exit For
+    End If
+  Next i
+End Function
+
 ' 入力済みデータを削除する
 Function ResetData(sheetName As String, deleteRange As String)
   With Worksheets(sheetName).Range(deleteRange)
