@@ -1,0 +1,63 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "RepoErrMsgs_JaJp"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = True
+Attribute VB_Exposed = True
+
+Option Explicit
+
+' エラーキーに対応するメッセージ群
+Public inner_Msgs As ObjDict
+
+Private Sub class_initialize()
+  Set inner_Msgs = New ObjDict
+  With inner_Msgs
+    .Append "repo.sheet.readcol.error", _
+      Array("シート読み取りエラー", "{}シート{}列の読み取りに失敗しました．\n(エラーコード：{}, {})")
+    .Append "repo.sheet.readcell.empty", _
+      Array("セル読み取りエラー", "{}シート{}が空欄です．\n値を入力してください．")
+    .Append "repo.sheet.readcell.error", _
+      Array("セル読み取りエラー", "{}シート{}の読み取りに失敗しました．\n(エラーコード：{}, {})")
+    .Append "repo.sheet.writecol.error", _
+      Array("シート書き込みエラー", "{}シート{}列の書き込みに失敗しました．\n(エラーコード：{}, {})")
+    .Append "repo.sheet.getlastrow.error", _
+      Array("最終データ読み取りエラー", "{}シート{}列の末端データ位置の取得に失敗しました．\n(エラーコード：{}, {})")
+    .Append "repo.sheet.clearcells.error", _
+      Array("セル削除エラー", "{}シート{}のデータ削除に失敗しました．\n(エラーコード：{}, {})")
+    
+    .Append "service.file.load.folder_not_found", _
+      Array("フォルダエラー", "以下のパスに示すフォルダが見つかりません．\n{}")
+    .Append "service.file.load.empty_folder", _
+      Array("フォルダエラー", "以下のパスに示すフォルダにファイルが入っていません．\n{}")
+      
+    .Append "service.match.noFiles", _
+      Array("マッチングエラー", "マッチング対象のファイルが見つかりません．")
+    .Append "service.match.error", _
+      Array("マッチングエラー", "未知のエラーでマッチング処理に失敗しました．\n(エラーコード：{}, {})")
+      
+    .Append "repo.nameanalyzer.snippedname.empty", _
+      Array("名前解析エラー", "ファイル名「{}」から図面名称を取得できませんでした．")
+    .Append "repo.nameanalyzer.analyzename.error", _
+      Array("名前解析エラー", "ファイル名「{}」の解析中に未知のエラーが発生しました．\n(エラーコード：{}, {})")
+      
+    .Append "service.namecleaner.clean.error", _
+      Array("図面名正規化エラー", "未知のエラーが発生しました．\n(エラーコード：{}, {})")
+      
+    .Append "service.paper.build.emptySheet", _
+      Array("図面名エラー", "図面番号・図面名を入力してください．")
+    .Append "service.paper.build.mismatch", _
+      Array("図面名エラー", "図面番号・図面名を入力数が一致しません．\n図面番号・図面名の列に空欄が含まれていないことを確認してください．")
+    
+    .Append "service.sheet.pulldown.files", _
+      Array("入力エラー", "フォルダ内に存在しないファイル名は入力できません．")
+  End With
+End Sub
+
+' メッセージウィンドウのタイトル
+Public Property Get MsgboxTitle() As String
+  MsgboxTitle = "らくびむ"
+End Property
