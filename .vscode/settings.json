@@ -2,15 +2,19 @@
   "files.exclude": {
     "**/~$*": true
   },
+  "editor.tabSize": 2,
   "files.encoding": "shiftjis",
-  "files.autoGuessEncoding": true,
+  "files.autoGuessEncoding": false,
   "[python]": {
-    "editor.tabSize": 2,
+    "files.encoding": "utf8",
     "editor.defaultFormatter": "ms-python.autopep8",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.organizeImports": "explicit"
     }
+  },
+  "[json]": {
+    "files.encoding": "utf8"
   },
   "autopep8.args": [
     "--indent-size",

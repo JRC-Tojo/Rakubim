@@ -12,7 +12,11 @@ Private Const ReleaseFilePath = "https://jrcjregroup.app.box.com/folder/34864529
 Private Const ThisVersion = "v1.1.0"
 
 Sub Workbook_Open()
-  Call SetPulldown
+  Dim r As Routes
+  Set r = New Routes
+  
+  ' 目録入力シートにプルダウンを設置
+  Call r.SetPulldownForFiles()
 
   SplashScreen.Show
 
@@ -26,17 +30,6 @@ Sub Workbook_Open()
       ActiveWorkbook.FollowHyperlink Address:=ReleaseFilePath, SubAddress:="", NewWindow:=True
     End If
   End If
-End Sub
-
-Private Sub SetPulldown()
-  Dim matcher As Paper2FileMatcher
-  Set matcher = GetMatcher()
-  If (matcher Is Nothing) Then Exit Sub
-
-  Dim rowNum As Integer
-  rowNum = getLastPaperRows()
-
-  Call SetFilePulldownMenu(matcher, rowNum - LIMITED_SPACE_COUNTER)
 End Sub
 
 Private Function RequireUpdate() As Boolean

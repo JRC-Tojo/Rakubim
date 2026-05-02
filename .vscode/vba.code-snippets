@@ -1,0 +1,63 @@
+{
+	// VBAファイルの標準スニペット
+
+	"Create class": {
+		"scope": "vb",
+		"prefix": "class",
+		"body": [
+			"VERSION 1.0 CLASS",
+			"BEGIN",
+			"  MultiUse = -1  'True",
+			"END",
+			"Attribute VB_Name = \"$1\"",
+			"Attribute VB_GlobalNameSpace = False",
+			"Attribute VB_Creatable = False",
+			"Attribute VB_PredeclaredId = True",
+			"Attribute VB_Exposed = True",
+			"",
+			"Option Explicit",
+			"",
+		]
+	},
+
+	"Create module": {
+		"scope": "vb",
+		"prefix": "module",
+		"body": [
+			"Attribute VB_Name = \"$1\"",
+			"",
+			"Option Explicit",
+			"",
+		]
+	},
+
+	"Create test main function": {
+		"scope": "vb",
+		"prefix": "test",
+		"body": [
+			"VERSION 1.0 CLASS",
+			"BEGIN",
+			"  MultiUse = -1  'True",
+			"END",
+			"Attribute VB_Name = \"$1\"",
+			"Attribute VB_GlobalNameSpace = False",
+			"Attribute VB_Creatable = False",
+			"Attribute VB_PredeclaredId = True",
+			"Attribute VB_Exposed = True",
+			"",
+			"Option Explicit",
+			"",
+			"Public Function Run()",
+			"  Dim Ts As TestSuite",
+			"  Set Ts = New TestSuite",
+			"  Ts.Description = \"$1\"",
+			"",
+			"  With Ts.Test(\"$2\")",
+			"  ",
+			"  End With",
+			"",
+			"  Set Run = Ts",
+			"End Function",
+		]
+	}
+}
