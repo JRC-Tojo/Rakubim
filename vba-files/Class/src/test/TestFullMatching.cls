@@ -2,96 +2,141 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "TestCaseObj"
+Attribute VB_Name = "TestFullMatching"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
-Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_PredeclaredId = True
+Attribute VB_Exposed = True
 
 Option Explicit
 
-' 基本情報
-Private innerInfo_companyID As String
-Private innerInfo_projectID As String
-Private innerInfo_structureID As String
-Private innerInfo_designID As String
-Private innerInfo_useContinuousNumber As Boolean
-' テストケース名
-Private inner_testCaseFileName As String
-' 旧名称のファイル一覧
-Private inner_oldPdfNames As Collection
-Private inner_oldDwgNames As Collection
-' 新名称のファイル一覧
-Private inner_newPdfNames As Collection
-Private inner_newDwgNames As Collection
-' 図名一覧
-Private inner_paperNumbers As Collection
-Private inner_paperNames As Collection
+' テストケースを格納するフォルダ名
+Private Const CASES_FOLDER_NAME = "testCases"
+
+' テストケースExcelのうち，設定項目シートの名称
+Private Const BASE_INFO_SHEET_NAME = "基本情報"
+
+' テストケースExcelのうち，テスト対象データを格納したシートの名称
+Private Const TEST_DATA_SHEET_NAME = "図面ファイル対応一覧"
+
+
+Public Function Run()
+  Dim Ts As TestSuite
+  Set Ts = New TestSuite
+  Ts.Description = "TestFullMatching"
+
+  Dim testFolder As ObjPath
+  Set testFolder = New ObjPath
+  Set testFolder = testFolder.Init(ActiveWorkbook.path).Child("testCases")
+
+  If Not testFolder.Exists() Then
+    Set Run = Ts
+    Exit Function
+  End If
+
+  Dim caseFile As ObjPath
+  For Each caseFile In testFolder.Colldir()
+    Call _Run(Ts, caseFile)
+  Next
+
+  Set Run = Ts
+End Function
+
+
+Private Function _Run(ByRef Ts As TestSuite, wbPath As ObjPath)
+  ' load case
+  Dim wb As Workbook
+  Set wb = LoadTestWorkbook(wbPath)
+  If (wb Is Nothing) Then Exit Function
+
+  Dim config As ServiceSystemConfig
+  Set config = LoadConfigs(wb)
+  If (config Is Nothing) Then Exit Function
+
+  Dim matchingController As ControllerMatching
+  Set matchingController = New ControllerMatching
+  Dim sheetService As ServiceSheet
+  Set sheetService = New ServiceSheet
+  Call sheetService.SetWorkbook(wb)
+
+  Dim papers As ObjResult
+  Set papers = matchingController.LoadPapers(sheetService)
+  If (Not papers.isOK) Then Exit Function
+
+  ' TODO: loadedPathsをダミーファイル群に置換
+  ' TODO: PDF, CADで処理を分岐
+  Dim loadedFiles As ObjResult
+  Set loadedFiles = matchingController.LoadFiles(loadedPaths.value, useSeq)
+
+  With Ts.Test("Matching (Case: " & wbPath.Stem & ")")
+    ' Run target process
+
+    ' Check Result
+    ' Dim i As Long
+    ' For i = 0 To count
+    '   ' .IsEqual <処理結果>[i] <想定解>[i]  ' PDF
+    '   ' .IsEqual <処理結果>[i] <想定解>[i]  ' CAD
+    ' Next i
+  End With
+  
+  With Ts.Test("New Name (Case: " & wbPath.Stem & ")")
+    ' Run target process
+
+    ' Check Result
+    ' Dim i As Long
+    ' For i = 0 To count
+    '   ' .IsEqual <処理結果>[i] <想定解>[i]  ' PDF
+    '   ' .IsEqual <処理結果>[i] <想定解>[i]  ' CAD
+    ' Next i
+  End With
+End Function
+
+
+Private Function LoadTestWorkbook(targetPath As ObjPath) As Workbook
+  If (targetPath.Extension <> "xlsb") Then Exit Function
+
+  Dim ExcelApp As Application
+  Set ExcelApp = New Application
+
+  'エクセルを不可視で開く
+  ExcelApp.Visible = False      'エクセル可視/不可視設定
+  ExcelApp.DisplayAlerts = False      '警告メッセージをオフ
+  Set LoadTestWorkbook = ExcelApp.Workbooks.Open(targetPath, , True)
+End Function
+
+
+Private Function LoadConfigs(wb As Workbook) As ServiceSystemConfig
+  Dim config As ServiceSystemConfig
+  Set config = New ServiceSystemConfig
+
+  ' システム設定の読み込み
+  Dim resConfig As ObjResult
+  Set resConfig = config.LoadUserInput(wb)
+  If Not resConfig.isOK Then Exit Function
+  
+  Set LoadConfigs = config
+End Function
+
+
+' 読み込んだテストケースのうち，マッチング後のファイル一覧を元のファイル一覧としてlist[Path]を返す
+Private Function LoadDummyPaths(wb As Workbook) As ObjList
+
+End Function
+
 
 ' TestCaseObjの初期化
-Public Function InitTestCase(testCaseFileName As String)
-  inner_testCaseFileName = testCaseFileName
+' Public Function InitTestCase(testCaseFileName As String)
+'   inner_testCaseFileName = testCaseFileName
   
-  ' テストケースを取得
-  Call SetInnerVals()
-  ' テストケースを書き出し
-  Call CreateTestCaseFiles()
-End Function
-
-' テスト結果を表示
-Public Function GetSummary()
-  Dim matcher As Paper2FileMatcher
-  Set matcher = New Paper2FileMatcher
-  Dim creater As NewNameCreater
-  Set creater = New NewNameCreater
-
-  ' 図面一覧をMatcherに登録
-  Call matcher.BaseInitMatcher(ActiveWorkbook.path)
-  Call matcher.InitMatcher(inner_paperNames)
-
-  ' createrに必要な情報を登録
-  Call creater.InitCreater(innerInfo_companyID, innerInfo_projectID, innerInfo_structureID)
-
-  Dim i As Integer
-  Dim paper As PaperObj
-  For i = 1 To inner_paperNames.Count
-    ' 無効な図面以外をテスト
-    If (inner_paperNames.Item(i) <> "") Then
-      ' 図面データを宣言
-      Set paper = New PaperObj
-      Call paper.InitPaperObj( _
-        inner_paperNames.Item(i), _
-        i, _
-        inner_paperNumbers.Item(i) _
-      )
-    
-      ' マッチング
-      Call MatchPaper2File( _
-        matcher, _
-        paper, _
-        inner_oldPdfNames.Item(i), _
-        inner_oldDwgNames.Item(i) _
-      )
-    
-      ' リネームのためのCreaterを定義
-      Call SetDataForCreater( _
-        creater, _
-        paper, _
-        inner_oldPdfNames.Item(i), _
-        inner_oldDwgNames.Item(i) _
-      )
-    End If
-  Next i
-
-  ' リネーム結果の確認
-  Call CorrectRenameFiles(creater)
-
-  Debug.Print "All test cases in " & inner_testCaseFileName & " are done"
-End Function
+'   ' テストケースを取得
+'   Call SetInnerVals()
+'   ' テストケースを書き出し
+'   Call CreateTestCaseFiles()
+' End Function
 
 
 ' ファイル名一覧や図名一覧を取得
-Private Sub SetInnerVals()
+Private Function SetInnerVals()
   Dim ExcelApp As New Application
   Dim wb As Workbook
 
