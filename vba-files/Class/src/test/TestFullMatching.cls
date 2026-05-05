@@ -63,20 +63,27 @@ Private Function _Run(ByRef Ts As TestSuite, wbPath As ObjPath)
   Set papers = matchingController.LoadPapers(sheetService)
   If (Not papers.isOK) Then Exit Function
 
-  ' TODO: loadedPathsをダミーファイル群に置換
-  ' TODO: PDF, CADで処理を分岐
-  Dim loadedFiles As ObjResult
-  Set loadedFiles = matchingController.LoadFiles(loadedPaths.value, useSeq)
+  ' マッチ結果をダミーファイル群として読み込み
+  Dim loadedPdfPaths As ObjResult
+  Dim loadedCadPaths As ObjResult
+  Set loadedPdfPaths = sheetService.ReadPdfColAsPath(config.PdfFolderPath)
+  Set loadedCadPaths = sheetService.ReadCadColAsPath(config.CadFolderPath)
+  If (Not IsResultAllOK(loadedPdfPaths, loadedCadPaths)) Then Exit Function
+    
+  ' ダミーファイル群に対してマッチ結果を抽出
+  Dim matchedPdfNames As ObjResult
+  Dim matchedCadNames As ObjResult
+  Set matchedPdfNames = CalcMatchedFiles(matchingController, papers.value, loadedPdfPaths.value, config.UseSequenceForPdf)
+  Set matchedCadNames = CalcMatchedFiles(matchingController, papers.value, loadedCadPaths.value, config.UseSequenceForCad)
+  If (Not IsResultAllOK(matchedPdfNames, matchedCadNames)) Then Exit Function
 
   With Ts.Test("Matching (Case: " & wbPath.Stem & ")")
-    ' Run target process
-
     ' Check Result
-    ' Dim i As Long
-    ' For i = 0 To count
-    '   ' .IsEqual <処理結果>[i] <想定解>[i]  ' PDF
-    '   ' .IsEqual <処理結果>[i] <想定解>[i]  ' CAD
-    ' Next i
+    Dim i As Long
+    For i = 0 To count
+      .IsEqual loadedPdfPaths.value.At(i).Name matchedPdfNames.value.At(i)  ' PDF
+      .IsEqual loadedCadPaths.value.At(i).Name matchedCadNames.value.At(i)  ' CAD
+    Next i
   End With
   
   With Ts.Test("New Name (Case: " & wbPath.Stem & ")")
@@ -118,9 +125,24 @@ Private Function LoadConfigs(wb As Workbook) As ServiceSystemConfig
 End Function
 
 
-' 読み込んだテストケースのうち，マッチング後のファイル一覧を元のファイル一覧としてlist[Path]を返す
-Private Function LoadDummyPaths(wb As Workbook) As ObjList
+Private Function CalcMatchedFiles( _
+  matchingController As ControllerMatching, _
+  papers As ObjList, _
+  targetPaths As ObjList, _
+  useSeq As Boolean, _
+) As ObjResult
+  ' Path -> FileObj
+  Dim loadedFiles As ObjResult
+  Set loadedFiles = matchingController.LoadFiles(targetPaths, useSeq)
+  If (Not loadedFiles.isOK) Then
+    Set CalcMatchedFiles = loadedFiles
+    Exit Function
+  End If
 
+  ' 各図面とファイルをマッチング
+  Dim matchingService As ServiceMatching
+  Set matchingService = New ServiceMatching
+  Set CalcMatchedFiles = matchingService.Match(papers, loadedFiles.value, useSeq)
 End Function
 
 

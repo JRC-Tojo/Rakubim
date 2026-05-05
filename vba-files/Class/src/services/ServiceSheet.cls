@@ -48,6 +48,34 @@ Public Function WriteMatchedFileNames(pdfNames As ObjList, cadNames As ObjList) 
   Set WriteMatchedFileNames = PickResultErr(Nothing, wrotePdfRes, wroteCadRes)
 End Function
 
+' 指定した列の値をファイル名として`basePath/readName`のlist[Path]を作成
+Private Function ReadColAsPath(basePath As ObjPath, sheetName As String, startCell As String) As ObjResult
+  Dim colItems As ObjResult
+  Set colItems = inner_SheetRepo.ReadColumn(sheetName, startCell)
+  If (Not colItems.isOK) Then
+    Set ReadCadColAsPath = colItems
+    Exit Function
+  End If
+
+  Dim path As ObjPath
+  Dim paths As ObjList
+  Set paths = New ObjList
+  For Each path In colItems.value
+    Call paths.Append(basePath.Child(path))
+  Next
+
+  Set ReadColAsPath = paths
+End Function
+
+' 目録入力シートのPDF列をファイルパスとして読み込む
+Public Function ReadPdfColAsPath(basePath As ObjPath) As ObjResult
+  Set ReadPdfColAsPath = ReadColAsPath(basePath, MatchingSheetName, MatchingPdfStartCell)
+End Function
+
+' 目録入力シートのCAD列をファイルパスとして読み込む
+Public Function ReadCadColAsPath(basePath As ObjPath) As ObjResult
+  Set ReadCadColAsPath = ReadColAsPath(basePath, MatchingSheetName, MatchingCadStartCell)
+End Function
 
 ' 目録入力シートのPDF列とCAD列にプルダウンメニューを追加する
 Public Function SetFilesPulldown(pdfFilePaths As ObjList, cadFilePaths As ObjList, errLang As String) As ObjResult
