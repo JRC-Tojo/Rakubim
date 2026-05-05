@@ -14,3 +14,7 @@ secret/
 /PDF/
 /_CAD/
 /_PDF/
+
+# secret files
+/docs
+/testCases
