@@ -25,9 +25,15 @@ Public Function Run()
   Set Ts = New TestSuite
   Ts.Description = "TestRealCases"
 
+  ' テストケースファイルを開くためのExcel App
+  Dim ExcelApp As Application
+  Set ExcelApp = New Application
+  ExcelApp.Visible = False
+  ExcelApp.DisplayAlerts = False
+
   Dim testFolder As ObjPath
   Set testFolder = New ObjPath
-  Set testFolder = testFolder.Init(ActiveWorkbook.path).Child("testCases")
+  Set testFolder = testFolder.Init(ActiveWorkbook.Path).Child("testCases")
 
   If Not testFolder.Exists() Then
     Set Run = Ts
@@ -36,17 +42,18 @@ Public Function Run()
 
   Dim caseFile As ObjPath
   For Each caseFile In testFolder.Colldir()
-    Call runCase(Ts, caseFile)
+    Call runCase(Ts, ExcelApp, caseFile)
   Next
+
+  ' close Excel App
+  ExcelApp.Quit
 
   Set Run = Ts
 End Function
 
-
-Private Function runCase(ByRef Ts As TestSuite, wbPath As ObjPath)
-  ' load case
+Private Function runCase(ByRef Ts As TestSuite, ExcelApp As Application, wbPath As ObjPath)
   Dim wb As Workbook
-  Set wb = LoadTestWorkbook(wbPath)
+  Set wb = LoadTestWorkbook(ExcelApp, wbPath)
   If (wb Is Nothing) Then Exit Function
 
   Dim config As ServiceSystemConfig
@@ -102,16 +109,9 @@ Private Function runCase(ByRef Ts As TestSuite, wbPath As ObjPath)
 End Function
 
 
-Private Function LoadTestWorkbook(targetPath As ObjPath) As Workbook
+Private Function LoadTestWorkbook(ExcelApp As Application, targetPath As ObjPath) As Workbook
   If (targetPath.Extension <> "xlsx") Then Exit Function
   If (InStr(targetPath.Stem, "skip")) Then Exit Function
-
-  Dim ExcelApp As Application
-  Set ExcelApp = New Application
-
-  'エクセルを不可視で開く
-  ExcelApp.Visible = False      'エクセル可視/不可視設定
-  ExcelApp.DisplayAlerts = False      '警告メッセージをオフ
   Set LoadTestWorkbook = ExcelApp.Workbooks.Open(targetPath.FullPath, , True)
 End Function
 
