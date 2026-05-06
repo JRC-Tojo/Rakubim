@@ -53,18 +53,18 @@ Private Function ReadColAsPath(basePath As ObjPath, sheetName As String, startCe
   Dim colItems As ObjResult
   Set colItems = inner_SheetRepo.ReadColumn(sheetName, startCell)
   If (Not colItems.isOK) Then
-    Set ReadCadColAsPath = colItems
+    Set ReadColAsPath = colItems
     Exit Function
   End If
 
-  Dim path As ObjPath
+  Dim fileName As Variant
   Dim paths As ObjList
   Set paths = New ObjList
-  For Each path In colItems.value
-    Call paths.Append(basePath.Child(path))
+  For Each fileName In colItems.value
+    Call paths.Append(basePath.Child(fileName))
   Next
 
-  Set ReadColAsPath = paths
+  Set ReadColAsPath = Success(paths)
 End Function
 
 ' 目録入力シートのPDF列をファイルパスとして読み込む

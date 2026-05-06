@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "TestFullMatching"
+Attribute VB_Name = "TestRealCases"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
@@ -23,7 +23,7 @@ Private Const TEST_DATA_SHEET_NAME = "図面ファイル対応一覧"
 Public Function Run()
   Dim Ts As TestSuite
   Set Ts = New TestSuite
-  Ts.Description = "TestFullMatching"
+  Ts.Description = "TestRealCases"
 
   Dim testFolder As ObjPath
   Set testFolder = New ObjPath
@@ -34,16 +34,17 @@ Public Function Run()
     Exit Function
   End If
 
+  ' TODO: 高速化
   Dim caseFile As ObjPath
   For Each caseFile In testFolder.Colldir()
-    Call _Run(Ts, caseFile)
+    Call runCase(Ts, caseFile)
   Next
 
   Set Run = Ts
 End Function
 
 
-Private Function _Run(ByRef Ts As TestSuite, wbPath As ObjPath)
+Private Function runCase(ByRef Ts As TestSuite, wbPath As ObjPath)
   ' load case
   Dim wb As Workbook
   Set wb = LoadTestWorkbook(wbPath)
@@ -80,9 +81,9 @@ Private Function _Run(ByRef Ts As TestSuite, wbPath As ObjPath)
   With Ts.Test("Matching (Case: " & wbPath.Stem & ")")
     ' Check Result
     Dim i As Long
-    For i = 0 To count
-      .IsEqual loadedPdfPaths.value.At(i).Name matchedPdfNames.value.At(i)  ' PDF
-      .IsEqual loadedCadPaths.value.At(i).Name matchedCadNames.value.At(i)  ' CAD
+    For i = 0 To loadedPdfPaths.value.Count - 1
+      .IsEqual loadedPdfPaths.value.At(i).Name, matchedPdfNames.value.At(i)  ' PDF
+      .IsEqual loadedCadPaths.value.At(i).Name, matchedCadNames.value.At(i)  ' CAD
     Next i
   End With
   
@@ -96,11 +97,15 @@ Private Function _Run(ByRef Ts As TestSuite, wbPath As ObjPath)
     '   ' .IsEqual <処理結果>[i] <想定解>[i]  ' CAD
     ' Next i
   End With
+
+  ' close workbook
+  wb.Close SaveChanges:=False
 End Function
 
 
 Private Function LoadTestWorkbook(targetPath As ObjPath) As Workbook
-  If (targetPath.Extension <> "xlsb") Then Exit Function
+  If (targetPath.Extension <> "xlsx") Then Exit Function
+  If (InStr(targetPath.Stem, "skip")) Then Exit Function
 
   Dim ExcelApp As Application
   Set ExcelApp = New Application
@@ -108,7 +113,7 @@ Private Function LoadTestWorkbook(targetPath As ObjPath) As Workbook
   'エクセルを不可視で開く
   ExcelApp.Visible = False      'エクセル可視/不可視設定
   ExcelApp.DisplayAlerts = False      '警告メッセージをオフ
-  Set LoadTestWorkbook = ExcelApp.Workbooks.Open(targetPath, , True)
+  Set LoadTestWorkbook = ExcelApp.Workbooks.Open(targetPath.FullPath, , True)
 End Function
 
 
@@ -129,7 +134,7 @@ Private Function CalcMatchedFiles( _
   matchingController As ControllerMatching, _
   papers As ObjList, _
   targetPaths As ObjList, _
-  useSeq As Boolean, _
+  useSeq As Boolean _
 ) As ObjResult
   ' Path -> FileObj
   Dim loadedFiles As ObjResult
