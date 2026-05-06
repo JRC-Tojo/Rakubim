@@ -13,12 +13,6 @@ Option Explicit
 ' テストケースを格納するフォルダ名
 Private Const CASES_FOLDER_NAME = "testCases"
 
-' テストケースExcelのうち，設定項目シートの名称
-Private Const BASE_INFO_SHEET_NAME = "基本情報"
-
-' テストケースExcelのうち，テスト対象データを格納したシートの名称
-Private Const TEST_DATA_SHEET_NAME = "図面ファイル対応一覧"
-
 
 Public Function Run()
   Dim Ts As TestSuite
@@ -33,7 +27,7 @@ Public Function Run()
 
   Dim testFolder As ObjPath
   Set testFolder = New ObjPath
-  Set testFolder = testFolder.Init(ActiveWorkbook.Path).Child("testCases")
+  Set testFolder = testFolder.Init(ActiveWorkbook.Path).Child(CASES_FOLDER_NAME)
 
   If Not testFolder.Exists() Then
     Set Run = Ts

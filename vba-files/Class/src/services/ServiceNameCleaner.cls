@@ -10,8 +10,7 @@ Attribute VB_Exposed = True
 
 Option Explicit
 
-' ServiceNameCleaner: 既存の `FileNameCleaner` ロジックを流用し
-' 図面名・ファイル名から頻出語彙を除去する
+' ServiceNameCleaner: 図面名・ファイル名から頻出語彙を除去する
 
 ' 引数: pfs (ObjList of ModelPaper/ModelFile)
 ' 戻り値: ObjResult - 成功時は ObjList(ModelPaper/ModelFile) を返す
