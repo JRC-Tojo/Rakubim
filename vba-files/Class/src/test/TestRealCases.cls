@@ -34,7 +34,6 @@ Public Function Run()
     Exit Function
   End If
 
-  ' TODO: çÇë¨âª
   Dim caseFile As ObjPath
   For Each caseFile In testFolder.Colldir()
     Call runCase(Ts, caseFile)

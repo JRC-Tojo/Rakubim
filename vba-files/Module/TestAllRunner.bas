@@ -20,9 +20,7 @@ Public Sub RunAllTests()
   tests.Add New TestServiceNameCleaner
   tests.Add New TestBPE
   tests.Add New TestCluster
-
-  ' long run
-  ' tests.Add New TestRealCases
+  tests.Add New TestRealCases
 
   Dim t As Object
   For Each t In tests
