@@ -5,21 +5,9 @@
   "editor.tabSize": 2,
   "files.encoding": "shiftjis",
   "files.autoGuessEncoding": false,
-  "[python]": {
-    "files.encoding": "utf8",
-    "editor.defaultFormatter": "ms-python.autopep8",
-    "editor.formatOnSave": true,
-    "editor.codeActionsOnSave": {
-      "source.organizeImports": "explicit"
-    }
-  },
   "[json]": {
     "files.encoding": "utf8"
   },
-  "autopep8.args": [
-    "--indent-size",
-    "2"
-  ],
   "[markdown]": {
     "files.encoding": "utf8"
   }
