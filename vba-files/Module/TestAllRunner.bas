@@ -27,3 +27,12 @@ Public Sub RunAllTests()
     Reporter.ListenTo t.Run()
   Next t
 End Sub
+
+
+' ================= ŒÂ•ÊƒeƒXƒg =================
+
+Public Sub GenerateRealFiles()
+  Dim testRealCases As TestRealCases
+  Set testRealCases = New TestRealCases
+  Call testRealCases.GenerateRealFiles()
+End Sub

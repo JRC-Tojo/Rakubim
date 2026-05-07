@@ -142,3 +142,58 @@ Private Function CalcMatchedFiles( _
   Set matchingService = New ServiceMatching
   Set CalcMatchedFiles = matchingService.Match(papers, loadedFiles.value, useSeq)
 End Function
+
+
+' UIからの実テスト用ファイル群を生成する
+Public Function GenerateRealFiles()
+  ' テストケースファイルを開くためのExcel App
+  Dim ExcelApp As Application
+  Set ExcelApp = New Application
+  ExcelApp.Visible = False
+  ExcelApp.DisplayAlerts = False
+
+  Dim testFolder As ObjPath
+  Set testFolder = New ObjPath
+  Set testFolder = testFolder.Init(ActiveWorkbook.Path).Child(CASES_FOLDER_NAME)
+
+  Dim sheetService As ServiceSheet
+  Set sheetService = New ServiceSheet
+  Dim wb As Workbook
+  Dim config As ServiceSystemConfig
+  Dim caseFile As ObjPath
+  For Each caseFile In testFolder.Colldir()
+    Dim rc As VbMsgBoxResult
+    rc = MsgBox("テストケース「" & caseFile.Stem & "」のモックファイルを生成しますか？", vbYesNo) 
+
+    If (rc = vbYes) Then
+      Set wb = LoadTestWorkbook(ExcelApp, caseFile)
+      Call sheetService.SetWorkbook(wb)
+      Set config = LoadConfigs(wb)
+  
+      ' マッチ結果をダミーファイル群として読み込み
+      Dim loadedPdfPaths As ObjResult
+      Dim loadedCadPaths As ObjResult
+      Set loadedPdfPaths = sheetService.ReadPdfColAsPath(config.PdfFolderPath)
+      Set loadedCadPaths = sheetService.ReadCadColAsPath(config.CadFolderPath)
+      If (Not IsResultAllOK(loadedPdfPaths, loadedCadPaths)) Then
+        Dim errController As ControllerError
+        Set errController = New ControllerError
+        Call errController.ShowErrorMsg(PickResultErr(Nothing, loadedPdfPaths, loadedCadPaths).err) 
+        Exit Function
+      End If
+      
+      ' 旧ファイルを削除して新ファイルを生成
+      Call config.PdfFolderPath.Unlink(missingOk:=True)
+      Call config.CadFolderPath.Unlink(missingOk:=True)
+      Dim path As ObjPath
+      For Each path In loadedPdfPaths.value.Combine(loadedCadPaths.value)
+        Call path.Touch()
+      Next
+
+      ' １ケース生成すれば後続の処理は不要
+      wb.Close SaveChanges:=False
+      MsgBox "生成が完了しました" 
+      Exit Function
+    End If
+  Next
+End Function
