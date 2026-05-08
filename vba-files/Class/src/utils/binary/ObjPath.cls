@@ -28,12 +28,14 @@ Public Property Get IsFile() As Boolean
 End Property
 
 Public Property Get Name() As String
-  Dim fso As Object: Set fso = CreateObject("Scripting.FileSystemObject")
+  Dim fso As FileSystemObject
+  Set fso = New FileSystemObject
   Name = fso.GetFileName(p_FullPath)
 End Property
 
 Public Property Get Extension() As String
-  Dim fso As Object: Set fso = CreateObject("Scripting.FileSystemObject")
+  Dim fso As FileSystemObject
+  Set fso = New FileSystemObject
   Extension = LCase$(fso.GetExtensionName(p_FullPath))
 End Property
 
@@ -48,7 +50,8 @@ Public Property Get Stem() As String
 End Property
 
 Public Function Parent(Optional level As Long = 0) As ObjPath
-  Dim fso As Object: Set fso = CreateObject("Scripting.FileSystemObject")
+  Dim fso As FileSystemObject
+  Set fso = New FileSystemObject
   Dim parentPath As String
   parentPath = p_FullPath
 
@@ -90,7 +93,8 @@ Public Function ToString() As String
 End Function
 
 Public Function Exists() As Boolean
-  Dim fso As Object: Set fso = CreateObject("Scripting.FileSystemObject")
+  Dim fso As FileSystemObject
+  Set fso = New FileSystemObject
   If (Me.IsFile) Then
     Exists = fso.FileExists(p_FullPath)
   Else
@@ -109,7 +113,8 @@ Public Function Colldir() As ObjList
     Exit Function
   End If
 
-  Dim fso As Object: Set fso = CreateObject("Scripting.FileSystemObject")
+  Dim fso As FileSystemObject
+  Set fso = New FileSystemObject
   Dim folder As Object
   Set folder = fso.GetFolder(p_FullPath)
 
@@ -128,4 +133,35 @@ Public Function Colldir() As ObjList
   Next subfolder
 
   Set Colldir = childPaths
+End Function
+
+Public Function Touch(Optional parents As Boolean = True, Optional existOk As Boolean = True)
+  Dim fso As FileSystemObject
+  Set fso = New FileSystemObject
+
+  If (existOk And Me.Exists()) Then Exit Function
+
+  ' íÜä‘ÉtÉHÉãÉ_Çê∂ê¨Ç∑ÇÈ
+  If (parents And Not Me.Parent().Exists()) Then
+    Call Me.Parent().Touch()
+  End If
+
+  If (Me.IsFile) Then
+    Call fso.CreateTextFile(p_FullPath, True)
+  Else
+    Call fso.CreateFolder(p_FullPath)
+  End If
+End Function
+
+Public Function Unlink(Optional missingOk As Boolean = False)
+  Dim fso As FileSystemObject
+  Set fso = New FileSystemObject
+
+  If (missingOk And Not Me.Exists()) Then Exit Function
+
+  If (Me.IsFile) Then
+    Call fso.DeleteFile(p_FullPath, True)
+  Else
+    Call fso.DeleteFolder(p_FullPath)
+  End If  
 End Function

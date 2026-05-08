@@ -20,16 +20,21 @@ Public Function ReadColumn(wb As Workbook, sheetName As String, startCell As Str
   Dim list As ObjList
   Set list = New ObjList
   
-  Dim cellValue As Variant
+  ' 配列一括読み込み（最初の10000行）
+  Dim arrValues As Variant
   With wb.Worksheets(sheetName)
-    For Each cellValue In .Range(startCell).Resize(10000, 1)
-      If cellValue <> "" Then
-        list.Append cellValue
-      ElseIf Not ignoreEmptyCell Then
-        list.Append ""
-      End If
-    Next
+    arrValues = .Range(startCell).Resize(10000, 1).Value
   End With
+
+  ' 配列をループ処理
+  Dim i As Long
+  For i = 1 To UBound(arrValues)
+    If arrValues(i, 1) <> "" Then
+      list.Append arrValues(i, 1)
+    ElseIf Not ignoreEmptyCell Then
+      list.Append ""
+    End If
+  Next i
 
   Set ReadColumn = Success(list)
   Exit Function

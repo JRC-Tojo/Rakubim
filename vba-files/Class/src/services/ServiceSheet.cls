@@ -29,42 +29,58 @@ End Function
 
 ' 目録入力シートの図面番号列を読み取る
 Public Function ReadPaperNumbersInMatching() As ObjResult
-  Dim sheetRepo As RepoSheet
-  Set sheetRepo = New RepoSheet
-
-  Set ReadPaperNumbersInMatching = sheetRepo.ReadColumn(MatchingSheetName, MatchingPaperNumberStartCell)
+  Set ReadPaperNumbersInMatching = inner_SheetRepo.ReadColumn(MatchingSheetName, MatchingPaperNumberStartCell)
 End Function
 
 ' 目録入力シートの図面名称列を読み取る
 Public Function ReadPaperNamesInMatching() As ObjResult
-  Dim sheetRepo As RepoSheet
-  Set sheetRepo = New RepoSheet
-
-  Set ReadPaperNamesInMatching = sheetRepo.ReadColumn(MatchingSheetName, MatchingPaperNameStartCell)
+  Set ReadPaperNamesInMatching = inner_SheetRepo.ReadColumn(MatchingSheetName, MatchingPaperNameStartCell)
 End Function
 
 ' 与えられたPDFファイル名群とCADファイル名群を目録入力シートのPDF列とCAD列にそれぞれ書き込む
 Public Function WriteMatchedFileNames(pdfNames As ObjList, cadNames As ObjList) As ObjResult
-  Dim sheetRepo As RepoSheet
-  Set sheetRepo = New RepoSheet
-
   ' シートに書き込み
   Dim wrotePdfRes As ObjResult
   Dim wroteCadRes As ObjResult
-  Set wrotePdfRes = sheetRepo.WriteColFromCell(MatchingSheetName, MatchingPdfStartCell, pdfNames)
-  Set wroteCadRes = sheetRepo.WriteColFromCell(MatchingSheetName, MatchingCadStartCell, cadNames)
+  Set wrotePdfRes = inner_SheetRepo.WriteColFromCell(MatchingSheetName, MatchingPdfStartCell, pdfNames)
+  Set wroteCadRes = inner_SheetRepo.WriteColFromCell(MatchingSheetName, MatchingCadStartCell, cadNames)
 
   Set WriteMatchedFileNames = PickResultErr(Nothing, wrotePdfRes, wroteCadRes)
 End Function
 
+' 指定した列の値をファイル名として`basePath/readName`のlist[Path]を作成
+Private Function ReadColAsPath(basePath As ObjPath, sheetName As String, startCell As String) As ObjResult
+  Dim colItems As ObjResult
+  Set colItems = inner_SheetRepo.ReadColumn(sheetName, startCell)
+  If (Not colItems.isOK) Then
+    Set ReadColAsPath = colItems
+    Exit Function
+  End If
+
+  Dim fileName As Variant
+  Dim paths As ObjList
+  Set paths = New ObjList
+  For Each fileName In colItems.value
+    Call paths.Append(basePath.Child(fileName))
+  Next
+
+  Set ReadColAsPath = Success(paths)
+End Function
+
+' 目録入力シートのPDF列をファイルパスとして読み込む
+Public Function ReadPdfColAsPath(basePath As ObjPath) As ObjResult
+  Set ReadPdfColAsPath = ReadColAsPath(basePath, MatchingSheetName, MatchingPdfStartCell)
+End Function
+
+' 目録入力シートのCAD列をファイルパスとして読み込む
+Public Function ReadCadColAsPath(basePath As ObjPath) As ObjResult
+  Set ReadCadColAsPath = ReadColAsPath(basePath, MatchingSheetName, MatchingCadStartCell)
+End Function
 
 ' 目録入力シートのPDF列とCAD列にプルダウンメニューを追加する
 Public Function SetFilesPulldown(pdfFilePaths As ObjList, cadFilePaths As ObjList, errLang As String) As ObjResult
-  Dim sheetRepo As RepoSheet
-  Set sheetRepo = New RepoSheet
-
   Dim endRowNum As ObjResult
-  Set endRowNum = sheetRepo.GetLastRow(MatchingSheetName, MatchingPaperNameStartCell)
+  Set endRowNum = inner_SheetRepo.GetLastRow(MatchingSheetName, MatchingPaperNameStartCell)
   If (Not endRowNum.isOK) Then
     Set SetFilesPulldown = endRowNum
   End If
@@ -79,8 +95,8 @@ Public Function SetFilesPulldown(pdfFilePaths As ObjList, cadFilePaths As ObjLis
   Dim errTitle As String: errTitle = errMsgRepo.GetTitle("service.sheet.pulldown.files")
   Dim errMsg As String: errMsg = errMsgRepo.GetMsg("service.sheet.pulldown.files")
   
-  Call sheetRepo.Pulldown(MatchingSheetName, pdfAddress, pdfFilePaths, errTitle, errMsg)
-  Call sheetRepo.Pulldown(MatchingSheetName, cadAddress, cadFilePaths, errTitle, errMsg)
+  Call inner_SheetRepo.Pulldown(MatchingSheetName, pdfAddress, pdfFilePaths, errTitle, errMsg)
+  Call inner_SheetRepo.Pulldown(MatchingSheetName, cadAddress, cadFilePaths, errTitle, errMsg)
 
   Set SetFilesPulldown = Success()
 End Function

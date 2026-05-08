@@ -20,9 +20,19 @@ Public Sub RunAllTests()
   tests.Add New TestServiceNameCleaner
   tests.Add New TestBPE
   tests.Add New TestCluster
+  tests.Add New TestRealCases
 
   Dim t As Object
   For Each t In tests
     Reporter.ListenTo t.Run()
   Next t
+End Sub
+
+
+' ================= ŒÂ•ÊƒeƒXƒg =================
+
+Public Sub GenerateRealFiles()
+  Dim testRealCases As TestRealCases
+  Set testRealCases = New TestRealCases
+  Call testRealCases.GenerateRealFiles()
 End Sub

@@ -50,16 +50,6 @@ Public Sub Variants2Cell(arr As Variant, sheetName As String, startCell As Strin
   End With
 End Sub
 
-' —ñ”Ô†¨—ñ–¼
-Public Function ColumnIdx2Name(ByVal colNum As Long) As String
-  ColumnIdx2Name = Split(Columns(colNum).address, "$")(2)
-End Function
-
-' —ñ–¼¨—ñ”Ô†
-Public Function ColumnName2Idx(ByVal colName As String) As Long
-  ColumnName2Idx = Columns(colName).column
-End Function
-
 ' w’è‚µ‚½”ÍˆÍ‚ÉŠiq‚ğ•`‰æ‚·‚é
 Public Function MakeLattice(workSheetName As String, startCell As String, endCell As String)
   With Worksheets(workSheetName).Range(startCell & ":" & endCell)
