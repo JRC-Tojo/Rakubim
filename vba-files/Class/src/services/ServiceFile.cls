@@ -95,3 +95,69 @@ Private Function buildModelFiles(analyzer As ServiceNameAnalyzer, ps As ObjList,
 
   Set buildModelFiles = loadedFiles
 End Function
+
+
+' ファイル群に対する新規名称を返す
+' 引数：papers (ObjList[ModelPaper])
+'       files (ObjList[ObjPath])
+' 戻り値：ObjResult[Dict[oldName: NewName]]
+Public Function NewNames(papers As ObjList, files As ObjList, companyId As String, projectId As String, structureId As String) As ObjResult
+  If (papers.Count <> files.Count) Then
+    Set NewNames = Failure("service.file.newname.missmatch")
+    Exit Function
+  End If
+  If (companyId = "") Then
+    Set NewNames = Failure("service.file.newname.company")
+    Exit Function
+  End If
+  If (projectId = "") Then
+    Set NewNames = Failure("service.file.newname.project")
+    Exit Function
+  End If
+  If (structureId = "") Then
+    Set NewNames = Failure("service.file.newname.structure")
+    Exit Function
+  End If
+
+  Dim fileToPapers As ObjDict
+  Set fileToPapers = New ObjDict
+  Dim oldToNew As ObjDict
+  Set oldToNew = New ObjDict
+
+  ' ファイル名別に図面名のリストを作成
+  Dim fName As ObjPath
+  Dim paper As ModelPaper
+  Dim emptyPapers As ObjList
+  Dim i As Long
+  For i = 0 To papers.Count
+    fName = files.At(i).Name
+    paper = papers.At(i)
+    If (fileToPapers.Exists(fName)) Then 
+      Call fileToPapers.At(fName).Append(paper)
+    Else
+      Set emptyPapers = New ObjList
+      Call emptyPapers.InitItems(paper)
+      Call fileToPapers.Append(fName, emptyPapers)
+    End If
+  Next i
+
+  ' 定数宣言
+  Dim newNameHeader As String
+  newNameHeader = companyId & "-" & projectId & "-" & structureId
+  Dim fileExt As String
+  fileExt = files.At(0).Extension
+
+  ' ファイル別に新ファイル名を作成
+  Dim fpsPair As ModelKeyValue
+  For Each fpsPair In fileToPapers
+    Call oldToNew.Append(fpsPair.Key, CreateFileNameFromPapers(fpsPair.Value, newNameHeader, fileExt))
+  Next
+
+  Set NewNames = Success(oldToNew)
+End Function
+
+
+' 新規ファイル名を作成
+Private Function CreateFileNameFromPapers(papers As ObjList, header As String, fileExt As String) As String
+  ' TODO: 実装
+End Function

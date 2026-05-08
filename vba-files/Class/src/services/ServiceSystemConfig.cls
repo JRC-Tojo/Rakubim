@@ -108,3 +108,18 @@ End Property
 Public Property Get UseSequenceForCad() As Boolean
   UseSequenceForCad = False
 End Property
+
+Public Property Get CompanyId() As String
+  CompanyId = GetCachedVals("CompanyID")
+End Property
+
+Public Property Get ProjectId() As String
+  ProjectId = GetCachedVals("ProjectID")
+End Property
+
+Public Property Get StructureId() As String
+  StructureId = GetCachedVals("StructureID")
+
+Public Property Get DesignId() As String
+  DesignId = GetCachedVals("DesignID")
+End Property

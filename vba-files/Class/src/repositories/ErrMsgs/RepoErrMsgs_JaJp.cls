@@ -33,6 +33,14 @@ Private Sub class_initialize()
       Array("フォルダエラー", "以下のパスに示すフォルダが見つかりません．\n{}")
     .Append "service.file.load.empty_folder", _
       Array("フォルダエラー", "以下のパスに示すフォルダにファイルが入っていません．\n{}")
+    .Append "service.file.newname.missmatch", _
+      Array("新ファイル名エラー", "図面名とPDF、DWGファイルの対応がすべての図面に対して定義されていません．\n目録入力シートのPDFファイルとDWGファイルの列をすべて埋めてください．")
+    .Append "service.file.newname.company", _
+      Array("新ファイル名エラー", "業務機関名が入力されていません．\n入力シートの業務機関コードのセルを選択し，契約先の業務機関をプルダウンメニューから選択してください．")
+    .Append "service.file.newname.project", _
+      Array("新ファイル名エラー", "契約番号が入力されていません．\n入力シートの契約番号セルに契約番号となる5桁の数字を入力してください．")
+    .Append "service.file.newname.structure", _
+      Array("新ファイル名エラー", "構造物通し番号が入力されていません．\n入力シートの構造物通し番号のセルを選択して番号を入力してください．")
       
     .Append "service.match.noFiles", _
       Array("マッチングエラー", "マッチング対象のファイルが見つかりません．")

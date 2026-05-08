@@ -18,6 +18,10 @@ Private Const MatchingPaperNameStartCell As String = "B2"
 Private Const MatchingPdfStartCell As String = "G2"
 Private Const MatchingCadStartCell As String = "H2"
 
+Private Const RenameSheetName As String = "ファイル名変更"
+Private Const RenameOldNamesStartCell As String = "A2"
+Private Const RenameNewNamesStartCell As String = "B2"
+
 Private Sub class_initialize()
   Set inner_SheetRepo = New RepoSheet
 End Sub
@@ -113,4 +117,21 @@ End Function
 Public Function ClearMatchedFileNames() As ObjResult
 
 
+End Function
+
+
+' ファイル名変更シートにおいて，各ファイルの変更先名称の提案をシートに書き込む
+Public Function WriteSuggestRenames(pdfOldToNewDict As ObjDict, cadOldToNewDict As ObjDict) As ObjResult
+  Dim oldNames As ObjList
+  Dim newNames As ObjList
+  Set oldNames = pdfOldToNewDict.Keys().Combine(cadOldToNewDict.Keys())
+  Set newNames = pdfOldToNewDict.Values().Combine(cadOldToNewDict.Values())
+
+  ' シートに書き込み
+  Dim wroteOldRes As ObjResult
+  Dim wroteNewRes As ObjResult
+  Set wroteOldRes = inner_SheetRepo.WriteColFromCell(RenameSheetName, RenameOldNamesStartCell, oldNames)
+  Set wroteNewRes = inner_SheetRepo.WriteColFromCell(RenameSheetName, RenameNewNamesStartCell, newNames)
+
+  Set WriteSuggestRenames = PickResultErr(Nothing, wroteOldRes, wroteNewRes)
 End Function
