@@ -34,3 +34,11 @@ Public Function SetPulldownForFiles() As ObjResult
   Set sheetController = New ControllerSheet8
   Set SetPulldownForFiles = sheetController.SetFilesPulldown()
 End Function
+
+
+' 図面とマッチングしたファイルの新名称を提案する
+Public Function SuggestNewFileNames() As ObjResult
+  Dim sheetController As ControllerSheet10
+  Set sheetController = New ControllerSheet10
+  Set SuggestNewFileNames = sheetController.SuggestNewName()
+End Function

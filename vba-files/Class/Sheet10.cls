@@ -7,122 +7,18 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
+
 ' ファイル名変更タブを作成
 Sub GetFileNamesBtn_Click()
-  Dim systemSettings As SystemIdObj
-  Set systemSettings = New SystemIdObj
-  Dim lastIdx As Integer: lastIdx = 1
-  Dim isReadSuccess As Boolean
+  Dim r As Routes
+  Set r = New Routes
 
-  ' 必要なシステム設定が抜けていないか確認する
-  If (systemSettings.CompanyID = "") Then
-    MsgBox "業務機関名が入力されていません．" & vbCrLf & _
-              "入力シートの業務機関コードのセルを選択し，契約先の業務機関をプルダウンメニューから選択してください．" _
-              ,,"らくびむ　- 入力情報エラー -"
-    Exit Sub
+  Dim suggestResult As ObjResult
+  Set suggestResult = r.SuggestNewFileNames()
+
+  If (Not suggestResult.isOK) Then
+    Call r.ShowErrorMsg(suggestResult.err)
   End If
-  If (systemSettings.ProjectID = "") Then
-    MsgBox "契約番号が入力されていません．" & vbCrLf & _
-              "入力シートの契約番号セルに契約番号となる5桁の数字を入力してください．" _
-              ,,"らくびむ　- 入力情報エラー -"
-    Exit Sub
-  End If
-  If (systemSettings.StructureID = "") Then
-    MsgBox "構造物通し番号が入力されていません．" & vbCrLf & _
-              "入力シートの構造物通し番号のセルを選択して番号を入力してください．" _
-              ,,"らくびむ　- 入力情報エラー -"
-    Exit Sub
-  End If
-  
-  If checkFill4Mokuroku() Then
-    ' 新ファイル名称の生成器を宣言
-    Dim creater As NewNameCreater
-    Set creater = New NewNameCreater
-    Call creater.InitCreater(systemSettings.CompanyID, systemSettings.ProjectID, systemSettings.StructureID)
-
-    ' 入力情報の読み取り
-    isReadSuccess = ReadMokurokuInput(creater)
-
-    If (isReadSuccess) Then
-      ' 前のデータをリセット
-      Call ResetData("ファイル名変更", "A2:B10000")
-      ' 書き出し
-      Call WriteOld2NewNames(creater)
-    End If
-  Else
-    MsgBox _
-      "図面名とPDF、DWGファイルの対応がすべての図面に対して定義されていません" & vbCrLf & _
-      "目録入力シートのPDFファイルとDWGファイルの列をすべて埋めてください"
-  End If
-End Sub
-
-' 目録入力で入力された情報でデータを構築
-' 読み取りに失敗した場合はFalseが返される
-Private Function ReadMokurokuInput(creater As NewNameCreater) As Boolean
-  Dim sheets As SheetObj
-  Set sheets = New SheetObj
-  ' 何回空欄の行が連続したのか
-  Dim spaceCounter As Integer: spaceCounter = 0
-  ' 目録を読み込み始める行番号
-  Dim rowNum As Integer: rowNum = INIT_ROWNUM_MOKUROKU
-  
-  Dim paper As PaperObj
-  Dim paperCounter As Integer: paperCounter = 1
-  Dim cadFile As FileObj
-  Dim pdfFile As FileObj
-  With Worksheets(sheets.MokurokuPage)
-    Do
-      ' 目録データの取得
-      If checkSpaceRow(rowNum) Then
-        ' 将来的に
-        ' ・目録一行空け：次の列から目録を再開
-        ' ・目録二行空け：次のページから目録を再開
-        ' という規則にする予定のため、spaceCount = 3までは容認
-        spaceCounter = spaceCounter + 1
-        If spaceCounter = 3 Then Exit Do
-      Else
-        spaceCounter = 0
-        
-        ' PaperObjを宣言
-        Set paper = New PaperObj
-        Call paper.InitPaperObj(.Cells(rowNum, "B").Value, paperCounter, .Cells(rowNum, "A").Value)
-        If (creater.Papers.Exists(paper.Id)) Then
-          MsgBox "目録入力シート内の図面名称に重複が含まれます．" & vbCrLf & _
-            "同一名称の図面は処理できないため，図面名称を変更して再度お試しください" & vbCrLf & vbCrLf & _
-            "【重複が確認された図面名称】　" & paper.SourceName _
-            , vbExclamation, "らくびむ　- 図面名称の重複エラー -"
-          ReadMokurokuInput = False
-          Exit Function
-        End If
-        Call creater.Papers.Add(paper.Id, paper)
-
-        ' FileObjを構築
-        Set pdfFile = New FileObj
-        Call pdfFile.InitFileObj(.Cells(rowNum, "G").Value)
-        Set cadFile = New FileObj
-        Call cadFile.InitFileObj(.Cells(rowNum, "H").Value)
-
-        ' 図面とファイルの対応関係を記録
-        Call creater.SetPDFFile(pdfFile, paper.Id)
-        Call creater.SetCADFile(cadFile, paper.Id)
-      End If
-        
-      ' 次処理に向けて値を更新
-      rowNum = rowNum + 1
-      paperCounter = paperCounter + 1
-    Loop
-  End With
-  ReadMokurokuInput = True
-End Function
-
-Private Sub WriteOld2NewNames(creater As NewNameCreater)
-  Dim sheets As SheetObj
-  Dim sUtils As SheetUtils
-  Set sheets = New SheetObj
-  Set sUtils = New SheetUtils
-
-  Call sUtils.Collection2Cell(creater.OldNames, sheets.RenamePage, "A2")
-  Call sUtils.Collection2Cell(creater.NewNames, sheets.RenamePage, "B2")
 End Sub
 
 ' 最終的なファイル名にリネーム
