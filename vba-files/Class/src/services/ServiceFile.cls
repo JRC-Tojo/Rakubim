@@ -126,13 +126,13 @@ Public Function NewNames(papers As ObjList, files As ObjList, companyId As Strin
   Set oldToNew = New ObjDict
 
   ' ファイル名別に図面名のリストを作成
-  Dim fName As ObjPath
+  Dim fName As String
   Dim paper As ModelPaper
   Dim emptyPapers As ObjList
   Dim i As Long
-  For i = 0 To papers.Count
+  For i = 0 To papers.Count - 1
     fName = files.At(i).Name
-    paper = papers.At(i)
+    Set paper = papers.At(i)
     If (fileToPapers.Exists(fName)) Then 
       Call fileToPapers.At(fName).Append(paper)
     Else
@@ -227,7 +227,7 @@ Private Function FormattedPaperIdxsFromPapers(papers As ObjList) As String
   Dim formattedGroupIdxs As ObjList
   Set formattedGroupIdxs = New ObjList
   Dim groupedIdx As ObjList
-  Dim pIdx As Long
+  Dim pIdx As Variant
   For Each groupedIdx In groupedIdxs
     Set formattedGroupIdx = New ObjList
     For Each pIdx In groupedIdx
@@ -272,7 +272,7 @@ Private Function FormattedPaperNumsFromPapers(papers As ObjList) As String
   Dim formattedGroupNums As ObjList
   Set formattedGroupNums = New ObjList
   Dim groupedNum As ObjList
-  Dim pNum As Long
+  Dim pNum As Variant
   For Each groupedNum In groupedNums
     Set formattedGroupNum = New ObjList
     For Each pNum In groupedNum
@@ -283,7 +283,7 @@ Private Function FormattedPaperNumsFromPapers(papers As ObjList) As String
 
   ' 連続/不連続状態を略記で表現
   Dim formattedPaperNums As String
-  formattedPaperNums = formatGroupedConsecutiveNumbers(formattedGroupIdxs, "、その", "～その")
+  formattedPaperNums = formatGroupedConsecutiveNumbers(formattedGroupNums, "、その", "～その")
 
   FormattedPaperNumsFromPapers = "（その" & formattedPaperNums & "）"
 End Function
@@ -311,7 +311,7 @@ Private Function groupConsecutiveNumbers(targets As ObjList, Optional ignores As
   Dim currentGroup As ObjList
   Set currentGroup = New ObjList
 
-  Dim target As Long
+  Dim target As Variant
   For Each target In targets
     ' 無視する数字の場合
     If (thisIgnores.Contains(target)) Then

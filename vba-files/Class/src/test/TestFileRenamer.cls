@@ -136,10 +136,10 @@ Private Function runCase(Ts As TestSuite, scenario As ObjDict)
     Dim gotNewName As String
     Dim expNewName As String
     Dim i As Long
-    For i = 0 To scenario.At("expects").Count
+    For i = 0 To scenario.At("expects").Count - 1
       oldName = GetTestFileName(i)
       gotNewName = oldToNewNames.value.At(oldName)
-      expNewName = scenario.At("expects").At(i)
+      expNewName = scenario.At("expects").At(i).FullPath
       .IsEqual gotNewName, expNewName
     Next i
   End With
@@ -161,6 +161,7 @@ Private Function buildCase( _
   Dim scenario As ObjDict
   Set scenario = New ObjDict
   Dim i As Long
+  Dim newPath As ObjPath
 
   Call scenario.Append("title", titleName)
   Call scenario.Append("papers", papers)
@@ -172,7 +173,8 @@ Private Function buildCase( _
   Dim maxFileIdx As Long: maxFileIdx = 0
   For i = 0 To filePaths.Count - 1
     If maxFileIdx < filePaths.At(i) Then maxFileIdx = filePaths.At(i)
-    Call filePaths.Update(i, GetTestFileName(filePaths.At(i)))
+    Set newPath = New ObjPath
+    Call filePaths.Update(i, newPath.Init(GetTestFileName(filePaths.At(i))))
   Next i
   Call scenario.Append("files", filePaths)
 
@@ -181,7 +183,8 @@ Private Function buildCase( _
   Set newNames = New ObjList
   Call newNames.InitItemsFromArray(newFileNames)
   For i = 0 To newNames.Count - 1
-    Call newNames.Update(i, TestHeader & "-" & newNames.At(i) & TestExt)
+    Set newPath = New ObjPath
+    Call newNames.Update(i, newPath.Init(TestHeader & "-" & newNames.At(i) & TestExt))
   Next i
   Call scenario.Append("expects", newNames)
 
