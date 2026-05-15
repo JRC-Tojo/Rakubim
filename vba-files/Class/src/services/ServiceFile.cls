@@ -183,7 +183,7 @@ Private Function FormattedTitleFromPapers(papers As ObjList) As String
     Call uniquePaperNames.Append(TitleFormatter(paper.SnippedName))  
   Next
 
-  FormattedTitleFromPapers = uniquePaperNames.Join(", ")
+  FormattedTitleFromPapers = uniquePaperNames.Join("、")
 End Function
 
 
@@ -300,7 +300,7 @@ Private Function groupConsecutiveNumbers(targets As ObjList, Optional ignores As
   End If
 
   Dim thisIgnores As ObjSet
-  If (thisIgnores Is Nothing) Then 
+  If (ignores Is Nothing) Then 
     Set thisIgnores = New ObjSet
   Else
     Set thisIgnores = ignores
@@ -314,19 +314,13 @@ Private Function groupConsecutiveNumbers(targets As ObjList, Optional ignores As
   Dim target As Variant
   For Each target In targets
     ' 無視する数字の場合
-    If (thisIgnores.Contains(target)) Then
-      ' 現在のグループに中身があれば結果に追加してリセット
-      If (currentGroup.Count > 0) Then
-        Call splitted.Append(currentGroup)
-        Set currentGroup = New ObjList
-      End If
-    Else
+    If (Not thisIgnores.Contains(target)) Then
       ' グループが空なら現在の数字を追加
       If (currentGroup.Count = 0) Then
         Call currentGroup.Append(target)
       Else
         ' 1つ前の数字と連続しているかチェック
-        If (target = currentGroup.At(-1)) Then
+        If (target = currentGroup.At(-1) + 1) Then
           Call currentGroup.Append(target)
         Else
           ' 連続していない場合、今のグループを結果に入れて新しいグループを開始
