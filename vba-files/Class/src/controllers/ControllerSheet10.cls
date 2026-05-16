@@ -11,6 +11,8 @@ Attribute VB_Exposed = True
 Option Explicit
 
 Public Function SuggestNewName() As ObjResult
+  Dim matchingController As ControllerMatching
+  Set matchingController = New ControllerMatching
   Dim fileService As ServiceFile
   Set fileService = New ServiceFile
   Dim sheetService As ServiceSheet
@@ -28,7 +30,7 @@ Public Function SuggestNewName() As ObjResult
 
   ' ê}ñ èÓïÒÇéÊìæ
   Dim papers As ObjResult
-  Set papers = LoadPapers(sheetService)
+  Set papers = matchingController.LoadPapers(sheetService)
   If Not papers.isOK Then
     Set SuggestNewName = papers
     Exit Function

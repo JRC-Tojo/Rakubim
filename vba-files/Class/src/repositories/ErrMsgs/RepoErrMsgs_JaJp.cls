@@ -59,6 +59,8 @@ Private Sub class_initialize()
       Array("図面名エラー", "図面番号・図面名を入力してください．")
     .Append "service.paper.build.mismatch", _
       Array("図面名エラー", "図面番号・図面名を入力数が一致しません．\n図面番号・図面名の列に空欄が含まれていないことを確認してください．")
+    .Append "service.paper.build.duplicated", _
+      Array("図面名エラー", "目録入力シート内の図面名称に重複が含まれます．\n同一名称の図面は処理できないため，図面名称を変更して再度お試しください．\n\n【重複が確認された図面名称】\n・{}")
     
     .Append "service.sheet.pulldown.files", _
       Array("入力エラー", "フォルダ内に存在しないファイル名は入力できません．")

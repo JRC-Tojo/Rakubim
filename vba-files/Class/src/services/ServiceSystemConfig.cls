@@ -11,25 +11,28 @@ Attribute VB_Exposed = True
 Option Explicit
 
 ' .LoadUserInput()で読み取った値を保存しておく
-Private cachedUserInput As Dictionary
+Private cachedUserInput As ObjDict
 
 ' ユーザー情報として読み取る情報のKeyとその位置を定義
-Private userInputPositions As Dictionary
+Private userInputPositions As ObjDict
 
 ' ユーザー入力シートの名前
 Private Const USER_INPUT_SHEET_NAME As String = "入力"
 
+' 事業所番号シートの名前
+Private Const OFFICE_CODES_SHEET_NAME As String = "業務機関コード"
+
 Private Sub Class_Initialize()
   ' ユーザー入力キャッシュの初期化
-  Set cachedUserInput = New Dictionary
+  Set cachedUserInput = New ObjDict
 
   ' ユーザー入力位置の定義
-  Set userInputPositions = New Dictionary
-  userInputPositions.Add "TargetFolder", "E3"
-  userInputPositions.Add "CompanyID", "C6"
-  userInputPositions.Add "ProjectID", "C7"
-  userInputPositions.Add "StructureID", "C8"
-  userInputPositions.Add "DesignID", "C9"
+  Set userInputPositions = New ObjDict
+  Call userInputPositions.Append("TargetFolder", "E3")
+  Call userInputPositions.Append("CompanyID", "C6")
+  Call userInputPositions.Append("ProjectID", "C7")
+  Call userInputPositions.Append("StructureID", "C8")
+  Call userInputPositions.Append("DesignID", "C9")
 End Sub
 
 ' ユーザーがExcelに入力した内容を取得する
@@ -44,30 +47,43 @@ Public Function LoadUserInput(Optional wb As Workbook = Nothing) As ObjResult
   End If
   
   ' セル位置から情報を読み取ってキャッシュに格納
-  Dim key As Variant
-  For Each key In userInputPositions.Keys
-    Dim cellAddress As String
-    cellAddress = userInputPositions(key)
+  Dim keyVal As ModelKeyValue
+  For Each keyVal In userInputPositions
     Dim res As ObjResult
-    Set res = sheetRepo.ReadCell(USER_INPUT_SHEET_NAME, cellAddress, True)
+    Set res = sheetRepo.ReadCell(USER_INPUT_SHEET_NAME, keyVal.Value, True)
     If Not res.isOK Then
       Set LoadUserInput = res.err
       Exit Function
     End If
-    cachedUserInput.Add key, res.value
-  Next key
+    Call cachedUserInput.Append(keyVal.Key, res.value)
+  Next
 
   ' 特殊オブジェクトから値を取得する
-  cachedUserInput.Add "UseContinuousNumber", CBool(sheetRepo.ReadObjValue(USER_INPUT_SHEET_NAME, "useContinuousNumberCheck"))
+  Call cachedUserInput.Append("UseContinuousNumber", CBool(sheetRepo.ReadObjValue(USER_INPUT_SHEET_NAME, "useContinuousNumberCheck")))
+  Call cachedUserInput.Update("CompanyID", getCompanyID(wb, cachedUserInput.At("CompanyID")))
+
 
   Set LoadUserInput = Success(Nothing)
+End Function
+
+
+' 業務機関コードから情報を取得する
+Private Function getCompanyID(wb As Workbook, name As String)
+  Dim ws As Worksheet
+  If (wb Is Nothing) Then
+    Set ws = Worksheets(OFFICE_CODES_SHEET_NAME)
+  Else
+    Set ws = wb.Worksheets(OFFICE_CODES_SHEET_NAME)
+  End If
+
+  getCompanyID = WorksheetFunction.VLookup(name, ws.Range("H3:I21"), 2, False)
 End Function
 
 
 ' キャッシュの読み取り
 Private Function GetCachedVals(targetKey As String) As Variant
   Debug.Assert IsLoadedCache  ' 読み取り前にMe.LoadUserInput()を呼び出す必要がある
-  GetCachedVals = cachedUserInput(targetKey)
+  GetCachedVals = cachedUserInput.At(targetKey)
 End Function
 
 ' メッセージの表示言語
@@ -119,6 +135,7 @@ End Property
 
 Public Property Get StructureId() As String
   StructureId = GetCachedVals("StructureID")
+End Property
 
 Public Property Get DesignId() As String
   DesignId = GetCachedVals("DesignID")

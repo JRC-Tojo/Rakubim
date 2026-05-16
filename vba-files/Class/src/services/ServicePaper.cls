@@ -35,8 +35,8 @@ End Function
 ' Private helper: 生データ ObjList を受け取り ModelPaper の ObjResult of ObjList を返す
 ' 役割を小さい関数に分割することでテストと可読性を改善する
 Private Function buildModelPapers(analyzer As ServiceNameAnalyzer, numbers As ObjList, names As ObjList) As ObjResult
-  Dim paperObjs As ObjList
-  Set paperObjs = New ObjList
+  Dim pNameToPobj As ObjDict
+  Set pNameToPobj = New ObjDict
   
   ' numbers と names の要素数を確認
   If (numbers.Count = 0 Or names.Count = 0) Then
@@ -54,14 +54,19 @@ Private Function buildModelPapers(analyzer As ServiceNameAnalyzer, numbers As Ob
   Dim info As ModelAnalyzed
   Dim pm As ModelPaper
   For i = 0 To numbers.Count - 1
+    If (pNameToPobj.Exists(names.At(i))) Then
+      Set buildModelPapers = Failure("service.paper.build.duplicated", names.At(i))
+      Exit Function
+    End If
+
     Set res = analyzer.AnalyzeName(names.At(i), False)
     If res.isOK Then
       Set info = res.value
       Set pm = New ModelPaper
       Call pm.InitModel(numbers.At(i), names.At(i), info.AnalyzedName, info.SnippedName, info.PaperNumbers)
-      Call paperObjs.Append(pm)
+      Call pNameToPobj.Append(names.At(i), pm)
     End If
   Next i
 
-  Set buildModelPapers = Success(paperObjs)
+  Set buildModelPapers = Success(pNameToPobj.Values)
 End Function
