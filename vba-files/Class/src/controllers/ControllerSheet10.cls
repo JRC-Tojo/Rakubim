@@ -66,3 +66,41 @@ Public Function SuggestNewName() As ObjResult
 
   Set SuggestNewName = Success()
 End Function
+
+
+Public Function RenameFiles() As ObjResult
+  Dim fileService As ServiceFile
+  Set fileService = New ServiceFile
+  Dim sheetService As ServiceSheet
+  Set sheetService = New ServiceSheet
+  Dim config As ServiceSystemConfig
+  Set config = New ServiceSystemConfig
+
+  ' システム設定の読み込み
+  Dim resConfig As ObjResult
+  Set resConfig = config.LoadUserInput()
+  If Not resConfig.isOK Then
+    Set RenameFiles = resConfig
+    Exit Function
+  End If
+
+  ' ファイルパス一覧を読み込み
+  Dim oldPaths As ObjResult
+  Dim newPaths As ObjResult
+  Set oldPaths = sheetService.ReadOldFilePaths(config.PdfFolderPath, config.PdfExtensions, config.CadFolderPath, config.CadExtensions)
+  Set newPaths = sheetService.ReadNewFilePaths(config.PdfFolderPath, config.PdfExtensions, config.CadFolderPath, config.CadExtensions)
+  If (Not IsResultAllOK(oldPaths, newPaths)) Then
+    Set RenameFiles = PickResultErr(Nothing, oldPaths, newPaths)
+    Exit Function
+  End If
+
+  ' ファイルのリネーム
+  Dim renameRes As ObjResult
+  Set renameRes = fileService.RenameFiles(oldPaths.value, newPaths.value)
+  If Not renameRes.isOK Then
+    Set RenameFiles = renameRes
+    Exit Function
+  End If
+
+  Set RenameFiles = Success()
+End Function

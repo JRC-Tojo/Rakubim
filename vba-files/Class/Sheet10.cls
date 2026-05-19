@@ -23,46 +23,14 @@ End Sub
 
 ' 最終的なファイル名にリネーム
 Sub ChangeFileNamesBtn_Click()
-  If checkFill4File() And checkFill4Mokuroku() Then
-    Dim duplicatedFileName As String
-    duplicatedFileName = checkDuplicate4File()
-    If (duplicatedFileName <> "") Then
-      MsgBox _
-        "変更後ファイル名「" & duplicatedFileName & "」が重複していたため，名前変更を行いませんでした．" & vbCrLf & _
-        "変更後ファイル名称を修正して再度お試しください．" _
-        , vbExclamation, "らくびむ - 変更後ファイル名の重複 -"
-      Exit Sub
-    End If
+  Dim r As Routes
+  Set r = New Routes
 
-    Dim skippedPaths As Collection
-    Set skippedPaths = New Collection
-    Dim oldFileName As String
-    Dim newFileName As String
-    For rowNum = 2 To getRanameFileCounts() + 1
-      oldFileName = ""
-      newFileName = ""
-      Call Renamer(rowNum, oldFileName, newFileName)
-      If (newFileName = "") Then
-        skippedPaths.Add(oldFileName)
-      End If
-    Next rowNum
+  Dim renameResult As ObjResult
+  Set renameResult = r.RenameFiles()
 
-    If (skippedPaths.Count > 0) Then
-      Dim pathTxts As String
-      For Each p In skippedPaths
-        pathTxts = pathTxts & "・" & p & vbCrLf
-      Next p 
-
-      MsgBox _
-        "以下のファイルは存在しなかった、または既に開かれていたため、リネーム処理が行われませんでした。" & vbCrLf & _
-        "成果品フォルダが正しく設定されていることを確認し、問題が解決しない場合はご自身のデスクトップ上に成果品ファイルをダウンロードしてお試しください。" & vbCrLf & pathTxts _
-        , vbExclamation, "らくびむ - 存在しないパス -" 
-    End If
-  Else
-    MsgBox _
-      "旧ファイル名に対応する新ファイル名がすべての項目に対して定義されていません" & vbCrLf & _
-      "ファイル名変更シートの色が塗られている箇所に新ファイル名を定義してください" _
-      , vbExclamation, "らくびむ - 新ファイル定義エラー -"
+  If (Not renameResult.isOK) Then
+    Call r.ShowErrorMsg(renameResult.err)
   End If
 End Sub
 

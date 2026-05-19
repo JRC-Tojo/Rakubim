@@ -42,3 +42,11 @@ Public Function SuggestNewFileNames() As ObjResult
   Set sheetController = New ControllerSheet10
   Set SuggestNewFileNames = sheetController.SuggestNewName()
 End Function
+
+
+' ファイル名変更シートの旧ファイル名列と新ファイル名列を読み取り、ファイルのリネームを行う
+Public Function RenameFiles() As ObjResult
+  Dim sheetController As ControllerSheet10
+  Set sheetController = New ControllerSheet10
+  Set RenameFiles = sheetController.RenameFiles()
+End Function

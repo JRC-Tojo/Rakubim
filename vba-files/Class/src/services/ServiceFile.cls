@@ -370,3 +370,43 @@ End Function
 Private Function ToPaddedString(ByVal num As Variant, ByVal digits As Integer) As String
   ToPaddedString = Format(num, String(digits, "0"))
 End Function
+
+' ============================================
+
+' 旧ファイル名一覧を新ファイル名一覧にリネームする
+' 引数：oldFiles (ObjList[ObjPath]) 旧ファイル名のパスオブジェクトのリスト
+'       newNames (ObjList[String]) 新ファイル名のリスト（旧ファイル名とインデックスが対応していること）
+' 戻り値：ObjResult[Nothing]
+Public Function RenameFiles(oldFiles As ObjList, newNames As ObjList) As ObjResult
+  If (oldFiles.Count <> newNames.Count) Then
+    Set RenameFiles = Failure("service.file.rename.missmatch")
+    Exit Function
+  End If
+
+  Dim oldPath As ObjPath
+  Dim newPath As ObjPath
+  Dim errFileNames As ObjList
+  Set errFileNames = New ObjList
+
+  Dim i As Long
+  For i = 0 To oldFiles.Count - 1
+    Set oldPath = oldFiles.At(i)
+    Set newPath = newNames.At(i)
+    On Error Resume Next
+    Call oldPath.Rename(newPath)
+    If Err.Number <> 0 And (Not newPath.Exists()) Then
+      Dim errMsg As String
+      errMsg = "(" & Err.Number & ": " & Err.Description & ")"
+      Call errFileNames.Append(oldPath.Name & " " & errMsg)
+      Err.Clear
+    End If
+  Next i
+
+  If (errFileNames.Count > 0) Then
+    Dim errPathTxt As String
+    errPathTxt = "・" & errFileNames.Join(vbCrLf & "・")
+    Set RenameFiles = Failure("service.file.rename.failed", errPathTxt)
+  Else
+    Set RenameFiles = Success()
+  End If
+End Function

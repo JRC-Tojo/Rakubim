@@ -67,6 +67,8 @@ Private Function ReadColAsPath(basePath As ObjPath, targetExts As ModelExts, she
   Dim tmpPath As ObjPath
   For Each fileName In colItems.value
     Set tmpPath = basePath.Child(fileName)
+    ' TODO: 勝手に処理対象のファイルを落とすため，数のずれによるバグが生じる可能性あり
+    ' エラーとして返すようにすべきか？
     If targetExts.ExtSet.Contains(tmpPath.Extension) Then
       Call paths.Append(tmpPath)
     End If
@@ -138,4 +140,52 @@ Public Function WriteSuggestRenames(pdfOldToNewDict As ObjDict, cadOldToNewDict 
   Set wroteNewRes = inner_SheetRepo.WriteColFromCell(RenameSheetName, RenameNewNamesStartCell, newNames)
 
   Set WriteSuggestRenames = PickResultErr(Nothing, wroteOldRes, wroteNewRes)
+End Function
+
+
+' 名前変更シートの指定したセルの列に記載された各ファイル名をファイルパス一覧として返す
+Private Function readRenameSheetFilePaths(pdfBasePath As ObjPath, pdfExts As ModelExts, cadBasePath As ObjPath, cadExts As ModelExts, startCell As String) As ObjResult
+  Dim pdfPaths As ObjResult
+  Dim cadPaths As ObjResult
+
+  Set pdfPaths = ReadColAsPath(pdfBasePath, pdfExts, RenameSheetName, startCell)
+  Set cadPaths = ReadColAsPath(cadBasePath, cadExts, RenameSheetName, startCell)
+  If (Not IsResultAllOK(pdfPaths, cadPaths)) Then
+    Set readRenameSheetFilePaths = PickResultErr(Nothing, pdfPaths, cadPaths)
+    Exit Function
+  End If
+
+  Set readRenameSheetFilePaths = Success(pdfPaths.value.Combine(cadPaths.value))
+End Function
+
+
+' 名前変更シートにおける旧ファイルパス一覧を返す
+Public Function ReadOldFilePaths(pdfBasePath As ObjPath, pdfExts As ModelExts, cadBasePath As ObjPath, cadExts As ModelExts) As ObjResult
+  Set ReadOldFilePaths = readRenameSheetFilePaths(pdfBasePath, pdfExts, cadBasePath, cadExts, RenameOldNamesStartCell)
+End Function
+
+
+' 名前変更シートにおける新ファイルパス一覧を返す
+Public Function ReadNewFilePaths(pdfBasePath As ObjPath, pdfExts As ModelExts, cadBasePath As ObjPath, cadExts As ModelExts) As ObjResult
+  Dim newPaths As ObjResult
+  Set newPaths = readRenameSheetFilePaths(pdfBasePath, pdfExts, cadBasePath, cadExts, RenameNewNamesStartCell)
+  If (Not newPaths.isOK) Then
+    Set ReadNewFilePaths = newPaths
+    Exit Function
+  End If
+
+  ' 新ファイル名が重複していないか確認
+  Dim newPath As ObjPath
+  Dim newPathSet As ObjSet
+  Set newPathSet = New ObjSet
+  For Each newPath In newPaths.value
+    If newPathSet.Contains(newPath.FullPath) Then
+      Set ReadNewFilePaths = Failure("service.sheet.newname.duplicated", newPath.Name)
+      Exit Function
+    Else
+      Call newPathSet.Append(newPath.FullPath)
+    End If
+  Next newPath
+
+  Set ReadNewFilePaths = newPaths
 End Function
