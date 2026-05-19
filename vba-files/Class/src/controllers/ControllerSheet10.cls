@@ -39,8 +39,8 @@ Public Function SuggestNewName() As ObjResult
   ' “ü—ÍÏ‚İ‚Ìƒtƒ@ƒCƒ‹ŒQ‚ğ“Ç‚İ‚İ
   Dim loadedPdfPaths As ObjResult
   Dim loadedCadPaths As ObjResult
-  Set loadedPdfPaths = sheetService.ReadPdfColAsPath(config.PdfFolderPath)
-  Set loadedCadPaths = sheetService.ReadCadColAsPath(config.CadFolderPath)
+  Set loadedPdfPaths = sheetService.ReadPdfColAsPath(config.PdfFolderPath, config.PdfExtensions)
+  Set loadedCadPaths = sheetService.ReadCadColAsPath(config.CadFolderPath, config.CadExtensions)
   If (Not IsResultAllOK(loadedPdfPaths, loadedCadPaths)) Then
     Set SuggestNewName = PickResultErr(Nothing, loadedPdfPaths, loadedCadPaths)
     Exit Function

@@ -107,12 +107,12 @@ Public Property Get CadFolderPath() As ObjPath
   Set CadFolderPath = path.Init(GetCachedVals("TargetFolder")).Child("CAD")
 End Property
 
-Public Property Get PdfExtensions() As Variant
+Public Property Get PdfExtensions() As ModelExts
   Dim exts As ModelExts: Set exts = New ModelExts
   Set PdfExtensions = exts.InitModel("pdf")
 End Property
 
-Public Property Get CadExtensions() As Variant
+Public Property Get CadExtensions() As ModelExts
   Dim exts As ModelExts: Set exts = New ModelExts
   Set CadExtensions = exts.InitModel("dwg", "dxf")
 End Property
