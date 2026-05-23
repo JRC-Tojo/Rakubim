@@ -59,6 +59,10 @@ Public Function ClearCells(sheetName As String, cellAddress As String) As ObjRes
   Set ClearCells = inner_IO.ClearCells(inner_Workbook, sheetName, cellAddress)
 End Function
 
+Public Function RegistCellMsg(sheetName As String, cellAddress As String, msg As String) As ObjResult
+  Set RegistCellMsg = inner_IO.RegistCellMsg(inner_Workbook, sheetName, cellAddress, msg)
+End Function
+
 ' ========================= IO =========================
 
 Public Function ReadObjValue(sheetName As String, objName As String) As Variant

@@ -21,6 +21,8 @@ Private Const MatchingCadStartCell As String = "H2"
 Private Const RenameSheetName As String = "ファイル名変更"
 Private Const RenameOldNamesStartCell As String = "A2"
 Private Const RenameNewNamesStartCell As String = "B2"
+Private Const RenameNoRenamePdfMsgCell As String = "G6"
+Private Const RenameNoRenameCadMsgCell As String = "G8"
 
 Private Sub class_initialize()
   Set inner_SheetRepo = New RepoSheet
@@ -188,4 +190,67 @@ Public Function ReadNewFilePaths(pdfBasePath As ObjPath, pdfExts As ModelExts, c
   Next newPath
 
   Set ReadNewFilePaths = newPaths
+End Function
+
+
+' 指定した拡張子の新ファイル名称を旧ファイル名称に戻す
+Private Function RevertNewFileNames(targetExts As ModelExts) As ObjResult
+  Dim oldFileNames As ObjResult
+  Dim newFileNames As ObjResult
+  Set newFileNames = inner_SheetRepo.ReadColumn(RenameSheetName, RenameNewNamesStartCell)
+  Set oldFileNames = inner_SheetRepo.ReadColumn(RenameSheetName, RenameOldNamesStartCell)
+  If (Not IsResultAllOK(newFileNames, oldFileNames)) Then
+    Set RevertNewFileNames = PickResultErr(Nothing, newFileNames, oldFileNames)
+    Exit Function
+  End If
+
+  ' 新ファイル名を旧ファイル名と同じにする
+  Dim i As Long
+  Dim newFileName As String
+  Dim newFilePath As ObjPath
+  Dim oldFileName As String
+  For i = 0 To newFileNames.value.Count - 1
+    oldFileName = oldFileNames.value.At(i)
+    newFileName = newFileNames.value.At(i)
+    Set newFilePath = New ObjPath
+    Call newFilePath.Init(newFileName)
+    If (targetExts.ExtSet.Contains(newFilePath.Extension)) Then
+      Call newFileNames.value.Update(i, oldFileName)
+    End If
+  Next i
+
+  ' 変更済み新ファイル名一覧をシートに書き込む
+  Dim wroteRes As ObjResult
+  Set wroteRes = inner_SheetRepo.WriteColFromCell(RenameSheetName, RenameNewNamesStartCell, newFileNames.value)
+  If (Not wroteRes.isOK) Then
+    Set RevertNewFileNames = wroteRes
+    Exit Function
+  End If
+
+  Set RevertNewFileNames = Success()
+End Function
+
+
+' 名前変更シートの新旧ファイル名称を同じにする標準処理
+Private Function ShowNoRenameMsg(targetExts As ModelExts, msgCell As String) As ObjResult
+  Dim revertRes As ObjResult
+  Set revertRes = RevertNewFileNames(targetExts)
+  If (Not revertRes.isOK) Then
+    Set ShowNoRenameMsg = revertRes
+    Exit Function
+  End If
+
+  Set ShowNoRenameMsg = inner_SheetRepo.RegistCellMsg(RenameSheetName, msgCell, "設定OK")
+End Function
+
+
+' ファイル名変更シートにおいて，新PDFファイル名を旧ファイル名と同じにする
+Public Function ShowNoRename4PDFMsg(pdfExts As ModelExts) As ObjResult
+  Set ShowNoRename4PDFMsg = ShowNoRenameMsg(pdfExts, RenameNoRenamePdfMsgCell)
+End Function
+
+
+' ファイル名変更シートにおいて，新PDFファイル名を旧ファイル名と同じにする
+Public Function ShowNoRename4CADMsg(cadExts As ModelExts) As ObjResult
+  Set ShowNoRename4CADMsg = ShowNoRenameMsg(cadExts, RenameNoRenameCadMsgCell)
 End Function

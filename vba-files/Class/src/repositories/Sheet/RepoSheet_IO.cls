@@ -109,3 +109,22 @@ Public Function ClearCells(wb As Workbook, sheetName As String, cellAddress As S
 ErrHandler:
   Set ClearCells = Failure("repo.sheet.clearcells.error", sheetName, cellAddress, Err.Number, Err.Description)
 End Function
+
+
+' 指定セルにN秒で消えるメッセージを登録する
+Public Function RegistCellMsg(wb As Workbook, sheetName As String, cellAddress As String, msg As String, Optional duration As Long = 5) As ObjResult
+  On Error GoTo ErrHandler
+  Dim targetCell As Range
+  Set targetCell = wb.Worksheets(sheetName).Range(cellAddress)
+  
+  ' メッセージをセルに表示
+  targetCell.Value = msg
+  
+  ' `duration`秒後にメッセージを消す
+  Application.OnTime Now + TimeValue("00:00:" & Right("0" & duration, 2)), "'OnTimeHelper.ResetCell """ & sheetName & """,""" & cellAddress & """'"
+  
+  Set RegistCellMsg = Success()
+  Exit Function
+ErrHandler:
+  Set RegistCellMsg = Failure("repo.sheet.registcellmsg.error", sheetName, cellAddress, Err.Number, Err.Description)
+End Function

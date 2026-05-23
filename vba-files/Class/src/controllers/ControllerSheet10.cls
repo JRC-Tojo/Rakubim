@@ -104,3 +104,39 @@ Public Function RenameFiles() As ObjResult
 
   Set RenameFiles = Success()
 End Function
+
+
+Public Function NoRenamePdf() As ObjResult
+  Dim sheetService As ServiceSheet
+  Set sheetService = New ServiceSheet
+  Dim config As ServiceSystemConfig
+  Set config = New ServiceSystemConfig
+
+  ' システム設定の読み込み
+  Dim resConfig As ObjResult
+  Set resConfig = config.LoadUserInput()
+  If Not resConfig.isOK Then
+    Set NoRenamePdf = resConfig
+    Exit Function
+  End If
+
+  Set NoRenamePdf = sheetService.ShowNoRename4PDFMsg(config.PdfExtensions)
+End Function
+
+
+Public Function NoRenameCad() As ObjResult
+  Dim sheetService As ServiceSheet
+  Set sheetService = New ServiceSheet
+  Dim config As ServiceSystemConfig
+  Set config = New ServiceSystemConfig
+
+  ' システム設定の読み込み
+  Dim resConfig As ObjResult
+  Set resConfig = config.LoadUserInput()
+  If Not resConfig.isOK Then
+    Set NoRenameCad = resConfig
+    Exit Function
+  End If
+
+  Set NoRenameCad = sheetService.ShowNoRename4CADMsg(config.CadExtensions)
+End Function

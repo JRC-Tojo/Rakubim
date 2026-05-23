@@ -50,3 +50,19 @@ Public Function RenameFiles() As ObjResult
   Set sheetController = New ControllerSheet10
   Set RenameFiles = sheetController.RenameFiles()
 End Function
+
+
+' PDFファイルの名前変更を行わない
+Public Function NoRenamePdf() As ObjResult
+  Dim sheetController As ControllerSheet10
+  Set sheetController = New ControllerSheet10
+  Set NoRenamePdf = sheetController.NoRenamePdf()
+End Function
+
+
+' CADファイルの名前変更を行わない
+Public Function NoRenameCad() As ObjResult
+  Dim sheetController As ControllerSheet10
+  Set sheetController = New ControllerSheet10
+  Set NoRenameCad = sheetController.NoRenameCad()
+End Function
