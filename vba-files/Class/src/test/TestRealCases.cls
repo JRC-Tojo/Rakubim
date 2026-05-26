@@ -67,8 +67,8 @@ Private Function runCase(ByRef Ts As TestSuite, ExcelApp As Application, wbPath 
   ' マッチ結果をダミーファイル群として読み込み
   Dim loadedPdfPaths As ObjResult
   Dim loadedCadPaths As ObjResult
-  Set loadedPdfPaths = sheetService.ReadPdfColAsPath(config.PdfFolderPath)
-  Set loadedCadPaths = sheetService.ReadCadColAsPath(config.CadFolderPath)
+  Set loadedPdfPaths = sheetService.ReadPdfColAsPath(config.PdfFolderPath, config.PdfExtensions)
+  Set loadedCadPaths = sheetService.ReadCadColAsPath(config.CadFolderPath, config.CadExtensions)
   If (Not IsResultAllOK(loadedPdfPaths, loadedCadPaths)) Then Exit Function
     
   ' ダミーファイル群に対してマッチ結果を抽出
@@ -173,8 +173,8 @@ Public Function GenerateRealFiles()
       ' マッチ結果をダミーファイル群として読み込み
       Dim loadedPdfPaths As ObjResult
       Dim loadedCadPaths As ObjResult
-      Set loadedPdfPaths = sheetService.ReadPdfColAsPath(config.PdfFolderPath)
-      Set loadedCadPaths = sheetService.ReadCadColAsPath(config.CadFolderPath)
+      Set loadedPdfPaths = sheetService.ReadPdfColAsPath(config.PdfFolderPath, config.PdfExtensions)
+      Set loadedCadPaths = sheetService.ReadCadColAsPath(config.CadFolderPath, config.CadExtensions)
       If (Not IsResultAllOK(loadedPdfPaths, loadedCadPaths)) Then
         Dim errController As ControllerError
         Set errController = New ControllerError

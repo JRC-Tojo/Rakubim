@@ -18,6 +18,12 @@ Private Const MatchingPaperNameStartCell As String = "B2"
 Private Const MatchingPdfStartCell As String = "G2"
 Private Const MatchingCadStartCell As String = "H2"
 
+Private Const RenameSheetName As String = "ファイル名変更"
+Private Const RenameOldNamesStartCell As String = "A2"
+Private Const RenameNewNamesStartCell As String = "B2"
+Private Const RenameNoRenamePdfMsgCell As String = "G6"
+Private Const RenameNoRenameCadMsgCell As String = "G8"
+
 Private Sub class_initialize()
   Set inner_SheetRepo = New RepoSheet
 End Sub
@@ -49,7 +55,7 @@ Public Function WriteMatchedFileNames(pdfNames As ObjList, cadNames As ObjList) 
 End Function
 
 ' 指定した列の値をファイル名として`basePath/readName`のlist[Path]を作成
-Private Function ReadColAsPath(basePath As ObjPath, sheetName As String, startCell As String) As ObjResult
+Private Function ReadColAsPath(basePath As ObjPath, targetExts As ModelExts, sheetName As String, startCell As String) As ObjResult
   Dim colItems As ObjResult
   Set colItems = inner_SheetRepo.ReadColumn(sheetName, startCell)
   If (Not colItems.isOK) Then
@@ -60,21 +66,27 @@ Private Function ReadColAsPath(basePath As ObjPath, sheetName As String, startCe
   Dim fileName As Variant
   Dim paths As ObjList
   Set paths = New ObjList
+  Dim tmpPath As ObjPath
   For Each fileName In colItems.value
-    Call paths.Append(basePath.Child(fileName))
+    Set tmpPath = basePath.Child(fileName)
+    ' TODO: 勝手に処理対象のファイルを落とすため，数のずれによるバグが生じる可能性あり
+    ' エラーとして返すようにすべきか？
+    If targetExts.ExtSet.Contains(tmpPath.Extension) Then
+      Call paths.Append(tmpPath)
+    End If
   Next
 
   Set ReadColAsPath = Success(paths)
 End Function
 
 ' 目録入力シートのPDF列をファイルパスとして読み込む
-Public Function ReadPdfColAsPath(basePath As ObjPath) As ObjResult
-  Set ReadPdfColAsPath = ReadColAsPath(basePath, MatchingSheetName, MatchingPdfStartCell)
+Public Function ReadPdfColAsPath(basePath As ObjPath, targetExts As ModelExts) As ObjResult
+  Set ReadPdfColAsPath = ReadColAsPath(basePath, targetExts, MatchingSheetName, MatchingPdfStartCell)
 End Function
 
 ' 目録入力シートのCAD列をファイルパスとして読み込む
-Public Function ReadCadColAsPath(basePath As ObjPath) As ObjResult
-  Set ReadCadColAsPath = ReadColAsPath(basePath, MatchingSheetName, MatchingCadStartCell)
+Public Function ReadCadColAsPath(basePath As ObjPath, targetExts As ModelExts) As ObjResult
+  Set ReadCadColAsPath = ReadColAsPath(basePath, targetExts, MatchingSheetName, MatchingCadStartCell)
 End Function
 
 ' 目録入力シートのPDF列とCAD列にプルダウンメニューを追加する
@@ -113,4 +125,132 @@ End Function
 Public Function ClearMatchedFileNames() As ObjResult
 
 
+End Function
+
+
+' ファイル名変更シートにおいて，各ファイルの変更先名称の提案をシートに書き込む
+Public Function WriteSuggestRenames(pdfOldToNewDict As ObjDict, cadOldToNewDict As ObjDict) As ObjResult
+  Dim oldNames As ObjList
+  Dim newNames As ObjList
+  Set oldNames = pdfOldToNewDict.Keys().Combine(cadOldToNewDict.Keys())
+  Set newNames = pdfOldToNewDict.Values().Combine(cadOldToNewDict.Values())
+
+  ' シートに書き込み
+  Dim wroteOldRes As ObjResult
+  Dim wroteNewRes As ObjResult
+  Set wroteOldRes = inner_SheetRepo.WriteColFromCell(RenameSheetName, RenameOldNamesStartCell, oldNames)
+  Set wroteNewRes = inner_SheetRepo.WriteColFromCell(RenameSheetName, RenameNewNamesStartCell, newNames)
+
+  Set WriteSuggestRenames = PickResultErr(Nothing, wroteOldRes, wroteNewRes)
+End Function
+
+
+' 名前変更シートの指定したセルの列に記載された各ファイル名をファイルパス一覧として返す
+Private Function readRenameSheetFilePaths(pdfBasePath As ObjPath, pdfExts As ModelExts, cadBasePath As ObjPath, cadExts As ModelExts, startCell As String) As ObjResult
+  Dim pdfPaths As ObjResult
+  Dim cadPaths As ObjResult
+
+  Set pdfPaths = ReadColAsPath(pdfBasePath, pdfExts, RenameSheetName, startCell)
+  Set cadPaths = ReadColAsPath(cadBasePath, cadExts, RenameSheetName, startCell)
+  If (Not IsResultAllOK(pdfPaths, cadPaths)) Then
+    Set readRenameSheetFilePaths = PickResultErr(Nothing, pdfPaths, cadPaths)
+    Exit Function
+  End If
+
+  Set readRenameSheetFilePaths = Success(pdfPaths.value.Combine(cadPaths.value))
+End Function
+
+
+' 名前変更シートにおける旧ファイルパス一覧を返す
+Public Function ReadOldFilePaths(pdfBasePath As ObjPath, pdfExts As ModelExts, cadBasePath As ObjPath, cadExts As ModelExts) As ObjResult
+  Set ReadOldFilePaths = readRenameSheetFilePaths(pdfBasePath, pdfExts, cadBasePath, cadExts, RenameOldNamesStartCell)
+End Function
+
+
+' 名前変更シートにおける新ファイルパス一覧を返す
+Public Function ReadNewFilePaths(pdfBasePath As ObjPath, pdfExts As ModelExts, cadBasePath As ObjPath, cadExts As ModelExts) As ObjResult
+  Dim newPaths As ObjResult
+  Set newPaths = readRenameSheetFilePaths(pdfBasePath, pdfExts, cadBasePath, cadExts, RenameNewNamesStartCell)
+  If (Not newPaths.isOK) Then
+    Set ReadNewFilePaths = newPaths
+    Exit Function
+  End If
+
+  ' 新ファイル名が重複していないか確認
+  Dim newPath As ObjPath
+  Dim newPathSet As ObjSet
+  Set newPathSet = New ObjSet
+  For Each newPath In newPaths.value
+    If newPathSet.Contains(newPath.FullPath) Then
+      Set ReadNewFilePaths = Failure("service.sheet.newname.duplicated", newPath.Name)
+      Exit Function
+    Else
+      Call newPathSet.Append(newPath.FullPath)
+    End If
+  Next newPath
+
+  Set ReadNewFilePaths = newPaths
+End Function
+
+
+' 指定した拡張子の新ファイル名称を旧ファイル名称に戻す
+Private Function RevertNewFileNames(targetExts As ModelExts) As ObjResult
+  Dim oldFileNames As ObjResult
+  Dim newFileNames As ObjResult
+  Set newFileNames = inner_SheetRepo.ReadColumn(RenameSheetName, RenameNewNamesStartCell)
+  Set oldFileNames = inner_SheetRepo.ReadColumn(RenameSheetName, RenameOldNamesStartCell)
+  If (Not IsResultAllOK(newFileNames, oldFileNames)) Then
+    Set RevertNewFileNames = PickResultErr(Nothing, newFileNames, oldFileNames)
+    Exit Function
+  End If
+
+  ' 新ファイル名を旧ファイル名と同じにする
+  Dim i As Long
+  Dim newFileName As String
+  Dim newFilePath As ObjPath
+  Dim oldFileName As String
+  For i = 0 To newFileNames.value.Count - 1
+    oldFileName = oldFileNames.value.At(i)
+    newFileName = newFileNames.value.At(i)
+    Set newFilePath = New ObjPath
+    Call newFilePath.Init(newFileName)
+    If (targetExts.ExtSet.Contains(newFilePath.Extension)) Then
+      Call newFileNames.value.Update(i, oldFileName)
+    End If
+  Next i
+
+  ' 変更済み新ファイル名一覧をシートに書き込む
+  Dim wroteRes As ObjResult
+  Set wroteRes = inner_SheetRepo.WriteColFromCell(RenameSheetName, RenameNewNamesStartCell, newFileNames.value)
+  If (Not wroteRes.isOK) Then
+    Set RevertNewFileNames = wroteRes
+    Exit Function
+  End If
+
+  Set RevertNewFileNames = Success()
+End Function
+
+
+' 名前変更シートの新旧ファイル名称を同じにする標準処理
+Private Function ShowNoRenameMsg(targetExts As ModelExts, msgCell As String) As ObjResult
+  Dim revertRes As ObjResult
+  Set revertRes = RevertNewFileNames(targetExts)
+  If (Not revertRes.isOK) Then
+    Set ShowNoRenameMsg = revertRes
+    Exit Function
+  End If
+
+  Set ShowNoRenameMsg = inner_SheetRepo.RegistCellMsg(RenameSheetName, msgCell, "設定OK")
+End Function
+
+
+' ファイル名変更シートにおいて，新PDFファイル名を旧ファイル名と同じにする
+Public Function ShowNoRename4PDFMsg(pdfExts As ModelExts) As ObjResult
+  Set ShowNoRename4PDFMsg = ShowNoRenameMsg(pdfExts, RenameNoRenamePdfMsgCell)
+End Function
+
+
+' ファイル名変更シートにおいて，新PDFファイル名を旧ファイル名と同じにする
+Public Function ShowNoRename4CADMsg(cadExts As ModelExts) As ObjResult
+  Set ShowNoRename4CADMsg = ShowNoRenameMsg(cadExts, RenameNoRenameCadMsgCell)
 End Function

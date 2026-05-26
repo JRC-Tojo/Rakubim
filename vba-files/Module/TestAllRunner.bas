@@ -18,6 +18,7 @@ Public Sub RunAllTests()
   tests.Add New TestServiceMatching
   tests.Add New TestServiceNameAnalyzer
   tests.Add New TestServiceNameCleaner
+  tests.Add New TestFileRenamer
   tests.Add New TestBPE
   tests.Add New TestCluster
   tests.Add New TestRealCases
