@@ -95,3 +95,318 @@ Private Function buildModelFiles(analyzer As ServiceNameAnalyzer, ps As ObjList,
 
   Set buildModelFiles = loadedFiles
 End Function
+
+' ============================================
+
+' ファイル群に対する新規名称を返す
+' 引数：papers (ObjList[ModelPaper])
+'       files (ObjList[ObjPath])
+' 戻り値：ObjResult[Dict[oldName: NewName]]
+Public Function NewNames(papers As ObjList, files As ObjList, companyId As String, projectId As String, structureId As String) As ObjResult
+  If (papers.Count <> files.Count) Then
+    Set NewNames = Failure("service.file.newname.missmatch")
+    Exit Function
+  End If
+  If (companyId = "") Then
+    Set NewNames = Failure("service.file.newname.company")
+    Exit Function
+  End If
+  If (projectId = "") Then
+    Set NewNames = Failure("service.file.newname.project")
+    Exit Function
+  End If
+  If (structureId = "") Then
+    Set NewNames = Failure("service.file.newname.structure")
+    Exit Function
+  End If
+
+  Dim fileToPapers As ObjDict
+  Set fileToPapers = New ObjDict
+  Dim oldToNew As ObjDict
+  Set oldToNew = New ObjDict
+
+  ' ファイル名別に図面名のリストを作成
+  Dim fName As String
+  Dim paper As ModelPaper
+  Dim emptyPapers As ObjList
+  Dim i As Long
+  For i = 0 To papers.Count - 1
+    fName = files.At(i).Name
+    Set paper = papers.At(i)
+    If (fileToPapers.Exists(fName)) Then 
+      Call fileToPapers.At(fName).Append(paper)
+    Else
+      Set emptyPapers = New ObjList
+      Call emptyPapers.InitItems(paper)
+      Call fileToPapers.Append(fName, emptyPapers)
+    End If
+  Next i
+
+  ' 定数宣言
+  Dim newNameHeader As String
+  newNameHeader = companyId & "-" & projectId & "-" & structureId
+  Dim fileExt As String
+  fileExt = files.At(0).Extension
+
+  ' ファイル別に新ファイル名を作成
+  Dim fpsPair As ModelKeyValue
+  For Each fpsPair In fileToPapers
+    Call oldToNew.Append(fpsPair.Key, CreateFileNameFromPapers(fpsPair.Value, newNameHeader, fileExt))
+  Next
+
+  Set NewNames = Success(oldToNew)
+End Function
+
+
+' 新規ファイル名を作成
+Private Function CreateFileNameFromPapers(papers As ObjList, header As String, fileExt As String) As String
+  Dim paperIdxs As String
+  Dim fileTitle As String
+  Dim paperNums As String
+  paperIdxs = FormattedPaperIdxsFromPapers(papers)
+  fileTitle = FormattedTitleFromPapers(papers)
+  paperNums = FormattedPaperNumsFromPapers(papers)
+
+  Dim newFileName As String
+  newFileName = header & "-" & paperIdxs & "_" & fileTitle & paperNums & "." & fileExt
+
+  CreateFileNameFromPapers = newFileName
+End Function
+
+
+Private Function FormattedTitleFromPapers(papers As ObjList) As String
+  ' 図面名の重複を除外しながらユニークな図面名のリストを作成
+  Dim uniquePaperNames As ObjSet
+  Set uniquePaperNames = New ObjSet
+  Dim paper As ModelPaper
+  For Each paper In papers
+    Call uniquePaperNames.Append(TitleFormatter(paper.SnippedName))  
+  Next
+
+  FormattedTitleFromPapers = uniquePaperNames.Join("、")
+End Function
+
+
+' 新規図面に入るタイトル文字のフォーマット
+Private Function TitleFormatter(title As String)
+  Dim i As Integer
+  For i = 1 To Len(title)
+    If Mid(title, i, 1) Like "[ａ-ｚＡ-Ｚ０-９　]" Then
+      Mid(title, i, 1) = StrConv(Mid(title, i, 1), vbNarrow)
+    End If
+  Next
+  TitleFormatter = title
+End Function
+
+
+Private Function FormattedPaperIdxsFromPapers(papers As ObjList) As String
+  Dim paperIdxs As ObjList
+  Set paperIdxs = New ObjList
+  Dim paper As ModelPaper
+  For Each paper In papers
+    Call paperIdxs.Append(paper.PaperIndex)
+  Next
+
+  ' PaperIndexが非対応の値の場合は最終表現から除外する
+  Dim ignoreIdxs As ObjSet
+  Set ignoreIdxs = New ObjSet
+  Call ignoreIdxs.InitItems(-1)
+
+  ' 数値の連続性でグループ分け
+  Dim groupedIdxs As ObjList
+  Set groupedIdxs = groupConsecutiveNumbers(paperIdxs, ignoreIdxs)
+
+  ' 数値が存在しない場合は無効な値として返す
+  If (groupedIdxs.Count = 0) Then
+    FormattedPaperIdxsFromPapers = "XXXX"
+    Exit Function
+  End If
+
+  ' 各数値を４桁パディングでフォーマット
+  Dim formattedGroupIdx As ObjList
+  Dim formattedGroupIdxs As ObjList
+  Set formattedGroupIdxs = New ObjList
+  Dim groupedIdx As ObjList
+  Dim pIdx As Variant
+  For Each groupedIdx In groupedIdxs
+    Set formattedGroupIdx = New ObjList
+    For Each pIdx In groupedIdx
+      Call formattedGroupIdx.Append(ToPaddedString(pIdx, 4))
+    Next
+    Call formattedGroupIdxs.Append(formattedGroupIdx)
+  Next
+
+  ' 連続/不連続状態を略記で表現
+  Dim formattedPaperIdxs As String
+  formattedPaperIdxs = formatGroupedConsecutiveNumbers(formattedGroupIdxs, ",", "-")
+
+  FormattedPaperIdxsFromPapers = formattedPaperIdxs
+End Function
+
+
+Private Function FormattedPaperNumsFromPapers(papers As ObjList) As String
+  Dim paperNums As ObjList
+  Set paperNums = New ObjList
+  Dim paper As ModelPaper
+  For Each paper In papers
+    Call paperNums.Append(paper.PaperNumber)
+  Next
+
+  ' PaperNumberが非対応の値の場合は最終表現から除外する
+  Dim ignoreNums As ObjSet
+  Set ignoreNums = New ObjSet
+  Call ignoreNums.InitItems(-1)
+
+  ' 数値の連続性でグループ分け
+  Dim groupedNums As ObjList
+  Set groupedNums = groupConsecutiveNumbers(paperNums, ignoreNums)
+
+  ' 数値が存在しない場合は表示すべき値がないものとして返す
+  If (groupedNums.Count = 0) Then
+    FormattedPaperNumsFromPapers = ""
+    Exit Function
+  End If
+
+  ' 各数値を全角にフォーマット
+  Dim formattedGroupNum As ObjList
+  Dim formattedGroupNums As ObjList
+  Set formattedGroupNums = New ObjList
+  Dim groupedNum As ObjList
+  Dim pNum As Variant
+  For Each groupedNum In groupedNums
+    Set formattedGroupNum = New ObjList
+    For Each pNum In groupedNum
+      Call formattedGroupNum.Append(StrConv(CStr(pNum), vbWide))
+    Next
+    Call formattedGroupNums.Append(formattedGroupNum)
+  Next
+
+  ' 連続/不連続状態を略記で表現
+  Dim formattedPaperNums As String
+  formattedPaperNums = formatGroupedConsecutiveNumbers(formattedGroupNums, "、その", "～その")
+
+  FormattedPaperNumsFromPapers = "（その" & formattedPaperNums & "）"
+End Function
+
+
+' 数値配列のうち，連続する部分を配列でくくることにより，連続/非連続の別による２次元配列を作成する
+' 引数：targets (ObjList) 数値配列
+'       ignores (ObjSet) 無視する数字を定義可能
+' 戻り値：ObjList (ex: [1, 2, 3, 6, 8] -> [[1, 2, 3], [6], [8]])
+Private Function groupConsecutiveNumbers(targets As ObjList, Optional ignores As ObjSet = Nothing) As ObjList
+  If (targets.Count = 0) Then
+    Set groupConsecutiveNumbers = targets
+    Exit Function
+  End If
+
+  Dim thisIgnores As ObjSet
+  If (ignores Is Nothing) Then 
+    Set thisIgnores = New ObjSet
+  Else
+    Set thisIgnores = ignores
+  End If
+
+  Dim splitted As ObjList
+  Set splitted = New ObjList
+  Dim currentGroup As ObjList
+  Set currentGroup = New ObjList
+
+  Dim target As Variant
+  For Each target In targets
+    ' 無視する数字の場合
+    If (Not thisIgnores.Contains(target)) Then
+      ' グループが空なら現在の数字を追加
+      If (currentGroup.Count = 0) Then
+        Call currentGroup.Append(target)
+      Else
+        ' 1つ前の数字と連続しているかチェック
+        If (target = currentGroup.At(-1) + 1) Then
+          Call currentGroup.Append(target)
+        Else
+          ' 連続していない場合、今のグループを結果に入れて新しいグループを開始
+          Call splitted.Append(currentGroup)
+          Set currentGroup = New ObjList
+          Call currentGroup.InitItems(target)
+        End If
+      End If
+    End If
+  Next
+
+  ' 最後に残ったグループがあれば追加
+  If (currentGroup.Count > 0) Then
+    Call splitted.Append(currentGroup)
+  End If
+
+  Set groupConsecutiveNumbers = splitted
+End Function
+
+
+' 連続状態でグループ分けした２次元配列をフォーマット
+' 引数：groupedNums (ObjList[String]) 連続状態で２次元化された配列．内部の値はフォーマット済みの文字列とする．
+'       divTxt (String) 不連続な箇所に挿入する文字列
+'       conTxt (String) 連続な箇所に挿入する文字列
+' 戻り値：(String) フォーマット済みの文字列 (ex: ([[1, 2, 3], [6], [8]], "|", "-") -> "1-3|6|8")
+Private Function formatGroupedConsecutiveNumbers(groupedNums As ObjList, divTxt As String, conTxt As String) As String
+  Dim formattedCons As ObjList
+  Set formattedCons = New ObjList
+
+  Dim innerList As ObjList
+  For Each innerList In groupedNums
+    If (innerList.Count = 1) Then
+      Call formattedCons.Append(innerList.At(0))
+    ElseIf (innerList.Count > 1) Then
+      Call formattedCons.Append(innerList.At(0) & conTxt & innerList.At(-1))
+    End If
+  Next
+
+  formatGroupedConsecutiveNumbers = formattedCons.Join(divTxt)
+End Function
+
+
+' 数値を指定された桁数の文字列に変換する（ゼロ埋め）
+' @param num    対象の数値
+' @param digits 指定する桁数
+' @return       フォーマットされた文字列
+Private Function ToPaddedString(ByVal num As Variant, ByVal digits As Integer) As String
+  ToPaddedString = Format(num, String(digits, "0"))
+End Function
+
+' ============================================
+
+' 旧ファイル名一覧を新ファイル名一覧にリネームする
+' 引数：oldFiles (ObjList[ObjPath]) 旧ファイル名のパスオブジェクトのリスト
+'       newNames (ObjList[String]) 新ファイル名のリスト（旧ファイル名とインデックスが対応していること）
+' 戻り値：ObjResult[Nothing]
+Public Function RenameFiles(oldFiles As ObjList, newNames As ObjList) As ObjResult
+  If (oldFiles.Count <> newNames.Count) Then
+    Set RenameFiles = Failure("service.file.rename.missmatch")
+    Exit Function
+  End If
+
+  Dim oldPath As ObjPath
+  Dim newPath As ObjPath
+  Dim errFileNames As ObjList
+  Set errFileNames = New ObjList
+
+  Dim i As Long
+  For i = 0 To oldFiles.Count - 1
+    Set oldPath = oldFiles.At(i)
+    Set newPath = newNames.At(i)
+    On Error Resume Next
+    Call oldPath.Rename(newPath)
+    If Err.Number <> 0 And (Not newPath.Exists()) Then
+      Dim errMsg As String
+      errMsg = "(" & Err.Number & ": " & Err.Description & ")"
+      Call errFileNames.Append(oldPath.Name & " " & errMsg)
+      Err.Clear
+    End If
+  Next i
+
+  If (errFileNames.Count > 0) Then
+    Dim errPathTxt As String
+    errPathTxt = "・" & errFileNames.Join(vbCrLf & "・")
+    Set RenameFiles = Failure("service.file.rename.failed", errPathTxt)
+  Else
+    Set RenameFiles = Success()
+  End If
+End Function

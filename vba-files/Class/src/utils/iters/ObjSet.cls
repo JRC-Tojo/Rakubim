@@ -216,19 +216,21 @@ Public Function ToList() As ObjList
   Set ToList = list.InitItemsFromArray(Me.ToArray())
 End Function
 
-' 表示用の文字列を返す
-Public Function ToString() As String
-  ToString = "()"
-  If Me.Count = 0 Then Exit Function
-
-  Dim result As String
-  result = "("
+' 配列を指定した`chrs`で結合した文字列を返す
+Public Function Join(chrs As String) As String
+  Join = ""
+  If (Me.Count = 0) Then Exit Function
   
+  Dim joined As String
   Dim value As Variant
   For Each value In Me.ToCollection()
-    result = result & CStr(value) & ", "
+    joined = joined & CStr(value) & chrs
   Next value
-  
-  result = Left(result, Len(result) - 2) & ")"
-  ToString = result
+
+  Join = Left(joined, Len(joined) - Len(chrs))
+End Function
+
+' 表示用の文字列を返す
+Public Function ToString() As String
+  ToString = "(" & Me.Join(", ") & ")"
 End Function

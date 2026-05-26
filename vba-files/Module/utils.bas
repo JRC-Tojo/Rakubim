@@ -1,12 +1,4 @@
 Attribute VB_Name = "utils"
-' Dictに値を追加する際にすでにKeyが存在していないかを確認し、存在した場合は追加をスキップする
-Function checkDictAppend(dict As Object, key As String, ByVal appendValue As String)
-  If dict.Exists(key) = False Then
-    dict.Add key, appendValue
-  End If
-  
-  Set checkDictAppend = dict
-End Function
 
 ' 引数で指定したすべての値が同じ値であることを確認する
 Function Equal(ParamArray arr() As Variant) As Boolean

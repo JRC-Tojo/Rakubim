@@ -165,3 +165,14 @@ Public Function Unlink(Optional missingOk As Boolean = False)
     Call fso.DeleteFolder(p_FullPath)
   End If  
 End Function
+
+Public Function Rename(newPath As ObjPath)
+  Dim fso As FileSystemObject
+  Set fso = New FileSystemObject
+
+  If (Me.IsFile) Then
+    Call fso.MoveFile(p_FullPath, newPath.FullPath)
+  Else
+    Call fso.MoveFolder(p_FullPath, newPath.FullPath)
+  End If
+End Function

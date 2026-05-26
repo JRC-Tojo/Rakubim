@@ -34,3 +34,35 @@ Public Function SetPulldownForFiles() As ObjResult
   Set sheetController = New ControllerSheet8
   Set SetPulldownForFiles = sheetController.SetFilesPulldown()
 End Function
+
+
+' 図面とマッチングしたファイルの新名称を提案する
+Public Function SuggestNewFileNames() As ObjResult
+  Dim sheetController As ControllerSheet10
+  Set sheetController = New ControllerSheet10
+  Set SuggestNewFileNames = sheetController.SuggestNewName()
+End Function
+
+
+' ファイル名変更シートの旧ファイル名列と新ファイル名列を読み取り、ファイルのリネームを行う
+Public Function RenameFiles() As ObjResult
+  Dim sheetController As ControllerSheet10
+  Set sheetController = New ControllerSheet10
+  Set RenameFiles = sheetController.RenameFiles()
+End Function
+
+
+' PDFファイルの名前変更を行わない
+Public Function NoRenamePdf() As ObjResult
+  Dim sheetController As ControllerSheet10
+  Set sheetController = New ControllerSheet10
+  Set NoRenamePdf = sheetController.NoRenamePdf()
+End Function
+
+
+' CADファイルの名前変更を行わない
+Public Function NoRenameCad() As ObjResult
+  Dim sheetController As ControllerSheet10
+  Set sheetController = New ControllerSheet10
+  Set NoRenameCad = sheetController.NoRenameCad()
+End Function

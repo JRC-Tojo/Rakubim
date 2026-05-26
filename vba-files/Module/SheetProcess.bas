@@ -2,9 +2,6 @@ Attribute VB_Name = "SheetProcess"
 ' WorkSheetに対する処理を記載
 ' WorkSheetから読み込む処理をすべてここに記載することで、Sheetに変更が入った場合に対応しやすくする
 
-' 目録入力シートでスキップしてよい空白行の数
-Public Const LIMITED_SPACE_COUNTER = 3
-
 ' 指定した行番号の図面名称が空欄か否かをチェックする
 Function checkSpaceRow(rowNum As Integer)
   Dim sheets As SheetObj
@@ -50,89 +47,11 @@ Function checkFill4File()
   checkFill4File = Equal(oldCounts, newCounts)
 End Function
 
-' ファイル名変更シートの新ファイル名に重複が含まれないことを確認
-Function checkDuplicate4File() As String
-  Dim sheets As SheetObj: Set sheets = New SheetObj
-  Dim sUtils As SheetUtils: Set sUtils = New SheetUtils
-  Dim calcUtil As CalcUtils: Set calcUtil = New CalcUtils
-
-  ' 新ファイル一覧を取得
-  Dim newFiles As Collection
-  Set newFiles = sUtils.Range2Collection(Worksheets(sheets.RenamePage), "B2:B10000")
-
-  ' Dictに登録していき，重複が発生した場合は重複したファイル名を返す
-  Dim i As Integer
-  dim fId As String
-  Dim testDict As Dictionary: Set testDict = New Dictionary
-  checkDuplicate4File = ""
-  For i = 1 To newFiles.Count
-    fId = calcUtil.HASH_SHA256(newFiles.item(i))
-    If (testDict.Exists(fId) = False) Then
-      Call testDict.Add(fId, "dummy")
-    Else
-      checkDuplicate4File = newFiles.item(i)
-      Exit For
-    End If
-  Next i
-End Function
-
 ' 入力済みデータを削除する
 Function ResetData(sheetName As String, deleteRange As String)
   With Worksheets(sheetName).Range(deleteRange)
     .Value = ""
     .Validation.Delete
-  End With
-End Function
-
-' 指定された行番号のデータを読み取り、リネーム処理を行う
-Function Renamer(ByVal rowNum As Integer, ByRef oldFileName As String, ByRef newFileName As String)
-  Dim folderName As String
-  Dim extension As String
-  Dim filePath As String
-  Dim sheets As SheetObj
-  Set sheets = New SheetObj
-  Dim objFSO As FileSystemObject
-  Set objFSO = New FileSystemObject
-  Dim systemIds As SystemIdObj
-  Set systemIds = New SystemIdObj
-  
-  With Worksheets(sheets.RenamePage)
-    oldFileName = .Cells(rowNum, "A")
-    If oldFileName = "" Then
-      Renamer = False
-    Else
-      'Debug.Print oldFileName & "|" & StrConv(Right(oldFileName, 3), vbUpperCase) & "|" & .Cells(rowNum, "B")
-      
-      extension = StrConv(Right(oldFileName, 3), vbLowerCase)
-      folderName = IIf(extension = "pdf", "PDF", IIf(extension = "dwg", "CAD", ""))
-      filePath = systemIds.TargetPath & "\" & folderName & "\" & oldFileName
-      If objFSO.FileExists(filePath) Then
-        newFileName = .Cells(rowNum, "B")
-        newPath = systemIds.TargetPath & "\" & folderName & "\" & newFileName
-        
-        ' リネームでエラーが出た（既に開かれていた）際にはダイアログを出す
-        On Error Resume Next
-        Name filePath As newPath
-        If Err.Number > 0 Then
-          Debug.Print oldFileName & "はファイルが開かれていたため、リネームに失敗しました。　エラーコード：" & Err.Number
-          newFileName = ""
-        End If
-      Else
-        Debug.Print oldFileName & "は存在しないため、リネームできませんでした。"
-      End If
-    End If
-  End With
-  
-  Renamer = True
-End Function
-
-' リネーム対象のファイル数を返す
-Function getRanameFileCounts()
-  Dim sheets As SheetObj
-  Set sheets = New SheetObj
-
-  With Worksheets(sheets.RenamePage)
-    getRanameFileCounts = WorksheetFunction.CountA(.Range("A:A")) - 1
   End With
 End Function
 

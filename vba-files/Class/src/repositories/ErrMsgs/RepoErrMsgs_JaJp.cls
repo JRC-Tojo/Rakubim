@@ -33,6 +33,18 @@ Private Sub class_initialize()
       Array("フォルダエラー", "以下のパスに示すフォルダが見つかりません．\n{}")
     .Append "service.file.load.empty_folder", _
       Array("フォルダエラー", "以下のパスに示すフォルダにファイルが入っていません．\n{}")
+    .Append "service.file.newname.missmatch", _
+      Array("新ファイル名エラー", "図面名とPDF、DWGファイルの対応がすべての図面に対して定義されていません．\n目録入力シートのPDFファイルとDWGファイルの列をすべて埋めてください．")
+    .Append "service.file.newname.company", _
+      Array("新ファイル名エラー", "業務機関名が入力されていません．\n入力シートの業務機関コードのセルを選択し，契約先の業務機関をプルダウンメニューから選択してください．")
+    .Append "service.file.newname.project", _
+      Array("新ファイル名エラー", "契約番号が入力されていません．\n入力シートの契約番号セルに契約番号となる5桁の数字を入力してください．")
+    .Append "service.file.newname.structure", _
+      Array("新ファイル名エラー", "構造物通し番号が入力されていません．\n入力シートの構造物通し番号のセルを選択して番号を入力してください．")
+    .Append "service.file.rename.missmatch", _
+      Array("リネームエラー", "旧ファイル名に対応する新ファイル名がすべての項目に対して定義されていません．\nファイル名変更シートの色が塗られている箇所に新ファイル名を定義してください．")
+    .Append "service.file.rename.failed", _
+      Array("リネームエラー", "以下のファイルのリネームに失敗しました．\n成果品フォルダが正しく設定されていることを確認し、問題が解決しない場合はご自身のデスクトップ上に成果品ファイルをダウンロードしてお試しください．\n\n【リネームに失敗したファイル一覧】\n{}")
       
     .Append "service.match.noFiles", _
       Array("マッチングエラー", "マッチング対象のファイルが見つかりません．")
@@ -51,9 +63,13 @@ Private Sub class_initialize()
       Array("図面名エラー", "図面番号・図面名を入力してください．")
     .Append "service.paper.build.mismatch", _
       Array("図面名エラー", "図面番号・図面名を入力数が一致しません．\n図面番号・図面名の列に空欄が含まれていないことを確認してください．")
+    .Append "service.paper.build.duplicated", _
+      Array("図面名エラー", "目録入力シート内の図面名称に重複が含まれます．\n同一名称の図面は処理できないため，図面名称を変更して再度お試しください．\n\n【重複が確認された図面名称】\n・{}")
     
     .Append "service.sheet.pulldown.files", _
       Array("入力エラー", "フォルダ内に存在しないファイル名は入力できません．")
+    .Append "service.sheet.newname.duplicated", _
+      Array("入力エラー", "新しいファイル名に重複が含まれます．\n同一名称のファイルは生成できないため，新しいファイル名称に変更して再度お試しください．\n\n【重複が確認された新しいファイル名称】\n・{}")
   End With
 End Sub
 
