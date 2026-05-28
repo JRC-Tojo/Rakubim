@@ -128,3 +128,23 @@ Public Function RegistCellMsg(wb As Workbook, sheetName As String, cellAddress A
 ErrHandler:
   Set RegistCellMsg = Failure("repo.sheet.registcellmsg.error", sheetName, cellAddress, Err.Number, Err.Description)
 End Function
+
+
+' àÛç¸îÕàÕÇê›íËÇ∑ÇÈ
+Public Function RegistPrintArea(wb As Workbook, sheetName As String, startCell As String, endCell As String) As ObjResult
+  On Error GoTo ErrHandler
+  Dim ws As Worksheet
+  Set ws = wb.Worksheets(sheetName)
+  
+  Dim targetStartCell As String
+  Dim targetEndCell As String
+  targetStartCell = IIf(startCell = "", "A1", startCell)
+  targetEndCell = IIf(endCell = "", ws.Cells(ws.Rows.Count, ws.Columns.Count).Address, endCell)
+  
+  ws.PageSetup.PrintArea = targetStartCell & ":" & targetEndCell
+  
+  Set RegistPrintArea = Success()
+  Exit Function
+ErrHandler:
+  Set RegistPrintArea = Failure("repo.sheet.registprintarea.error", sheetName, Err.Number, Err.Description)
+End Function

@@ -32,6 +32,8 @@ Private Sub class_initialize()
       Array("エクスポートエラー", "以下のファイルへのエクスポートに失敗しました．\n{}\n\n(エラーコード：{}, {})")
     .Append "repo.sheet.import.error", _
       Array("インポートエラー", "以下のファイルからのインポートに失敗しました．\n{}\n\n(エラーコード：{}, {})")
+    .Append "repo.sheet.registprintarea.error", _
+      Array("印刷範囲設定エラー", "{}シートの印刷範囲の設定に失敗しました．\n(エラーコード：{}, {})")
     
     .Append "service.file.load.folder_not_found", _
       Array("フォルダエラー", "以下のパスに示すフォルダが見つかりません．\n{}")

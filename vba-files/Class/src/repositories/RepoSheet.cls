@@ -65,6 +65,10 @@ Public Function RegistCellMsg(sheetName As String, cellAddress As String, msg As
   Set RegistCellMsg = inner_IO.RegistCellMsg(inner_Workbook, sheetName, cellAddress, msg)
 End Function
 
+Public Function RegistPrintArea(sheetName As String, Optional startCell As String = "", Optional endCell As String = "") As ObjResult
+  Set RegistPrintArea = inner_IO.RegistPrintArea(inner_Workbook, sheetName, startCell, endCell)
+End Function
+
 ' ========================= IO =========================
 
 Public Function ReadObjValue(sheetName As String, objName As String) As Variant

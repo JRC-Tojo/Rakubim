@@ -364,6 +364,14 @@ Public Function WriteRelationalTable(keiyakuId As String, designNum As String, p
   endCell = Range(RelationalGridStartCell).Offset(papers.Count * 2, RelationalGridColCount - 1).Address
   Call inner_SheetRepo.ClearGrid(RelationalTableSheetName)
   Call inner_SheetRepo.MakeGrid(RelationalTableSheetName, RelationalGridStartCell, endCell)
+
+  ' àÛç¸îÕàÕÇê›íË
+  Dim printAreaRes As ObjResult
+  Set printAreaRes = inner_SheetRepo.RegistPrintArea(RelationalTableSheetName, RelationalGridStartCell, endCell)
+  If (Not printAreaRes.isOK) Then
+    Set WriteRelationalTable = printAreaRes
+    Exit Function
+  End If
   
   Set WriteRelationalTable = Success()
 End Function
