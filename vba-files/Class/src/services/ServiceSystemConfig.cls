@@ -60,23 +60,32 @@ Public Function LoadUserInput(Optional wb As Workbook = Nothing) As ObjResult
 
   ' 特殊オブジェクトから値を取得する
   Call cachedUserInput.Append("UseContinuousNumber", CBool(sheetRepo.ReadObjValue(USER_INPUT_SHEET_NAME, "useContinuousNumberCheck")))
-  Call cachedUserInput.Update("CompanyID", getCompanyID(wb, cachedUserInput.At("CompanyID")))
-
+  Call cachedUserInput.Update("CompanyID", getCompanyID(sheetRepo, cachedUserInput.At("CompanyID")))
 
   Set LoadUserInput = Success(Nothing)
 End Function
 
 
 ' 業務機関コードから情報を取得する
-Private Function getCompanyID(wb As Workbook, name As String)
-  Dim ws As Worksheet
-  If (wb Is Nothing) Then
-    Set ws = Worksheets(OFFICE_CODES_SHEET_NAME)
-  Else
-    Set ws = wb.Worksheets(OFFICE_CODES_SHEET_NAME)
-  End If
+Private Function getCompanyID(sheetRepo As RepoSheet, companyName As String)
+  ' 不明な場合は000を返す
+  getCompanyID = "000"
 
-  getCompanyID = WorksheetFunction.VLookup(name, ws.Range("H3:I21"), 2, False)
+  ' 業務機関コードシートから事業所名と事業所IDの列を読み取る
+  Dim compNames As ObjResult
+  Set compNames = sheetRepo.ReadColumn(OFFICE_CODES_SHEET_NAME, "H3")
+  Dim compIds As ObjResult
+  Set compIds = sheetRepo.ReadColumn(OFFICE_CODES_SHEET_NAME, "I3")
+  If (Not IsResultAllOK(compNames, compIds)) Then Exit Function
+
+  ' 事業所名が一致する行の事業所IDを返す
+  Dim i As Long
+  For i = 0 To compNames.value.Count - 1
+    If compNames.value.At(i) = companyName Then
+      getCompanyID = compIds.value.At(i)
+      Exit Function
+    End If
+  Next i
 End Function
 
 
