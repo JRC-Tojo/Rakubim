@@ -18,6 +18,9 @@ Private Function setRuledLines( _
   Optional lColor As Long = 0, _
   Optional lWeight As long = xlThin _
 )
+  ' •`‰æˆ—‚ğ~‚ß‚é‚±‚Æ‚ÅŒrü‚ğ‚‘¬‚É•`‰æ‚·‚é
+  Application.ScreenUpdating = False
+
   Dim i As Long
   For i = 0 To directions.Count - 1
     With targetRange.Borders(directions.At(i))
@@ -29,6 +32,9 @@ Private Function setRuledLines( _
       End If
     End With
   Next i
+
+  ' •`‰æˆ—‚ğÄŠJ
+  Application.ScreenUpdating = True
 End Function
 
 
