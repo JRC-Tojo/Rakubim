@@ -140,3 +140,7 @@ End Property
 Public Property Get DesignId() As String
   DesignId = GetCachedVals("DesignID")
 End Property
+
+Public Property Get RelationalTableOutputPath() As ObjPath
+  Set RelationalTableOutputPath =  Me.CadFolderPath.Child(Me.CompanyId & "-" & Me.ProjectId & ".xls")
+End Property

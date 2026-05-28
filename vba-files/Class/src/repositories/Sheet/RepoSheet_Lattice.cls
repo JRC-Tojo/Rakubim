@@ -18,21 +18,31 @@ Private Function setRuledLines( _
   Optional lColor As Long = 0, _
   Optional lWeight As long = xlThin _
 )
-  Dim dir As long
-  For Each dir In directions
-    With targetRange.Borders(dir)
-      .LineStle = lStyle
-      .Color = lColor
-      .TintAndShade = 0
-      .Weight = lWeight
+  Dim i As Long
+  For i = 0 To directions.Count - 1
+    With targetRange.Borders(directions.At(i))
+      .LineStyle = lStyle
+      If (lStyle <> xlNone) Then
+        .ColorIndex = lColor
+        .TintAndShade = 0
+        .Weight = lWeight
+      End If
     End With
-  Next dir
+  Next i
 End Function
 
 
 ' ÉZÉãîÕàÕèÓïÒÇç\ízÇ∑ÇÈ
 Private Function buildRange(wb As Workbook, workSheetName As String, startCell As String, endCell As String)
-  Set buildRange = wb.Worksheets(workSheetName).Range(startCell & ":" & endCell)
+  Dim ws As Worksheet
+  Set ws = wb.Worksheets(workSheetName)
+
+  Dim targetStartCell As String
+  Dim targetEndCell As String
+  targetStartCell = IIf(startCell = "", "A1", startCell)
+  targetEndCell = IIf(endCell = "", ws.Cells(ws.Rows.Count, ws.Columns.Count).Address, endCell)
+  
+  Set buildRange = ws.Range(targetStartCell & ":" & targetEndCell)
 End Function
 
 

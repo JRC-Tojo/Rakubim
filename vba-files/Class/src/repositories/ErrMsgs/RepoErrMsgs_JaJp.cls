@@ -28,6 +28,10 @@ Private Sub class_initialize()
       Array("最終データ読み取りエラー", "{}シート{}列の末端データ位置の取得に失敗しました．\n(エラーコード：{}, {})")
     .Append "repo.sheet.clearcells.error", _
       Array("セル削除エラー", "{}シート{}のデータ削除に失敗しました．\n(エラーコード：{}, {})")
+    .Append "repo.sheet.export.error", _
+      Array("エクスポートエラー", "以下のファイルへのエクスポートに失敗しました．\n{}\n\n(エラーコード：{}, {})")
+    .Append "repo.sheet.import.error", _
+      Array("インポートエラー", "以下のファイルからのインポートに失敗しました．\n{}\n\n(エラーコード：{}, {})")
     
     .Append "service.file.load.folder_not_found", _
       Array("フォルダエラー", "以下のパスに示すフォルダが見つかりません．\n{}")
@@ -70,6 +74,10 @@ Private Sub class_initialize()
       Array("入力エラー", "フォルダ内に存在しないファイル名は入力できません．")
     .Append "service.sheet.newname.duplicated", _
       Array("入力エラー", "新しいファイル名に重複が含まれます．\n同一名称のファイルは生成できないため，新しいファイル名称に変更して再度お試しください．\n\n【重複が確認された新しいファイル名称】\n・{}")
+    .Append "service.sheet.old2new.missmatch", .At("service.file.rename.missmatch")
+    .Append "service.sheet.relationaltable.missmatch", .At("service.file.newname.missmatch")
+    .Append "service.sheet.relationaltable.lostrename", _
+      Array("入力エラー", "以下の元ファイル名に対応するリネームが行われていません．\nファイル名変更シートで新ファイル名の生成，適用を再度お試しください．\n\n{}")
   End With
 End Sub
 

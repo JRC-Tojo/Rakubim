@@ -66,3 +66,19 @@ Public Function NoRenameCad() As ObjResult
   Set sheetController = New ControllerSheet10
   Set NoRenameCad = sheetController.NoRenameCad()
 End Function
+
+
+' データファイル説明書を作成する
+Public Function GenerateRelationalTable() As ObjResult
+  Dim sheetController As ControllerSheet12
+  Set sheetController = New ControllerSheet12
+  Set GenerateRelationalTable = sheetController.GenerateRelationalTable()
+End Function
+
+
+' データファイル説明書を外部ファイルに出力する
+Public Function ExportRelationalTable() As ObjResult
+  Dim sheetController As ControllerSheet12
+  Set sheetController = New ControllerSheet12
+  Set ExportRelationalTable = sheetController.ExportRelationalTable()
+End Function
