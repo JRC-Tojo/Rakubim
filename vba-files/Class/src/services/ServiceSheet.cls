@@ -24,6 +24,15 @@ Private Const RenameNewNamesStartCell As String = "B2"
 Private Const RenameNoRenamePdfMsgCell As String = "G6"
 Private Const RenameNoRenameCadMsgCell As String = "G8"
 
+Private Const RelationalTableSheetName As String = "データファイル説明書"
+Private Const RelationalKeiyakuStartCell As String = "A2"
+Private Const RelationalPaperNumberStartCell As String = "B2"
+Private Const RelationalDesignNumberStartCell As String = "C2"
+Private Const RelationalPaperNameStartCell As String = "D2"
+Private Const RelationalFileNameStartCell As String = "E2"
+Private Const RelationalGridStartCell As String = "A1"
+Private Const RelationalGridColCount As Long = 6
+
 Private Sub class_initialize()
   Set inner_SheetRepo = New RepoSheet
 End Sub
@@ -193,6 +202,33 @@ Public Function ReadNewFilePaths(pdfBasePath As ObjPath, pdfExts As ModelExts, c
 End Function
 
 
+' 名前変更シートにおける旧ファイル名と新ファイル名の対応関係を表す辞書を返す
+Public Function ReadOldToNewFileNameDict(pdfBasePath As ObjPath, pdfExts As ModelExts, cadBasePath As ObjPath, cadExts As ModelExts) As ObjResult
+  Dim oldPaths As ObjResult
+  Dim newPaths As ObjResult
+  Set oldPaths = ReadOldFilePaths(pdfBasePath, pdfExts, cadBasePath, cadExts)
+  Set newPaths = ReadNewFilePaths(pdfBasePath, pdfExts, cadBasePath, cadExts)
+  If (Not IsResultAllOK(oldPaths, newPaths)) Then
+    Set ReadOldToNewFileNameDict = PickResultErr(Nothing, oldPaths, newPaths)
+    Exit Function
+  End If
+
+  If (oldPaths.value.Count <> newPaths.value.Count) Then
+    Set ReadOldToNewFileNameDict = Failure("service.sheet.old2new.missmatch")
+    Exit Function
+  End If
+
+  Dim oldNew As ObjDict
+  Set oldNew = New ObjDict
+  Dim i As Long
+  For i = 0 To oldPaths.value.Count - 1
+    Call oldNew.Append(oldPaths.value.At(i).Name, newPaths.value.At(i).Name)
+  Next i
+
+  Set ReadOldToNewFileNameDict = Success(oldNew)
+End Function
+
+
 ' 指定した拡張子の新ファイル名称を旧ファイル名称に戻す
 Private Function RevertNewFileNames(targetExts As ModelExts) As ObjResult
   Dim oldFileNames As ObjResult
@@ -253,4 +289,115 @@ End Function
 ' ファイル名変更シートにおいて，新PDFファイル名を旧ファイル名と同じにする
 Public Function ShowNoRename4CADMsg(cadExts As ModelExts) As ObjResult
   Set ShowNoRename4CADMsg = ShowNoRenameMsg(cadExts, RenameNoRenameCadMsgCell)
+End Function
+
+
+' データファイル説明書を書き込む
+' 引数: `keiyakuId`: 契約番号
+'       `designNum`: 設計番号
+'       `papers`[List[ModelPaper]]: 目録入力シートから読み取った図面情報のリスト
+'       `oldPdfPaths`[List[ObjPath]]: 名前変更シートから読み取った旧PDFファイルパスのリスト
+'       `oldCadPaths`[List[ObjPath]]: 名前変更シートから読み取った旧CADファイルパスのリスト
+'       `old2newPaths`[Dict[旧ファイルパス, 新ファイルパス]]: 名前変更シートから読み取った旧ファイルパスと新ファイルパスの対応関係を表す辞書
+Public Function WriteRelationalTable(keiyakuId As String, designNum As String, papers As ObjList, oldPdfPaths As ObjList, oldCadPaths As ObjList, old2newPaths As ObjDict) As ObjResult
+  If (papers.Count <> oldPdfPaths.Count Or papers.Count <> oldCadPaths.Count) Then
+    Set WriteRelationalTable = Failure("service.sheet.relationaltable.missmatch")
+    Exit Function
+  End If
+
+  Dim keiyakuIds As ObjList: Set keiyakuIds = New ObjList
+  Dim paperIdxs As ObjList : Set paperIdxs = New ObjList
+  Dim designNums As ObjList: Set designNums = New ObjList
+  Dim paperNames As ObjList: Set paperNames = New ObjList
+  Dim fileNames As ObjList : Set fileNames = New ObjList
+
+  Dim i As Long
+  Dim pdfFileName As String
+  Dim cadFileName As String
+  For i = 0 To papers.Count - 1
+    pdfFileName = old2newPaths.At(oldPdfPaths.At(i).Name, defValue:="")
+    cadFileName = old2newPaths.At(oldCadPaths.At(i).Name, defValue:="")
+    If (pdfFileName = "") Then
+      Set WriteRelationalTable = Failure("service.sheet.relationaltable.lostrename", oldPdfPaths.At(i).Name)
+      Exit Function
+    End If
+    If (cadFileName = "") Then
+      Set WriteRelationalTable = Failure("service.sheet.relationaltable.lostrename", oldCadPaths.At(i).Name)
+      Exit Function
+    End If
+
+    ' PDF
+    Call keiyakuIds.Append(keiyakuId)
+    Call paperIdxs.Append(papers.At(i).PaperIndex)
+    Call designNums.Append(designNum)
+    Call paperNames.Append(papers.At(i).SourceName)
+    Call fileNames.Append(pdfFileName)
+
+    ' CAD
+    Call keiyakuIds.Append(keiyakuId)
+    Call paperIdxs.Append(papers.At(i).PaperIndex)
+    Call designNums.Append(designNum)
+    Call paperNames.Append(papers.At(i).SourceName)
+    Call fileNames.Append(cadFileName)
+  Next i
+
+  ' シートに書き込み
+  Dim wroteKeiyakuRes As ObjResult
+  Dim wrotePaperIdxRes As ObjResult
+  Dim wroteDesignNumRes As ObjResult
+  Dim wrotePaperNameRes As ObjResult
+  Dim wroteFileNameRes As ObjResult
+  Dim wroteRes As ObjResult
+  Set wroteKeiyakuRes = inner_SheetRepo.WriteColFromCell(RelationalTableSheetName, RelationalKeiyakuStartCell, keiyakuIds)
+  Set wrotePaperIdxRes = inner_SheetRepo.WriteColFromCell(RelationalTableSheetName, RelationalPaperNumberStartCell, paperIdxs)
+  Set wroteDesignNumRes = inner_SheetRepo.WriteColFromCell(RelationalTableSheetName, RelationalDesignNumberStartCell, designNums)
+  Set wrotePaperNameRes = inner_SheetRepo.WriteColFromCell(RelationalTableSheetName, RelationalPaperNameStartCell, paperNames)
+  Set wroteFileNameRes = inner_SheetRepo.WriteColFromCell(RelationalTableSheetName, RelationalFileNameStartCell, fileNames)
+  Set wroteRes = PickResultErr(Nothing, wroteKeiyakuRes, wrotePaperIdxRes, wroteDesignNumRes, wrotePaperNameRes, wroteFileNameRes)
+  If (Not wroteRes.isOK) Then
+    Set WriteRelationalTable = wroteRes
+    Exit Function
+  End If
+
+  ' 罫線を描画
+  Dim endCell As String
+  endCell = Range(RelationalGridStartCell).Offset(papers.Count * 2, RelationalGridColCount - 1).Address
+  Call inner_SheetRepo.ClearGrid(RelationalTableSheetName)
+  Call inner_SheetRepo.MakeGrid(RelationalTableSheetName, RelationalGridStartCell, endCell)
+
+  ' 印刷範囲を設定
+  Dim printAreaRes As ObjResult
+  Set printAreaRes = inner_SheetRepo.RegistPrintArea(RelationalTableSheetName, RelationalGridStartCell, endCell)
+  If (Not printAreaRes.isOK) Then
+    Set WriteRelationalTable = printAreaRes
+    Exit Function
+  End If
+  
+  Set WriteRelationalTable = Success()
+End Function
+
+
+' データファイル説明書をエクスポートする
+Public Function ExportRelationalTable(outputPath As ObjPath) As ObjResult
+  ' データファイル説明書の最終行を取得
+  Dim lastCellRow As ObjResult
+  Set lastCellRow = inner_SheetRepo.GetLastRow(RelationalTableSheetName, RelationalGridStartCell)
+  If (Not lastCellRow.isOK) Then
+    Set ExportRelationalTable = lastCellRow
+    Exit Function
+  End If
+
+  ' 出力範囲を確定
+  Dim tableRangeAddress As String
+  tableRangeAddress = Range(RelationalGridStartCell).Resize(lastCellRow.Value + 1, RelationalGridColCount).Address
+
+  ' 外部Excelに出力
+  Dim exportRes As ObjResult
+  Set exportRes = inner_SheetRepo.ExportToExcel(RelationalTableSheetName, outputPath, tableRangeAddress)
+  If Not exportRes.isOK Then
+    Set ExportRelationalTable = exportRes
+    Exit Function
+  End If
+
+  Set ExportRelationalTable = Success()
 End Function

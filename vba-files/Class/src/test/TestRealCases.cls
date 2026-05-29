@@ -129,7 +129,7 @@ Private Function CalcMatchedFiles( _
   targetPaths As ObjList, _
   useSeq As Boolean _
 ) As ObjResult
-  ' Path -> FileObj
+  ' Path -> ModelFile
   Dim loadedFiles As ObjResult
   Set loadedFiles = matchingController.LoadFiles(targetPaths, useSeq)
   If (Not loadedFiles.isOK) Then

@@ -13,6 +13,7 @@ Option Explicit
 Private inner_Workbook As Workbook
 
 Private inner_Body As RepoSheet_Body
+Private inner_File As RepoSheet_File
 Private inner_IO As RepoSheet_IO
 Private inner_Object As RepoSheet_Object
 Private inner_Lattice As RepoSheet_Lattice
@@ -21,6 +22,7 @@ Private inner_Validation As RepoSheet_Validation
 Private Sub class_initialize()
   Set inner_Workbook = Application.ThisWorkbook
   Set inner_Body = New RepoSheet_Body
+  Set inner_File = New RepoSheet_File
   Set inner_IO = New RepoSheet_IO
   Set inner_Object = New RepoSheet_Object
   Set inner_Lattice = New RepoSheet_Lattice
@@ -63,6 +65,10 @@ Public Function RegistCellMsg(sheetName As String, cellAddress As String, msg As
   Set RegistCellMsg = inner_IO.RegistCellMsg(inner_Workbook, sheetName, cellAddress, msg)
 End Function
 
+Public Function RegistPrintArea(sheetName As String, Optional startCell As String = "", Optional endCell As String = "") As ObjResult
+  Set RegistPrintArea = inner_IO.RegistPrintArea(inner_Workbook, sheetName, startCell, endCell)
+End Function
+
 ' ========================= IO =========================
 
 Public Function ReadObjValue(sheetName As String, objName As String) As Variant
@@ -71,15 +77,15 @@ End Function
 
 ' ========================= Lattice =========================
 
-Public Function MakeGrid(workSheetName As String, startCell As String, endCell As String)
+Public Function MakeGrid(workSheetName As String, Optional startCell As String = "", Optional endCell As String = "")
   Call inner_Lattice.MakeGrid(inner_Workbook, workSheetName, startCell, endCell)
 End Function
 
-Public Function MakeBoldOutline(workSheetName As String, startCell As String, endCell As String)
+Public Function MakeBoldOutline(workSheetName As String, Optional startCell As String = "", Optional endCell As String = "")
   Call inner_Lattice.MakeBoldOutline(inner_Workbook, workSheetName, startCell, endCell)
 End Function
 
-Public Function ClearGrid(workSheetName As String, startCell As String, endCell As String)
+Public Function ClearGrid(workSheetName As String, Optional startCell As String = "", Optional endCell As String = "")
   Call inner_Lattice.ClearGrid(inner_Workbook, workSheetName, startCell, endCell)
 End Function
 
@@ -87,4 +93,10 @@ End Function
 
 Public Function Pulldown(sheetName As String, cellAddress As String, elems As ObjList, Optional ErrTitle As String = "", Optional ErrMessage As String = "")
   Call inner_Validation.Pulldown(inner_Workbook, sheetName, cellAddress, elems, ErrTitle, ErrMessage)
+End Function
+
+' ========================= File =========================
+
+Public Function ExportToExcel(sheetName As String, targetPath As ObjPath, rangeAddress As String, Optional newSheetName As String = "") As ObjResult
+  Set ExportToExcel = inner_File.ExportToExcel(inner_Workbook, sheetName, targetPath, rangeAddress, newSheetName)
 End Function
