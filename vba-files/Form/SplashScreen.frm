@@ -16,5 +16,5 @@ Attribute VB_Exposed = False
 
 
 Private Sub UserForm_Initialize()
-   Application.OnTime Earliesttime:=Now + TimeValue("00:00:05"), Procedure:="KillForm"
+   Application.OnTime Earliesttime:=Now + TimeValue("00:00:05"), Procedure:="OnTimeHelper.KillForm"
 End Sub

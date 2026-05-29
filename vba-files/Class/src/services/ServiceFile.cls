@@ -10,11 +10,11 @@ Attribute VB_Exposed = True
 
 Option Explicit
 
-' ServiceFile.LoadFiles: 指定したファイル一覧を FileObj の ObjList で返す
+' ServiceFile.LoadFiles: 指定したファイル一覧を ModelFile の ObjList で返す
 ' 引数: analyzer (ServiceNameAnalyzer) - ファイル名解析サービス
 '       filePaths (ObjList(ObjPath)) - ファイルオブジェクトを構築するファイルパス一覧
 '       useSeq (Boolean) - ファイル名の解析を連番モードで行うか
-' 戻り値: ObjResult - 成功時は ObjList(FileObj) を返す
+' 戻り値: ObjResult - 成功時は ObjList(ModelFile) を返す
 Public Function LoadFiles(analyzer As ServiceNameAnalyzer, filePaths As ObjList, useSeq As Boolean) As ObjResult
   ' ObjPath の情報を ServiceNameAnalyzer を使って解析し， ModelFile に変換する
   Dim fileColl As ObjList
