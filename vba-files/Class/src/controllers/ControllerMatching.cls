@@ -36,7 +36,7 @@ Public Function Run() As ObjResult
     Exit Function
   End If
   
-  ' PDF と CAD を個別にマッチング & シートへの書き込みを完了させる
+  ' PDF と CAD を個別にマッチング
   Dim pdfRes As ObjResult
   Dim cadRes As ObjResult
   Set pdfRes = completeMatchedFilesWithPapers( _
@@ -47,6 +47,14 @@ Public Function Run() As ObjResult
   )
   If Not IsResultAllOK(pdfRes, cadRes) Then
     Set Run = PickResultErr(Nothing, pdfRes, cadRes)
+    Exit Function
+  End If
+
+  ' 記入済みの情報を削除する
+  Dim clearRes As ObjResult
+  Set clearRes = sheetService.ClearMatchedFileNames()
+  If Not clearRes.isOK Then
+    Set Run = clearRes
     Exit Function
   End If
 

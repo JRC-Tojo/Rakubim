@@ -362,7 +362,6 @@ Public Function WriteRelationalTable(keiyakuId As String, designNum As String, p
   ' 罫線を描画
   Dim endCell As String
   endCell = Range(RelationalGridStartCell).Offset(papers.Count * 2, RelationalGridColCount - 1).Address
-  Call inner_SheetRepo.ClearGrid(RelationalTableSheetName)
   Call inner_SheetRepo.MakeGrid(RelationalTableSheetName, RelationalGridStartCell, endCell)
 
   ' 印刷範囲を設定
@@ -439,6 +438,7 @@ End Function
 
 ' データファイル説明書をリセットする
 Public Function ResetRelationalTable() As ObjResult
+  Call inner_SheetRepo.ClearGrid(RelationalTableSheetName)
   Set ResetRelationalTable = ResetCols( _
     RelationalTableSheetName, _
     RelationalKeiyakuStartCell, _
