@@ -52,6 +52,14 @@ Public Function GenerateRelationalTable() As ObjResult
     Exit Function
   End If
 
+  ' 記入済みの情報を削除する
+  Dim clearRes As ObjResult
+  Set clearRes = sheetService.ResetRelationalTable()
+  If Not clearRes.isOK Then
+    Set GenerateRelationalTable = clearRes
+    Exit Function
+  End If
+
   ' データファイル説明書を作成
   Dim wroteRes As ObjResult
   Dim keiyakuId As String

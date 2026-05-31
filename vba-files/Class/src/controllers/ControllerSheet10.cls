@@ -56,6 +56,14 @@ Public Function SuggestNewName() As ObjResult
     Exit Function
   End If
 
+  ' 記入済みの情報を削除する
+  Dim clearRes As ObjResult
+  Set clearRes = sheetService.ResetRenameSheet()
+  If Not clearRes.isOK Then
+    Set SuggestNewName = clearRes
+    Exit Function
+  End If
+
   ' シートへ書き込み
   Dim wroteRes As ObjResult
   Set wroteRes = sheetService.WriteSuggestRenames(oldToNewPdf.value, oldToNewCad.value)
