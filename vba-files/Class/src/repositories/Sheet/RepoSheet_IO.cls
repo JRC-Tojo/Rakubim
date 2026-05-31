@@ -97,17 +97,27 @@ ErrHandler:
   Set GetLastRow = Failure("repo.sheet.getlastrow.error", sheetName, startCell, Err.Number, Err.Description)
 End Function
 
-' 指定した範囲のセル内容をすべて削除する
-Public Function ClearCells(wb As Workbook, sheetName As String, cellAddress As String) As ObjResult
+' 指定したセルから縦方向に値をすべて削除する
+Public Function ClearColFromCell(wb As Workbook, sheetName As String, startCell As String) As ObjResult
   On Error GoTo ErrHandler
-  With wb.Worksheets(sheetName).Range(cellAddress)
-    .Value = ""
-    .Validation.Delete
+  With wb.Worksheets(sheetName)
+    Dim lastRow As ObjResult
+    Set lastRow = GetLastRow(wb, sheetName, startCell)
+    If Not lastRow.isOK Then
+      Set ClearColFromCell = lastRow
+      Exit Function
+    End If
+
+    If lastRow.value >= .Range(startCell).Row Then
+      .Range(startCell, .Cells(lastRow.value, .Range(startCell).Column)).Value = ""
+      .Range(startCell, .Cells(lastRow.value, .Range(startCell).Column)).Validation.Delete
+    End If
   End With
-  Set ClearCells = Success()
+  
+  Set ClearColFromCell = Success()
   Exit Function
 ErrHandler:
-  Set ClearCells = Failure("repo.sheet.clearcells.error", sheetName, cellAddress, Err.Number, Err.Description)
+  Set ClearColFromCell = Failure("repo.sheet.clearcol.error", sheetName, startCell, Err.Number, Err.Description)
 End Function
 
 
