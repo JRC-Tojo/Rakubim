@@ -35,3 +35,18 @@ Private Sub OutputData_Click()
   End If
 End Sub
 
+
+' 入力内容のリセット
+Private Sub ResetBtn_Click()
+  Dim r As Routes
+  Set r = New Routes
+  
+  Dim resetRes As ObjResult
+  Set resetRes = r.ResetRelationalTable()
+  
+  If (Not resetRes.isOK) Then
+    Call r.ShowErrorMsg(resetRes.err)
+    Exit Sub
+  End If
+End Sub
+

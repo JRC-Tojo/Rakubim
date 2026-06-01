@@ -52,7 +52,7 @@ Public Function Run() As ObjResult
 
   ' ‹L“üÏ‚İ‚Ìî•ñ‚ğíœ‚·‚é
   Dim clearRes As ObjResult
-  Set clearRes = sheetService.ClearMatchedFileNames()
+  Set clearRes = sheetService.ResetMatchedFileNames()
   If Not clearRes.isOK Then
     Set Run = clearRes
     Exit Function

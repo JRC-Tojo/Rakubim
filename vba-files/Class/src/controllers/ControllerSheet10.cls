@@ -148,3 +148,10 @@ Public Function NoRenameCad() As ObjResult
 
   Set NoRenameCad = sheetService.ShowNoRename4CADMsg(config.CadExtensions)
 End Function
+
+
+Public Function ResetSuggestion() As ObjResult
+  Dim sheetService As ServiceSheet
+  Set sheetService = New ServiceSheet
+  Set ResetSuggestion = sheetService.ResetRenameSheet()
+End Function

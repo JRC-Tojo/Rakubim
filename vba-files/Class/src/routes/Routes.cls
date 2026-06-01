@@ -17,10 +17,8 @@ Public Function ShowErrorMsg(err As ObjResultErr)
   Call errController.ShowErrorMsg(err)
 End Function
 
-' GetMatchingLists: 目録入力シートに記載された図面群のマッチング結果リストを取得する
-' 引数: em (ModelEvents) - イベント/プログレス管理用のオブジェクト
-'       sheetName (String) - 図面名が記載されたシート名
-' 戻り値: ObjResult - 成功時は MatchingResults オブジェクトを内包
+
+' 目録入力シートに記載された図面群のマッチング結果リストを取得する
 Public Function GetMatchingLists() As ObjResult
   Dim matchingController As ControllerMatching
   Set matchingController = New ControllerMatching
@@ -81,4 +79,36 @@ Public Function ExportRelationalTable() As ObjResult
   Dim sheetController As ControllerSheet12
   Set sheetController = New ControllerSheet12
   Set ExportRelationalTable = sheetController.ExportRelationalTable()
+End Function
+
+
+' 目録入力シートの図面目録部分をリセットする
+Public Function ResetMokuroku() As ObjResult
+  Dim sheetController As ControllerSheet8
+  Set sheetController = New ControllerSheet8
+  Set ResetMokuroku = sheetController.ResetMokuroku()
+End Function
+
+
+' 目録入力シートのマッチングしたファイル部分をリセットする
+Public Function ResetMatchedFiles() As ObjResult
+  Dim sheetController As ControllerSheet8
+  Set sheetController = New ControllerSheet8
+  Set ResetMatchedFiles = sheetController.ResetMatchedFiles()
+End Function
+
+
+' ファイル名変更シートの提案結果をリセットする
+Public Function ResetSuggestion() As ObjResult
+  Dim sheetController As ControllerSheet10
+  Set sheetController = New ControllerSheet10
+  Set ResetSuggestion = sheetController.ResetSuggestion()
+End Function
+
+
+' データファイル説明書の内容をリセットする
+Public Function ResetRelationalTable() As ObjResult
+  Dim sheetController As ControllerSheet12
+  Set sheetController = New ControllerSheet12
+  Set ResetRelationalTable = sheetController.ResetRelationalTable()
 End Function

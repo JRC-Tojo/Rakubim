@@ -41,3 +41,21 @@ Public Function SetFilesPulldown() As ObjResult
   ' プルダウンメニューのセット
   Set SetFilesPulldown = sheetService.SetFilesPulldown(pdfFilePaths.value, cadFilePaths.value, config.MsgLanguage)
 End Function
+
+
+' 図面目録部分をリセットする
+' 戻り値: ObjResult[Nothing]
+Public Function ResetMokuroku() As ObjResult
+  Dim sheetService As ServiceSheet
+  Set sheetService = New ServiceSheet
+  Set ResetMokuroku = sheetService.ResetMokuroku()
+End Function
+
+
+' ファイル部分をリセットする
+' 戻り値: ObjResult[Nothing]
+Public Function ResetMatchedFiles() As ObjResult
+  Dim sheetService As ServiceSheet
+  Set sheetService = New ServiceSheet
+  Set ResetMatchedFiles = sheetService.ResetMatchedFileNames()
+End Function

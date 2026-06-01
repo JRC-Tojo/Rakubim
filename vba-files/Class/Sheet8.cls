@@ -27,22 +27,26 @@ End Sub
 
 ' 目録入力シートのファイル名称を削除する（左）
 Sub ResetMokuroku_Left_Click()
-  Call ResetMokuroku("left")
+  Dim r As Routes
+  Set r = New Routes
+
+  Dim resetResult As ObjResult
+  Set resetResult = r.ResetMokuroku()
+
+  If (Not resetResult.isOK) Then
+    Call r.ShowErrorMsg(resetResult.err)
+  End If
 End Sub
 
 ' 目録入力シートのファイル名称を削除する（右）
 Sub ResetMokuroku_Right_Click()
-  Call ResetMokuroku("right")
-End Sub
+  Dim r As Routes
+  Set r = New Routes
 
-' 目録の記入データをリセット
-Private Sub ResetMokuroku(leftRight As String)
-  Dim sheets As SheetObj
-  Set sheets = New SheetObj
+  Dim resetResult As ObjResult
+  Set resetResult = r.ResetMatchedFiles()
 
-  If leftRight = "left" Then
-    Call ResetData(sheets.MokurokuPage, "A" & INIT_ROWNUM_MOKUROKU & ":E10000")
-  Else
-    Call ResetData(sheets.MokurokuPage, "G" & INIT_ROWNUM_MOKUROKU & ":H10000")
+  If (Not resetResult.isOK) Then
+    Call r.ShowErrorMsg(resetResult.err)
   End If
 End Sub
