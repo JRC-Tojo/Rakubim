@@ -10,9 +10,6 @@ Attribute VB_Exposed = True
 
 ' 入力シートにおける処理対象のフォルダを選択する
 Private Sub FolderSelectBtn_Click()
-  Dim sheets As SheetObj
-  Set sheets = New SheetObj
-
   Dim folderPath As Variant
   With Application.FileDialog(msoFileDialogFolderPicker)
     .Title = "らくびむ　- 成果品フォルダを選択してください -"
@@ -24,7 +21,7 @@ Private Sub FolderSelectBtn_Click()
     folderPath = .SelectedItems(1)
   End With
 
-  With WorkSheets(sheets.FirstInputPage)
+  With WorkSheets("入力")
     .Range("E3").Value = folderPath 
   End With
 End Sub
@@ -38,12 +35,10 @@ Private Sub AutoIDInputBtn_Click()
   Dim companyCode As String
   companyCode = ""
   
-  Dim sheets As SheetObj
-  Set sheets = New SheetObj
-  With Worksheets(sheets.FirstInputPage)
+  With Worksheets("入力")
     inputName = .Range("E7").Value
     
-    With Worksheets(sheets.TeamCodePage)
+    With Worksheets("業務機関コード")
       On Error Resume Next
       companyCode = WorksheetFunction.VLookup(Left(inputName, 2), .Range("G3:H22"), 2, False)
       If (Err.Number > 0) Then
