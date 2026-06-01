@@ -158,3 +158,14 @@ Public Function RegistPrintArea(wb As Workbook, sheetName As String, startCell A
 ErrHandler:
   Set RegistPrintArea = Failure("repo.sheet.registprintarea.error", sheetName, Err.Number, Err.Description)
 End Function
+
+
+' 指定したシートの印刷範囲をクリアする
+Public Function ClearPrintArea(wb As Workbook, sheetName As String) As ObjResult
+  On Error GoTo ErrHandler
+  wb.Worksheets(sheetName).PageSetup.PrintArea = ""
+  Set ClearPrintArea = Success()
+  Exit Function
+ErrHandler:
+  Set ClearPrintArea = Failure("repo.sheet.clearprintarea.error", sheetName, Err.Number, Err.Description)
+End Function
