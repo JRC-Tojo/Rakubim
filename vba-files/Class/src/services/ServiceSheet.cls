@@ -123,20 +123,6 @@ Public Function SetFilesPulldown(pdfFilePaths As ObjList, cadFilePaths As ObjLis
 End Function
 
 
-' 目録入力シートの左側をすべて削除する
-Public Function ClearMokuroku() As ObjResult
-
-
-End Function
-
-
-' 目録入力シートの右側をすべて削除する
-Public Function ClearMatchedFileNames() As ObjResult
-
-
-End Function
-
-
 ' ファイル名変更シートにおいて，各ファイルの変更先名称の提案をシートに書き込む
 Public Function WriteSuggestRenames(pdfOldToNewDict As ObjDict, cadOldToNewDict As ObjDict) As ObjResult
   Dim oldNames As ObjList
@@ -403,7 +389,7 @@ End Function
 
 
 ' 指定したシートのセル列のデータをリセットする
-Private Function ResetCols(sheetName As String, ParamArray startCells As Variant) As ObjResult
+Private Function ResetCols(sheetName As String, ParamArray startCells() As Variant) As ObjResult
   Dim res As ObjResult
   Dim startCell As Variant
   For Each startCell In startCells

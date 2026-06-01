@@ -57,7 +57,7 @@ Public Function GetLastRow(sheetName As String, startCell As String, Optional mu
   Set GetLastRow = inner_IO.GetLastRow(inner_Workbook, sheetName, startCell, mustContinue)
 End Function
 
-Public Function ClearColFromCell(sheetName As String, startCell As String) As ObjResult
+Public Function ClearColFromCell(sheetName As String, ByVal startCell As String) As ObjResult
   Set ClearColFromCell = inner_IO.ClearColFromCell(inner_Workbook, sheetName, startCell)
 End Function
 

@@ -62,7 +62,14 @@ End Sub
 
 ' 入力内容のリセット
 Private Sub ResetBtn_Click()
-  Dim sheets As SheetObj
-  Set sheets = New SheetObj
-  Call ResetData(sheets.RenamePage, "A" & INIT_ROWNUM_MOKUROKU & ":B10000")
+  Dim r As Routes
+  Set r = New Routes
+  
+  Dim resetRes As ObjResult
+  Set resetRes = r.ResetSuggestion()
+  
+  If (Not resetRes.isOK) Then
+    Call r.ShowErrorMsg(resetRes.err)
+    Exit Sub
+  End If
 End Sub

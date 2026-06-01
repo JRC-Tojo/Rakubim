@@ -84,7 +84,7 @@ Public Function ExportRelationalTable() As ObjResult
   Dim resConfig As ObjResult
   Set resConfig = config.LoadUserInput()
   If Not resConfig.isOK Then
-    Set GenerateRelationalTable = resConfig
+    Set ExportRelationalTable = resConfig
     Exit Function
   End If
 
@@ -97,4 +97,11 @@ Public Function ExportRelationalTable() As ObjResult
   End If
 
   Set ExportRelationalTable = Success()
+End Function
+
+
+Public Function ResetRelationalTable() As ObjResult
+  Dim sheetService As ServiceSheet
+  Set sheetService = New ServiceSheet
+  Set ResetRelationalTable = sheetService.ResetRelationalTable()
 End Function
