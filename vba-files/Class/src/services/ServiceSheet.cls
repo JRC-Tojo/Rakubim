@@ -425,6 +425,7 @@ End Function
 ' データファイル説明書をリセットする
 Public Function ResetRelationalTable() As ObjResult
   Call inner_SheetRepo.ClearGrid(RelationalTableSheetName)
+  Call inner_SheetRepo.ClearPrintArea(RelationalTableSheetName)
   Set ResetRelationalTable = ResetCols( _
     RelationalTableSheetName, _
     RelationalKeiyakuStartCell, _

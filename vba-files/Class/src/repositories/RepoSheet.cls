@@ -69,6 +69,10 @@ Public Function RegistPrintArea(sheetName As String, Optional startCell As Strin
   Set RegistPrintArea = inner_IO.RegistPrintArea(inner_Workbook, sheetName, startCell, endCell)
 End Function
 
+Public Function ClearPrintArea(sheetName As String) As ObjResult
+  Set ClearPrintArea = inner_IO.ClearPrintArea(inner_Workbook, sheetName)
+End Function
+
 ' ========================= IO =========================
 
 Public Function ReadObjValue(sheetName As String, objName As String) As Variant
