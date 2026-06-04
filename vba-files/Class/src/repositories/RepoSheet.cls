@@ -57,8 +57,8 @@ Public Function GetLastRow(sheetName As String, startCell As String, Optional mu
   Set GetLastRow = inner_IO.GetLastRow(inner_Workbook, sheetName, startCell, mustContinue)
 End Function
 
-Public Function ClearCells(sheetName As String, cellAddress As String) As ObjResult
-  Set ClearCells = inner_IO.ClearCells(inner_Workbook, sheetName, cellAddress)
+Public Function ClearColFromCell(sheetName As String, ByVal startCell As String) As ObjResult
+  Set ClearColFromCell = inner_IO.ClearColFromCell(inner_Workbook, sheetName, startCell)
 End Function
 
 Public Function RegistCellMsg(sheetName As String, cellAddress As String, msg As String) As ObjResult
@@ -67,6 +67,10 @@ End Function
 
 Public Function RegistPrintArea(sheetName As String, Optional startCell As String = "", Optional endCell As String = "") As ObjResult
   Set RegistPrintArea = inner_IO.RegistPrintArea(inner_Workbook, sheetName, startCell, endCell)
+End Function
+
+Public Function ClearPrintArea(sheetName As String) As ObjResult
+  Set ClearPrintArea = inner_IO.ClearPrintArea(inner_Workbook, sheetName)
 End Function
 
 ' ========================= IO =========================

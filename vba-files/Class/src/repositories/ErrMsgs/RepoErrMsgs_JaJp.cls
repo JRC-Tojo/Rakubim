@@ -26,14 +26,16 @@ Private Sub class_initialize()
       Array("シート書き込みエラー", "{}シート{}列の書き込みに失敗しました．\n(エラーコード：{}, {})")
     .Append "repo.sheet.getlastrow.error", _
       Array("最終データ読み取りエラー", "{}シート{}列の末端データ位置の取得に失敗しました．\n(エラーコード：{}, {})")
-    .Append "repo.sheet.clearcells.error", _
-      Array("セル削除エラー", "{}シート{}のデータ削除に失敗しました．\n(エラーコード：{}, {})")
+    .Append "repo.sheet.clearcol.error", _
+      Array("列削除エラー", "{}シート{}の列のデータ削除に失敗しました．\n(エラーコード：{}, {})")
     .Append "repo.sheet.export.error", _
       Array("エクスポートエラー", "以下のファイルへのエクスポートに失敗しました．\n{}\n\n(エラーコード：{}, {})")
     .Append "repo.sheet.import.error", _
       Array("インポートエラー", "以下のファイルからのインポートに失敗しました．\n{}\n\n(エラーコード：{}, {})")
     .Append "repo.sheet.registprintarea.error", _
       Array("印刷範囲設定エラー", "{}シートの印刷範囲の設定に失敗しました．\n(エラーコード：{}, {})")
+    .Append "repo.sheet.clearprintarea.error", _
+      Array("印刷範囲設定エラー", "{}シートの印刷範囲のクリアに失敗しました．\n(エラーコード：{}, {})")
     
     .Append "service.file.load.folder_not_found", _
       Array("フォルダエラー", "以下のパスに示すフォルダが見つかりません．\n{}")

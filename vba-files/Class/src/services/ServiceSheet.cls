@@ -123,20 +123,6 @@ Public Function SetFilesPulldown(pdfFilePaths As ObjList, cadFilePaths As ObjLis
 End Function
 
 
-' 目録入力シートの左側をすべて削除する
-Public Function ClearMokuroku() As ObjResult
-
-
-End Function
-
-
-' 目録入力シートの右側をすべて削除する
-Public Function ClearMatchedFileNames() As ObjResult
-
-
-End Function
-
-
 ' ファイル名変更シートにおいて，各ファイルの変更先名称の提案をシートに書き込む
 Public Function WriteSuggestRenames(pdfOldToNewDict As ObjDict, cadOldToNewDict As ObjDict) As ObjResult
   Dim oldNames As ObjList
@@ -362,7 +348,6 @@ Public Function WriteRelationalTable(keiyakuId As String, designNum As String, p
   ' 罫線を描画
   Dim endCell As String
   endCell = Range(RelationalGridStartCell).Offset(papers.Count * 2, RelationalGridColCount - 1).Address
-  Call inner_SheetRepo.ClearGrid(RelationalTableSheetName)
   Call inner_SheetRepo.MakeGrid(RelationalTableSheetName, RelationalGridStartCell, endCell)
 
   ' 印刷範囲を設定
@@ -400,4 +385,53 @@ Public Function ExportRelationalTable(outputPath As ObjPath) As ObjResult
   End If
 
   Set ExportRelationalTable = Success()
+End Function
+
+
+' 指定したシートのセル列のデータをリセットする
+Private Function ResetCols(sheetName As String, ParamArray startCells() As Variant) As ObjResult
+  Dim res As ObjResult
+  Dim startCell As Variant
+  For Each startCell In startCells
+    Set res = inner_SheetRepo.ClearColFromCell(sheetName, startCell)
+    If (Not res.isOK) Then
+      Set ResetCols = res
+      Exit Function
+    End If
+  Next startCell
+
+  Set ResetCols = Success()
+End Function
+
+
+' 目録入力シートの図面目録部分をリセットする
+Public Function ResetMokuroku() As ObjResult
+  Set ResetMokuroku = ResetCols(MatchingSheetName, MatchingPaperNumberStartCell, MatchingPaperNameStartCell)
+End Function
+
+
+' 目録入力シートのファイル名記入部分をリセットする
+Public Function ResetMatchedFileNames() As ObjResult
+  Set ResetMatchedFileNames = ResetCols(MatchingSheetName, MatchingPdfStartCell, MatchingCadStartCell)
+End Function
+
+
+' ファイル名変更シートをリセットする
+Public Function ResetRenameSheet() As ObjResult
+  Set ResetRenameSheet = ResetCols(RenameSheetName, RenameOldNamesStartCell, RenameNewNamesStartCell)
+End Function
+
+
+' データファイル説明書をリセットする
+Public Function ResetRelationalTable() As ObjResult
+  Call inner_SheetRepo.ClearGrid(RelationalTableSheetName)
+  Call inner_SheetRepo.ClearPrintArea(RelationalTableSheetName)
+  Set ResetRelationalTable = ResetCols( _
+    RelationalTableSheetName, _
+    RelationalKeiyakuStartCell, _
+    RelationalPaperNumberStartCell, _
+    RelationalDesignNumberStartCell, _
+    RelationalPaperNameStartCell, _
+    RelationalFileNameStartCell _
+  )
 End Function
