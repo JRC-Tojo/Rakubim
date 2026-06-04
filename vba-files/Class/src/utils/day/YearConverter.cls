@@ -29,7 +29,7 @@ Public Function GetSeireki(yearNum As Integer) As Integer
   End If
 
   ' 現在の年号を取得する
-  Dim nowWareki As YearObj
+  Dim nowWareki As ModelYear
   Set nowWareki = GetNowWareki()
 
   ' 数字に対応する年号の辞書を作成
@@ -40,7 +40,7 @@ Public Function GetSeireki(yearNum As Integer) As Integer
 
   ' yearNumに対応する年号を取得し，西暦に変換して返す
   On Error Resume Next
-  Dim targetYear As YearObj
+  Dim targetYear As ModelYear
   Set targetYear = targetYearDict.Item(yearNum)
   If Err.Number > 0 Then
     GetSeireki = -1
@@ -52,7 +52,7 @@ Public Function GetSeireki(yearNum As Integer) As Integer
 End Function
 
 ' 数字に対応する年号の辞書を作成
-Private Function ConstructTargets(nowWareki As YearObj) As Dictionary
+Private Function ConstructTargets(nowWareki As ModelYear) As Dictionary
   Dim dict As Dictionary
   Set dict = New Dictionary
   
@@ -62,8 +62,8 @@ Private Function ConstructTargets(nowWareki As YearObj) As Dictionary
   count = 0
   For i = nowWareki.year To 1 Step -1
     If count >= TargetYearWindow Then Exit For
-    Dim y As YearObj
-    Set y = New YearObj
+    Dim y As ModelYear
+    Set y = New ModelYear
     y.SetYear nowWareki.Wareki, i
     dict.Add i, y
     count = count + 1
@@ -89,7 +89,7 @@ Private Function ConstructTargets(nowWareki As YearObj) As Dictionary
       Dim prevYear As Integer
       prevYear = prevMaxYear
       Do While count < TargetYearWindow And prevYear >= 1
-        Set y = New YearObj
+        Set y = New ModelYear
         y.SetYear prevWareki, prevYear
         ' key はその年号内の年番号 (例: 平成31 -> key=31)
         dict.Add prevYear, y
@@ -103,9 +103,9 @@ Private Function ConstructTargets(nowWareki As YearObj) As Dictionary
 End Function
 
 ' 現在の年号を取得する関数
-Private Function GetNowWareki() As YearObj
-  Dim nowObj As YearObj
-  Set nowObj = New YearObj
+Private Function GetNowWareki() As ModelYear
+  Dim nowObj As ModelYear
+  Set nowObj = New ModelYear
 
   Dim warekiName As String
   Dim warekiYear As Integer
@@ -138,7 +138,7 @@ End Function
 
 ' 年号を西暦に変換する
 ' 年号データセットをファイル冒頭で定数宣言し，その値を用いて変換処理を実行する
-Private  Function ConvertWareki2Seireki(wareki As YearObj) As Integer
+Private  Function ConvertWareki2Seireki(wareki As ModelYear) As Integer
   Dim startYear As Integer
   Select Case wareki.Wareki
     Case "令和"
@@ -155,9 +155,9 @@ Private  Function ConvertWareki2Seireki(wareki As YearObj) As Integer
 End Function
 
 ' 西暦を和暦に変換する
-Private  Function ConvertSeireki2Wareki(seireki As Integer) As YearObj
-  Dim result As YearObj
-  Set result = New YearObj
+Private  Function ConvertSeireki2Wareki(seireki As Integer) As ModelYear
+  Dim result As ModelYear
+  Set result = New ModelYear
 
   If seireki >= Year(ReiwaStartDate) Then
     result.SetYear "令和", seireki - Year(ReiwaStartDate) + 1
