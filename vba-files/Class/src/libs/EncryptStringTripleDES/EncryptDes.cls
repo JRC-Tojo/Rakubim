@@ -17,7 +17,7 @@ Option Explicit
 '初期ベクトル
 Private Const INITIALIZATION_VECTOR = "12345678" '必ず8文字分
 '暗号用共通鍵
-Private TRIPLE_DES_KEY = "motorakudekirunj" '必ず16文字分
+Private Const TRIPLE_DES_KEY = "motorakudekirunj" '必ず16文字分
 
 '***************************************************************************************************
 '機　能：TripleDESによる暗号化（TripleDES暗号化⇒BASE64符号化）
@@ -39,16 +39,15 @@ Public Function EncryptStringTripleDES(plain_string As String, Optional key As S
     EncryptStringTripleDES = Null
     
     'P1_事前処理
-    On Error GoTo FunctionError
+    ' On Error GoTo FunctionError
     
     'P2_主処理
     'P2-1_平文文字列⇒平文バイトデータ
     plain_byte_data = CreateObject("System.Text.UTF8Encoding").GetBytes_4(plain_string)
     
     'P2-2_平文バイトデータ⇒暗号バイトデータ
-    Call SetKey(key)
     Set encryption_object = CreateObject("System.Security.Cryptography.TripleDESCryptoServiceProvider")
-    encryption_object.Key = CreateObject("System.Text.UTF8Encoding").GetBytes_4(TRIPLE_DES_KEY)
+    encryption_object.Key = CreateObject("System.Text.UTF8Encoding").GetBytes_4(GetEncryptKey(key))
     encryption_object.IV = CreateObject("System.Text.UTF8Encoding").GetBytes_4(INITIALIZATION_VECTOR)
     encrypted_byte_data = _
             encryption_object.CreateEncryptor().TransformFinalBlock(plain_byte_data, 0, UBound(plain_byte_data) + 1)
@@ -62,9 +61,9 @@ Public Function EncryptStringTripleDES(plain_string As String, Optional key As S
     EncryptStringTripleDES = encrypted_base64_string
     
     'P5_エラーハンドリング
-    Exit Function
-FunctionError:
-    MsgBox "TripleDESによる暗号化に失敗しました。"
+'     Exit Function
+' FunctionError:
+'     MsgBox "TripleDESによる暗号化に失敗しました。"
 End Function
 
 '***************************************************************************************************
@@ -87,16 +86,15 @@ Function DecryptStringTripleDES(encrypted_string As String, Optional key As Stri
     DecryptStringTripleDES = Null
     
     'P1_事前処理
-    On Error GoTo FunctionError
+    ' On Error GoTo FunctionError
     
     'P2_主処理
     'P2-1_BASE64符号文字列⇒DES暗号バイトデータ
     encrypted_byte_data = Base64toBytes(encrypted_string)
     
     'P2-2_DES暗号バイトデータ⇒平文バイトデータ
-    Call SetKey(key)
     Set encryption_object = CreateObject("System.Security.Cryptography.TripleDESCryptoServiceProvider")
-    encryption_object.Key = CreateObject("System.Text.UTF8Encoding").GetBytes_4(TRIPLE_DES_KEY)
+    encryption_object.Key = CreateObject("System.Text.UTF8Encoding").GetBytes_4(GetEncryptKey(key))
     encryption_object.IV = CreateObject("System.Text.UTF8Encoding").GetBytes_4(INITIALIZATION_VECTOR)
     plain_byte_data = encryption_object.CreateDecryptor().TransformFinalBlock(encrypted_byte_data, 0, UBound(encrypted_byte_data) + 1)
             
@@ -109,9 +107,9 @@ Function DecryptStringTripleDES(encrypted_string As String, Optional key As Stri
     DecryptStringTripleDES = plain_string
     
     'P5_エラーハンドリング
-    Exit Function
-FunctionError:
-    MsgBox "TripleDESによる復号化に失敗しました。"
+'     Exit Function
+' FunctionError:
+'     MsgBox "TripleDESによる復号化に失敗しました。"
 End Function
 
 '***************************************************************************************************
@@ -151,7 +149,8 @@ End Function
 '戻り値：（なし）
 '備　考：
 '***************************************************************************************************
-Function SetKey(key As String)
+Private Function GetEncryptKey(key As String) As String
+    GetEncryptKey = TRIPLE_DES_KEY
     If (key = "") Then Exit Function
     
     ' 鍵は必ず16文字である必要あり
@@ -159,5 +158,5 @@ Function SetKey(key As String)
     ' 16文字に満たない場合は_でパディング
     Const padChr = "_"
 
-    TRIPLE_DES_KEY = Right(String(targetLength, padChar) & key, targetLength)
+    GetEncryptKey = Right(String(targetLength, padChar) & key, targetLength)
 End Function
