@@ -83,12 +83,11 @@ End Function
 Public Function WriteCell(wb As Workbook, sheetName As String, cellAddress As String, val As String) As ObjResult
   On Error GoTo ErrHandler
 
-  Dim cellValue As String
   With wb.Worksheets(sheetName)
     .Range(cellAddress).Value = val
   End With
 
-  Set WriteCell = Success(cellValue)
+  Set WriteCell = Success()
   Exit Function
 ErrHandler:
   Set WriteCell = Failure("repo.sheet.writecell.error", sheetName, cellAddress, val, Err.Number, Err.Description)

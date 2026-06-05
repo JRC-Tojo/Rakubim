@@ -77,6 +77,8 @@ Public Function CopySheetFromOuter(wb As Workbook, outerPath As ObjPath, sheetNa
 
   Set CopySheetFromOuter = Success()
   Exit Function
-ErrHandler:
+ErrHandler:  
+  ' ‰æ–ÊXV‚ğÄŠJ
+  Application.ScreenUpdating = True
   Set CopySheetFromOuter = Failure("repo.sheet.copysheetouter.error", outerPath.FullPath, sheetName, Err.Number, Err.Description)
 End Function

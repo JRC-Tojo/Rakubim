@@ -69,6 +69,11 @@ Public Function ImportCodeSheet() As ObjResult
   targetSheetName = targetPath.Stem
 
   Set existsSheet = inner_SheetRepo.IsExistsSheet(targetSheetName)
+  If (Not existsSheet.isOK) Then
+    Set ImportCodeSheet = existsSheet
+    Exit Function
+  End If
+  
   If (existsSheet.value) Then
     Set ImportCodeSheet = Success()
   Else

@@ -64,7 +64,7 @@ End Function
 
 
 ' 選択中の業務機関表示から番号を取得する
-Private Function getCompanyID(companyName As String)
+Private Function getCompanyID(companyName As String) As String
   ' 不明な場合は000を返す
   getCompanyID = "000"
   

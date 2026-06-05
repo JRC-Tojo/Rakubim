@@ -48,9 +48,9 @@ Private Function getUserName() As String
   Dim execObj As Object
   Set wsh = CreateObject("WScript.Shell")
 
-  const command = "whoami"
+  Const command = "whoami"
   Set execObj = wsh.exec("%ComSpec% /c " & command)
-  GetUserName = Trim(execObj.stdOut.ReadAll)
+  getUserName = Trim(execObj.stdOut.ReadAll)
 End Function
 
 
