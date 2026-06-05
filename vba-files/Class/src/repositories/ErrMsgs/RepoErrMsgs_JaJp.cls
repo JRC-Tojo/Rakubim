@@ -24,6 +24,8 @@ Private Sub class_initialize()
       Array("セル読み取りエラー", "{}シート{}の読み取りに失敗しました．\n(エラーコード：{}, {})")
     .Append "repo.sheet.writecol.error", _
       Array("シート書き込みエラー", "{}シート{}列の書き込みに失敗しました．\n(エラーコード：{}, {})")
+    .Append "repo.sheet.writecell.error", _
+      Array("シート書き込みエラー", "{}シート{}に「{}」を書き込めませんでした．\n(エラーコード：{}, {})")
     .Append "repo.sheet.getlastrow.error", _
       Array("最終データ読み取りエラー", "{}シート{}列の末端データ位置の取得に失敗しました．\n(エラーコード：{}, {})")
     .Append "repo.sheet.clearcol.error", _

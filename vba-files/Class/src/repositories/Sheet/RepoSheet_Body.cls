@@ -15,11 +15,11 @@ Public Function IsExistsSheet(wb As Workbook, sheetName As String) As ObjResult
   Dim sht As Worksheet
   For Each sht In wb.Worksheets
     If sht.Name = sheetName Then
-      IsExistsSheet = Success(True)
+      Set IsExistsSheet = Success(True)
       Exit Function
     End If
   Next sht
-  IsExistsSheet = Success(False)
+  Set IsExistsSheet = Success(False)
 End Function
 
 
@@ -37,7 +37,7 @@ End Function
 
 
 ' 外部ファイルから特定のシートを取り込む
-Public Function CopySheetFromOuter(wb As Workbook, outerPath As ObjPath, sheetName, As String, Optional visible As Boolean = True) As ObjResult
+Public Function CopySheetFromOuter(wb As Workbook, outerPath As ObjPath, sheetName As String, Optional visible As Boolean = True) As ObjResult
   On Error GoTo ErrHandler
   Dim sourceBook As Workbook
   Dim filePath As Variant

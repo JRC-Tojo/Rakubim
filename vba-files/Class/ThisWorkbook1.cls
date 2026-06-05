@@ -14,14 +14,14 @@ Private Const ThisVersion = "v1.1.0"
 Sub Workbook_Open()
   Dim r As Routes
   Set r = New Routes
+
+  SplashScreen.Show
   
   ' 目録入力シートにプルダウンを設置
   Call r.SetPulldownForFiles()
 
   ' コードシートのプルダウンを設置
   Call r.CodeSheetInitializer()
-
-  SplashScreen.Show
 
   If (RequireUpdate() = True) Then
     Dim res As Long

@@ -86,12 +86,15 @@ Public Function SetCodesPulldown() As ObjResult
     Exit Function
   End If
   
+  ' プルダウンを設置
   Dim errMsgRepo As RepoErrMsgs
   Set errMsgRepo = New RepoErrMsgs
   Dim errTitle As String: errTitle = errMsgRepo.GetTitle("service.sheet.pulldown.codes")
   Dim errMsg As String: errMsg = errMsgRepo.GetMsg("service.sheet.pulldown.codes")
-
   Call inner_SheetRepo.Pulldown(FirstInputSheetName, FirstInputCodeCell, codeNameList.value, errTitle, errMsg)
+
+  ' 初期値を設定
+  Call inner_SheetRepo.WriteCell(FirstInputSheetName, FirstInputCodeCell, codeNameList.value.At(-1))
 
   Set SetCodesPulldown = Success() 
 End Function

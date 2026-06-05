@@ -44,7 +44,7 @@ Public Function IsExistsSheet(sheetName As String) As ObjResult
 End Function
 
 Public Function CopySheetFromOuter(outerPath As ObjPath, sheetName As String, Optional visible As Boolean = True) As ObjResult
-  Set CopySheetFromOuter = inner_IO.CopySheetFromOuter(inner_Workbook, outerPath, sheetName, visible)
+  Set CopySheetFromOuter = inner_Body.CopySheetFromOuter(inner_Workbook, outerPath, sheetName, visible)
 End Function
 
 ' ========================= IO =========================
@@ -59,6 +59,10 @@ End Function
 
 Public Function WriteColFromCell(sheetName As String, startCell As String, values As ObjList) As ObjResult
   Set WriteColFromCell = inner_IO.WriteColFromCell(inner_Workbook, sheetName, startCell, values)
+End Function
+
+Public Function WriteCell(sheetName As String, cellAddress As String, val As String) As ObjResult
+  Set WriteCell = inner_IO.WriteCell(inner_Workbook, sheetName, cellAddress, val)
 End Function
 
 Public Function GetLastRow(sheetName As String, startCell As String, Optional mustContinue As Boolean = False) As ObjResult

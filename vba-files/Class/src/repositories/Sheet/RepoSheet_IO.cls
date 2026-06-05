@@ -79,6 +79,21 @@ ErrHandler:
   Set WriteColFromCell = Failure("repo.sheet.writecol.error", sheetName, startCell, Err.Number, Err.Description)
 End Function
 
+' 特定のセルに値を書き込む
+Public Function WriteCell(wb As Workbook, sheetName As String, cellAddress As String, val As String) As ObjResult
+  On Error GoTo ErrHandler
+
+  Dim cellValue As String
+  With wb.Worksheets(sheetName)
+    .Range(cellAddress).Value = val
+  End With
+
+  Set WriteCell = Success(cellValue)
+  Exit Function
+ErrHandler:
+  Set WriteCell = Failure("repo.sheet.writecell.error", sheetName, cellAddress, val, Err.Number, Err.Description)
+End Function
+
 ' 指定したセルを起点として一番下に値が入っているセルの行番号を返す
 ' `mustContinue`: Trueの時は連続するセル群の一番下を返す
 Public Function GetLastRow(wb As Workbook, sheetName As String, startCell As String, Optional mustContinue As Boolean = False) As ObjResult
