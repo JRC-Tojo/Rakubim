@@ -19,9 +19,6 @@ Private userInputPositions As ObjDict
 ' ユーザー入力シートの名前
 Private Const USER_INPUT_SHEET_NAME As String = "入力"
 
-' 事業所番号シートの名前
-Private Const OFFICE_CODES_SHEET_NAME As String = "業務機関コード"
-
 Private Sub Class_Initialize()
   ' ユーザー入力キャッシュの初期化
   Set cachedUserInput = New ObjDict
@@ -60,32 +57,28 @@ Public Function LoadUserInput(Optional wb As Workbook = Nothing) As ObjResult
 
   ' 特殊オブジェクトから値を取得する
   Call cachedUserInput.Append("UseContinuousNumber", CBool(sheetRepo.ReadObjValue(USER_INPUT_SHEET_NAME, "useContinuousNumberCheck")))
-  Call cachedUserInput.Update("CompanyID", getCompanyID(sheetRepo, cachedUserInput.At("CompanyID")))
+  Call cachedUserInput.Update("CompanyID", getCompanyID(cachedUserInput.At("CompanyID")))
 
   Set LoadUserInput = Success(Nothing)
 End Function
 
 
-' 業務機関コードから情報を取得する
-Private Function getCompanyID(sheetRepo As RepoSheet, companyName As String)
+' 選択中の業務機関表示から番号を取得する
+Private Function getCompanyID(companyName As String)
   ' 不明な場合は000を返す
   getCompanyID = "000"
+  
+  ' `XXX (000)`の形式のため、()内の数字をコードとして返す
+  Dim regEx As ObjRegex
+  Set regEx = New ObjRegex
+  Dim matchedNums As ObjList
+  Set matchedNums = regEx.GetMatches("\((\d+)\)", companyName)
+  If (matchedNums.Count <> 1) Then Exit Function
 
-  ' 業務機関コードシートから事業所名と事業所IDの列を読み取る
-  Dim compNames As ObjResult
-  Set compNames = sheetRepo.ReadColumn(OFFICE_CODES_SHEET_NAME, "H3")
-  Dim compIds As ObjResult
-  Set compIds = sheetRepo.ReadColumn(OFFICE_CODES_SHEET_NAME, "I3")
-  If (Not IsResultAllOK(compNames, compIds)) Then Exit Function
-
-  ' 事業所名が一致する行の事業所IDを返す
-  Dim i As Long
-  For i = 0 To compNames.value.Count - 1
-    If compNames.value.At(i) = companyName Then
-      getCompanyID = compIds.value.At(i)
-      Exit Function
-    End If
-  Next i
+  ' キャプチャグループから括弧内の数字を抽出
+  Dim match As Match
+  Set match = matchedNums.At(0)
+  getCompanyID = Format(CLng(match.SubMatches(0)), "000")
 End Function
 
 
