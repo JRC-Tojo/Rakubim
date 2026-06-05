@@ -36,6 +36,13 @@ Private Sub class_initialize()
       Array("印刷範囲設定エラー", "{}シートの印刷範囲の設定に失敗しました．\n(エラーコード：{}, {})")
     .Append "repo.sheet.clearprintarea.error", _
       Array("印刷範囲設定エラー", "{}シートの印刷範囲のクリアに失敗しました．\n(エラーコード：{}, {})")
+    .Append "repo.sheet.copysheetouter.error", _
+      Array("シートコピーエラー", "{}\nに保存されている{}シートの取り込みに失敗しました．\n(エラーコード：{}, {})")
+
+    .Append "repo.secret.encrypt.error", _
+      Array("秘匿情報エラー", "文字列の暗号化中に不明なエラーが発生しました．\n(エラーコード：{}, {})")
+    .Append "repo.secret.decrypt.error", _
+      Array("秘匿情報エラー", "文字列の復号化中に不明なエラーが発生しました．\n(エラーコード：{}, {})")
     
     .Append "service.file.load.folder_not_found", _
       Array("フォルダエラー", "以下のパスに示すフォルダが見つかりません．\n{}")

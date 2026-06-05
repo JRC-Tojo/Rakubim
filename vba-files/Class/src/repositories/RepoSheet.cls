@@ -73,6 +73,10 @@ Public Function ClearPrintArea(sheetName As String) As ObjResult
   Set ClearPrintArea = inner_IO.ClearPrintArea(inner_Workbook, sheetName)
 End Function
 
+Public Function CopySheetFromOuter(outerPath As ObjPath, sheetName, As String, Optional visible As Boolean = True) As ObjResult
+  Set CopySheetFromOuter = inner_IO.CopySheetFromOuter(inner_Workbook, outerPath, sheetName, visible)
+End Function
+
 ' ========================= IO =========================
 
 Public Function ReadObjValue(sheetName As String, objName As String) As Variant

@@ -18,3 +18,4 @@ secret/
 # secret files
 /docs
 /testCases
+vba-files/Module/GenerateSecret.bas

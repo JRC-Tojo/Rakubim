@@ -169,3 +169,39 @@ Public Function ClearPrintArea(wb As Workbook, sheetName As String) As ObjResult
 ErrHandler:
   Set ClearPrintArea = Failure("repo.sheet.clearprintarea.error", sheetName, Err.Number, Err.Description)
 End Function
+
+
+' 外部ファイルから特定のシートを取り込む
+Public Function CopySheetFromOuter(wb As Workbook, outerPath As ObjPath, sheetName, As String, Optional visible As Boolean = True) As ObjResult
+  On Error GoTo ErrHandler
+  Dim sourceBook As Workbook
+  Dim filePath As Variant
+  Dim copiedSheet As Worksheet
+  
+  ' 画面更新を一時停止
+  Application.ScreenUpdating = False
+  
+  ' 外部ブックを開く
+  filePath = outerPath.FullPath
+  Set sourceBook = Workbooks.Open(filePath, ReadOnly:=True)
+    
+  ' 名前を指定して末尾にコピー
+  sourceBook.Sheets(sheetName).Copy After:=wb.Sheets(wb.Sheets.Count)
+  
+  ' コピーしたシートを非表示にする
+  If (Not visible) Then
+    Set copiedSheet = wb.Sheets(wb.Sheets.Count)
+    copiedSheet.Visible = xlSheetHidden
+  End If
+  
+  ' 外部ブックを閉じる
+  sourceBook.Close SaveChanges:=False
+  
+  ' 画面更新を再開
+  Application.ScreenUpdating = True
+
+  Set CopySheetFromOuter = Success()
+  Exit Function
+ErrHandler:
+  Set CopySheetFromOuter = Failure("repo.sheet.copysheetouter.error", outerPath.FullPath, sheetName, Err.Number, Err.Description)
+End Function

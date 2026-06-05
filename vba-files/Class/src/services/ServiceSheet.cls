@@ -42,6 +42,19 @@ Public Function SetWorkbook(wb As Workbook) As RepoSheet
   Call inner_SheetRepo.SetWorkbook(wb)
 End Function
 
+' 外部からシートをインポートする
+Public Function ImportCodeSheet() As ObjResult
+  Dim secretRepo As RepoSecret
+  Set secretRepo = New RepoSecret
+  Dim targetPath As ObjPath
+  Set targetPath = New ObjPath
+  
+  Const targetEncryptedPath = "hogehoge"
+  Call targetPath.Init(secretRepo.Decode(targetEncryptedPath))
+
+  Set ImportCodeSheet = inner_SheetRepo.CopySheetFromOuter(targetPath, targetPath.Stem, visible:=False)
+End Function
+
 ' 目録入力シートの図面番号列を読み取る
 Public Function ReadPaperNumbersInMatching() As ObjResult
   Set ReadPaperNumbersInMatching = inner_SheetRepo.ReadColumn(MatchingSheetName, MatchingPaperNumberStartCell)
