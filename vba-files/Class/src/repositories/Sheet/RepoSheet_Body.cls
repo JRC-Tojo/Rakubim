@@ -42,6 +42,12 @@ Public Function CopySheetFromOuter(wb As Workbook, outerPath As ObjPath, sheetNa
   Dim sourceBook As Workbook
   Dim filePath As Variant
   Dim copiedSheet As Worksheet
+
+  ' シートコピーの前後で選択位置が変わってしまう問題があるため、処理前の選択位置を保存しておく
+  Dim originalSheet As Worksheet
+  Dim originalRange As Range
+  Set originalSheet = ActiveSheet
+  Set originalRange = Selection
   
   ' 画面更新を一時停止
   Application.ScreenUpdating = False
@@ -61,6 +67,10 @@ Public Function CopySheetFromOuter(wb As Workbook, outerPath As ObjPath, sheetNa
   
   ' 外部ブックを閉じる
   sourceBook.Close SaveChanges:=False
+  
+  ' 選択位置を復元する
+  originalSheet.Select
+  originalRange.Select
   
   ' 画面更新を再開
   Application.ScreenUpdating = True
