@@ -12,16 +12,8 @@ Private Const ReleaseFilePath = "https://jrcjregroup.app.box.com/folder/34864529
 Private Const ThisVersion = "v1.1.0"
 
 Sub Workbook_Open()
-  Dim r As Routes
-  Set r = New Routes
-
+  ' スプラッシュスクリーンを表示しながら、アプリケーションとして必須の処理を実行する
   SplashScreen.Show
-  
-  ' 目録入力シートにプルダウンを設置
-  Call r.SetPulldownForFiles()
-
-  ' コードシートのプルダウンを設置
-  Call r.CodeSheetInitializer()
 
   If (RequireUpdate() = True) Then
     Dim res As Long
