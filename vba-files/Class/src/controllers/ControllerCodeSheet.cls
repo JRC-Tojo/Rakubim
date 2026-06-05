@@ -14,6 +14,12 @@ Public Function Run() As ObjResult
   Dim sheetService As ServiceSheet
   Set sheetService = New ServiceSheet
 
+  ' 開発者モードの時には実行しない
+  If (Environ("Rakubim") = "DEV_MODE") Then
+    Set Run = Success()
+    Exit Function
+  End If
+
   ' コードシートをインポート
   Dim importRes As ObjResult
   Set importRes = sheetService.ImportCodeSheet()
