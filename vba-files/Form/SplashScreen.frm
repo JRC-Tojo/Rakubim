@@ -16,6 +16,40 @@ Attribute VB_Exposed = False
 
 Option Explicit
 
+Private Declare PtrSafe Function FindWindow Lib "user32" Alias "FindWindowA" (ByVal lpClassName As String, ByVal lpWindowName As String) As LongPtr
+Private Declare PtrSafe Function GetWindowLongPtr Lib "user32" Alias "GetWindowLongPtrA" (ByVal hWnd As LongPtr, ByVal nIndex As Long) As LongPtr
+Private Declare PtrSafe Function SetWindowLongPtr Lib "user32" Alias "SetWindowLongPtrA" (ByVal hWnd As LongPtr, ByVal nIndex As Long, ByVal dwNewLong As LongPtr) As LongPtr
+Private Declare PtrSafe Function DrawMenuBar Lib "user32" (ByVal hWnd As LongPtr) As Long
+
+' スタイルの詳細は`https://learn.microsoft.com/ja-jp/windows/win32/winmsg/window-styles`を参照
+Private Const GWL_STYLE As Long = -16
+Private Const WS_CAPTION As Long = &HC00000     ' タイトルバー
+Private Const WS_THICKFRAME As Long = &H40000   ' サイズ変更枠（太い枠）
+Private Const WS_DLGFRAME As Long = &H400000    ' ダイアログ枠（二重枠）
+Private Const WS_BORDER As Long = &H800000      ' 単線枠
+
+Private Sub UserForm_Initialize()
+  Dim hWnd As LongPtr
+  Dim currentStyle As LongPtr
+  
+  ' 1. フォームのウィンドウハンドルを取得
+  hWnd = FindWindow("ThunderDFrame", Me.Caption)
+  
+  If hWnd <> 0 Then
+    ' 2. 現在のウィンドウスタイルを取得
+    currentStyle = GetWindowLongPtr(hWnd, GWL_STYLE)
+    
+    ' 3. タイトルバーと、あらゆる枠線スタイル（太枠・ダイアログ枠・単線枠）をすべて除去
+    currentStyle = currentStyle And Not (WS_CAPTION Or WS_THICKFRAME Or WS_DLGFRAME Or WS_BORDER)
+    
+    ' 4. 新しいスタイルをウィンドウに適用
+    Call SetWindowLongPtr(hWnd, GWL_STYLE, currentStyle)
+    
+    ' 5. ウィンドウの枠組み（メニューバーなど）を再描画して変更を反映
+    Call DrawMenuBar(hWnd)
+  End If
+End Sub
+
 Private Sub UserForm_Activate()
   Dim startTime As Double
   Dim minDuration As Double
