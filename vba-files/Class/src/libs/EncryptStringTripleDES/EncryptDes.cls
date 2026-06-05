@@ -156,7 +156,7 @@ Private Function GetEncryptKey(key As String) As String
     ' 鍵は必ず16文字である必要あり
     Const targetLength = 16
     ' 16文字に満たない場合は_でパディング
-    Const padChr = "_"
+    Const padChar = "_"
 
     GetEncryptKey = Right(String(targetLength, padChar) & key, targetLength)
 End Function

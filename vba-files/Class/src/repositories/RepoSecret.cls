@@ -34,7 +34,7 @@ Public Function Decrypt(targetEncrypted As String) As ObjResult
   
   Dim decryptedTxt As String
   decryptedTxt = encrypter.DecryptStringTripleDES(targetEncrypted, getEncryptKey())
-  
+
   Set Decrypt = Success(decryptedTxt)
   Exit Function
 ErrHandler:
@@ -44,11 +44,13 @@ End Function
 
 ' ÉÜÅ[ÉUÅ[ñºÇÃéÊìæ
 Private Function getUserName() As String
+  Dim wsh As Object
+  Dim execObj As Object
   Set wsh = CreateObject("WScript.Shell")
 
   const command = "whoami"
   Set execObj = wsh.exec("%ComSpec% /c " & command)
-  GetUserName = execObj.stdOut.ReadAll.trim()
+  GetUserName = Trim(execObj.stdOut.ReadAll)
 End Function
 
 

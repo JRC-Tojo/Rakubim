@@ -83,6 +83,8 @@ Private Sub class_initialize()
     
     .Append "service.sheet.pulldown.files", _
       Array("入力エラー", "フォルダ内に存在しないファイル名は入力できません．")
+    .Append "service.sheet.pulldown.codes", _
+      Array("入力エラー", "未登録の事業者コードを入力することはできません．")
     .Append "service.sheet.newname.duplicated", _
       Array("入力エラー", "新しいファイル名に重複が含まれます．\n同一名称のファイルは生成できないため，新しいファイル名称に変更して再度お試しください．\n\n【重複が確認された新しいファイル名称】\n・{}")
     .Append "service.sheet.old2new.missmatch", .At("service.file.rename.missmatch")

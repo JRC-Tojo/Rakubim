@@ -39,6 +39,14 @@ Public Function CreateSheet(sheetName As String, Optional visible As Boolean = T
   Set CreateSheet = inner_Body.Create(inner_Workbook, sheetName, visible)
 End Function
 
+Public Function IsExistsSheet(sheetName As String) As ObjResult
+  Set IsExistsSheet = inner_Body.IsExistsSheet(inner_Workbook, sheetName)
+End Function
+
+Public Function CopySheetFromOuter(outerPath As ObjPath, sheetName As String, Optional visible As Boolean = True) As ObjResult
+  Set CopySheetFromOuter = inner_IO.CopySheetFromOuter(inner_Workbook, outerPath, sheetName, visible)
+End Function
+
 ' ========================= IO =========================
 
 Public Function ReadColumn(ByVal sheetName As String, ByVal startCell As String) As ObjResult
@@ -71,10 +79,6 @@ End Function
 
 Public Function ClearPrintArea(sheetName As String) As ObjResult
   Set ClearPrintArea = inner_IO.ClearPrintArea(inner_Workbook, sheetName)
-End Function
-
-Public Function CopySheetFromOuter(outerPath As ObjPath, sheetName, As String, Optional visible As Boolean = True) As ObjResult
-  Set CopySheetFromOuter = inner_IO.CopySheetFromOuter(inner_Workbook, outerPath, sheetName, visible)
 End Function
 
 ' ========================= IO =========================

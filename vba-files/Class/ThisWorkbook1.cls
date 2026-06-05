@@ -18,6 +18,9 @@ Sub Workbook_Open()
   ' 目録入力シートにプルダウンを設置
   Call r.SetPulldownForFiles()
 
+  ' コードシートのプルダウンを設置
+  Call r.CodeSheetInitializer()
+
   SplashScreen.Show
 
   If (RequireUpdate() = True) Then

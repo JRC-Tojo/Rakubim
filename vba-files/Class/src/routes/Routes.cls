@@ -18,6 +18,14 @@ Public Function ShowErrorMsg(err As ObjResultErr)
 End Function
 
 
+' コードシートの初期化処理を実行する
+Public Function CodeSheetInitializer() As ObjResult
+  Dim codeSheetController As ControllerCodeSheet
+  Set codeSheetController = New ControllerCodeSheet
+  Set CodeSheetInitializer = codeSheetController.Run()
+End Function
+
+
 ' 目録入力シートに記載された図面群のマッチング結果リストを取得する
 Public Function GetMatchingLists() As ObjResult
   Dim matchingController As ControllerMatching
