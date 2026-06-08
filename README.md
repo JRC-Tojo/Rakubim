@@ -1,7 +1,7 @@
 
 <!-- logo -->
 <p align="center">
-    <img src="https://raw.githubusercontent.com/JRC-Tojo/Rakubim/refs/heads/main/%E3%82%89%E3%81%8F%E3%81%B3%E3%82%80%E8%A1%A8%E7%B4%99.png" height="350"/></a>
+    <img src="https://raw.githubusercontent.com/JRC-Tojo/Rakubim/refs/heads/main/%E3%82%89%E3%81%8F%E3%81%B3%E3%82%80%E8%A1%A8%E7%B4%99.png" alt="らくびむロゴ" height="350"/></a>
 </p>
 
 <h1 align="center"> らくびむ </h1>
@@ -12,11 +12,11 @@
 
 <p align="center">
     <!-- 実装言語 -->
-    <img src="https://img.shields.io/badge/Language-VBA-purple.svg" />
+    <img src="https://img.shields.io/badge/Language-VBA-purple.svg" alt="実装言語" />
     <!-- 最新バージョン -->
-    <img src="https://img.shields.io/github/release/JRC-Tojo/Rakubim.svg" />
+    <img src="https://img.shields.io/github/release/JRC-Tojo/Rakubim.svg" alt="最新バージョン" />
     <!-- ライセンス -->
-    <img src="https://img.shields.io/badge/LICENCE-MIT-green.svg" />
+    <img src="https://img.shields.io/badge/LICENCE-MIT-green.svg" alt="ライセンス" />
 </p>
 
 
