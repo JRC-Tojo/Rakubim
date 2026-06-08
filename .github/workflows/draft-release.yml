@@ -1,0 +1,83 @@
+name: Create Draft Release
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+jobs:
+  create-release:
+    # PRがマージされた場合、かつ「bump-version/」から始まるブランチだった場合のみ実行
+    if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'bump-version/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Extract version from branch name
+        id: extract_version
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          VERSION=${BRANCH_NAME#bump-version/}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Get filename
+        id: get_file_name
+        run: |
+          # config.json から最新の本体ファイル名を取得
+          FILENAME=$(jq -r '.excel_file' config.json)
+          echo "FILE_NAME=$FILENAME" >> $GITHUB_ENV
+
+      - name: Generate Manual Release Notes Template
+        id: manual_notes
+        run: |
+          # ヒアドキュメントを使ってMarkdownファイルを生成
+          # バッククリック（`）はシェルスクリプト内でエスケープしています
+          # EOFの競合や改行を安全に扱うため、ファイル経由で格納します
+          cat << EOF > release_note_template.md
+
+          <!--
+          リリース後のTODO
+          - 現行のバージョンでアップデート案内が出ること＆案内先でダウンロードできることを確認
+          - 新バージョンで`vba-files\Class\ThisWorkbook1.cls`のバージョン名を変更するとアップデート案内が出ること＆案内先でダウンロードできることを確認
+          -->
+
+          ## 💡 **ご利用になる方へ**
+          本ツールを実行するには、下部にある **「Assets」** セクションから **\`${{ env.FILE_NAME }}\`** をダウンロードしてください。
+          （\`Source code\` と書かれたZipファイルは通常ダウンロード不要です）
+
+
+          ## ✨ 変更内容 (Changelog)
+
+          ### 新機能 (Features)
+          * **[機能名]**: [機能の簡単な説明] (例: クラウドストレージへの出力機能を追加しました)
+          * **[機能名]**: [機能の簡単な説明] (例: 設定画面に「フォルダ除外設定」を追加)
+
+          ### バグ修正 (Bug Fixes)
+          * **[修正内容]**: [どのような不具合を直したか] (例: 特定の文字コードを含むファイル名でエラーが出る問題を修正)
+          * **[修正内容]**: [どのような不具合を直したか] (例: 大量ファイルを処理した際にメモリが不足する不具合を解消)
+
+          ### その他の変更 (Other Changes)
+          * 内部コードの最適化およびリファクタリング
+
+
+          ## ❌ 「マクロの実行がブロックされました」の対処方法
+
+          1. ファイルを右クリック ＞ **プロパティ** を開き、最下部の **「ブロック解除」** にチェックを入れて [OK] を押します（Windowsのセキュリティ対策）。
+          2. Excelでファイルを開き、「マクロを有効にする」を選択してご利用ください。
+          EOF
+
+      - name: Create Draft Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: "v${{ env.VERSION }}"
+          name: "Release v${{ env.VERSION }}"
+          body_path: release_note_template.md  # 生成したテンプレートファイルを指定
+          draft: true
+          # 上のステップで確認が取れたファイル名を動的に指定
+          files: ${{ env.FILE_NAME }}
