@@ -42,7 +42,7 @@ ErrHandler:
 End Function
 
 
-' ユーザー名の取得
+' ホスト名（ドメイン名）の取得
 Private Function getHostName() As String
   getHostName = LCase(Environ("USERDOMAIN"))
 End Function
