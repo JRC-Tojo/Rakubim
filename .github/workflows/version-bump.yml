@@ -1,0 +1,111 @@
+name: Version Bump and PR Creation
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: 'アップデートの種別を選択してください'
+        required: true
+        default: 'minor'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Run version bump script
+        id: bump
+        run: |
+          python - <<'EOF'
+          import json, re, os, sys
+
+          bump_type = "${{ github.event.inputs.bump_type }}"
+
+          # 1 & 2. config.json の読み込みとファイル名変更
+          with open('config.json', 'r', encoding='utf-8') as f:
+              config = json.load(f)
+          
+          old_filename = config.get('excel_file', '')
+          match = re.search(r'v?(\d+)\.(\d+)\.(\d+)', old_filename)
+          if not match:
+              print(f"Error: Could not find version string in {old_filename}")
+              sys.exit(1)
+
+          major, minor, patch = map(int, match.groups())
+          if bump_type == 'major':
+              major += 1; minor = 0; patch = 0
+          elif bump_type == 'minor':
+              minor += 1; patch = 0
+          else:
+              patch += 1
+
+          new_version = f"{major}.{minor}.{patch}"
+          new_filename = re.sub(r'\d+\.\d+\.\d+', new_version, old_filename)
+
+          # 実ファイルの名称変更
+          if os.path.exists(old_filename):
+              os.rename(old_filename, new_filename)
+          else:
+              print(f"Warning: {old_filename} not found in workspace.")
+
+          # config.json の更新
+          config['excel_file'] = new_filename
+          with open('config.json', 'w', encoding='utf-8') as f:
+              json.dump(config, f, indent=4, ensure_ascii=False)
+
+          # 3. ThisWorkbook1.cls の更新
+          cls_path = 'vba-files/Class/ThisWorkbook1.cls'
+          if os.path.exists(cls_path):
+              with open(cls_path, 'r', encoding='shift-jis') as f:
+                  cls_content = f.read()
+              
+              # Private Const ThisVersion = "vX.X.X" の形式にマッチさせて置換
+              cls_content = re.sub(
+                  r'(Const\s+ThisVersion\s*=\s*"v)\d+\.\d+\.\d+(")',
+                  rf'\g<1>{new_version}\g<2>',
+                  cls_content
+              )
+              
+              with open(cls_path, 'w', encoding='shift-jis') as f:
+                  f.write(cls_content)
+          else:
+              print(f"Warning: {cls_path} not found in workspace.")
+
+          # GitHub Actionsの環境変数にエクスポート
+          with open(os.environ['GITHUB_ENV'], 'a') as env_file:
+              env_file.write(f"NEW_VERSION={new_version}\n")
+          EOF
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v8
+        with:
+          commit-message: "chore: bump version to ${{ env.NEW_VERSION }}"
+          branch: "bump-version/${{ env.NEW_VERSION }}"
+          title: "🚀 Release v${{ env.NEW_VERSION }}"
+          body: |
+            バージョンを `v${{ env.NEW_VERSION }}` にアップデートするPRです。
+            
+            **【更新内容】**
+            - 本体ファイルの名前を更新
+            - `config.json` の設定を更新
+            - `ThisWorkbook1.cls` のバージョン表記を更新
+            
+            ## TODO
+            - [ ] ビルド（Excelファイルへのコード組み込み）は手動で行い、このPRにコミットを追加してください。
+          labels: "release"
