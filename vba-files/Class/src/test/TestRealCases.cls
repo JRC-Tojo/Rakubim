@@ -171,10 +171,14 @@ Public Function GenerateRealFiles()
       Set config = LoadConfigs(wb)
   
       ' マッチ結果をダミーファイル群として読み込み
+      Dim targetPdfPath As ObjPath
+      Dim targetCadPath As ObjPath
       Dim loadedPdfPaths As ObjResult
       Dim loadedCadPaths As ObjResult
-      Set loadedPdfPaths = sheetService.ReadPdfColAsPath(config.PdfFolderPath, config.PdfExtensions)
-      Set loadedCadPaths = sheetService.ReadCadColAsPath(config.CadFolderPath, config.CadExtensions)
+      Set targetPdfPath = testFolder.Parent().Child("PDF")
+      Set targetCadPath = testFolder.Parent().Child("CAD")
+      Set loadedPdfPaths = sheetService.ReadPdfColAsPath(targetPdfPath, config.PdfExtensions)
+      Set loadedCadPaths = sheetService.ReadCadColAsPath(targetCadPath, config.CadExtensions)
       If (Not IsResultAllOK(loadedPdfPaths, loadedCadPaths)) Then
         Dim errController As ControllerError
         Set errController = New ControllerError
@@ -183,8 +187,8 @@ Public Function GenerateRealFiles()
       End If
       
       ' 旧ファイルを削除して新ファイルを生成
-      Call config.PdfFolderPath.Unlink(missingOk:=True)
-      Call config.CadFolderPath.Unlink(missingOk:=True)
+      Call targetPdfPath.Unlink(missingOk:=True)
+      Call targetCadPath.Unlink(missingOk:=True)
       Dim path As ObjPath
       For Each path In loadedPdfPaths.value.Combine(loadedCadPaths.value)
         Call path.Touch()

@@ -8,8 +8,8 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 
-Private Const ReleaseFilePath = "https://jrcjregroup.app.box.com/folder/348645297166"
-Private Const ThisVersion = "v1.1.0"
+Private Const ReleaseFilePath = "https://github.com/JRC-Tojo/Rakubim/releases/latest"
+Private Const ThisVersion = "v1.2.0"
 
 Sub Workbook_Open()
   ' スプラッシュスクリーンを表示しながら、アプリケーションとして必須の処理を実行する
@@ -30,7 +30,7 @@ End Sub
 Private Function RequireUpdate() As Boolean
   Dim latestVersion As String
   On Error GoTo ErrHandler
-  latestVersion = LoadLatestGhReleaseVersion("JRC-Chorus", "RakubimPublic")
+  latestVersion = LoadLatestGhReleaseVersion("JRC-Tojo", "Rakubim")
   If (latestVersion <> ThisVersion) Then
     RequireUpdate = True
   Else
