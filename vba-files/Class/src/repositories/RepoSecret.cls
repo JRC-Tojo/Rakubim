@@ -43,18 +43,12 @@ End Function
 
 
 ' ユーザー名の取得
-Private Function getUserName() As String
-  Dim wsh As Object
-  Dim execObj As Object
-  Set wsh = CreateObject("WScript.Shell")
-
-  Const command = "whoami"
-  Set execObj = wsh.exec("%ComSpec% /c " & command)
-  getUserName = Trim(execObj.stdOut.ReadAll)
+Private Function getHostName() As String
+  getHostName = LCase(Environ("USERDOMAIN"))
 End Function
 
 
 ' 暗号化に用いるKeyを取得
 Private Function getEncryptKey() As String
-  getEncryptKey = Split(getUserName(), "\")(0)
+  getEncryptKey = getHostName()
 End Function
