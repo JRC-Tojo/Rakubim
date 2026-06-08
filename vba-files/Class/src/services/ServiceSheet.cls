@@ -12,6 +12,12 @@ Option Explicit
 
 Private inner_SheetRepo As RepoSheet
 
+Private Const FirstInputSheetName As String = "入力"
+Private Const FirstInputCodeCell As String = "C6"
+
+Private Const CodeSheetName As String = "業務機関コード"
+Private Const CodeShowingStartCell As String = "H3"
+
 Private Const MatchingSheetName As String = "目録入力"
 Private Const MatchingPaperNumberStartCell As String = "A2"
 Private Const MatchingPaperNameStartCell As String = "B2"
@@ -40,6 +46,62 @@ End Sub
 ' 処理対象のWorkbookを変更する
 Public Function SetWorkbook(wb As Workbook) As RepoSheet
   Call inner_SheetRepo.SetWorkbook(wb)
+End Function
+
+' 外部からシートをインポートする
+Public Function ImportCodeSheet() As ObjResult
+  Dim secretRepo As RepoSecret
+  Set secretRepo = New RepoSecret
+  Dim targetPath As ObjPath
+  Set targetPath = New ObjPath
+  Dim targetSheetName As String
+  Dim decryptRes As ObjResult
+  Dim existsSheet As ObjResult
+  
+  Const targetEncryptedPath = "xBMn/Yhb5Ah39VHS1qmeHB+BlEjg1rsjAPev42sL8Y7mXxFNdn0yTZ+xDxz2MX9pqxp+KYU9VLBMi1tqQUJhzP3CAyFolPbD9P+/n2F3o8GNXLD2kT2ZneBN/8+ng3LaPXeq7yrGwtSNJeyyxh1XTEnBpTRGgkwfVPW86xBbbHRrj1lmPEiWRQCI1UP7qonalwl+AxgU1XrlS8/ixhijnR6pJT/UBXonawhaykf9dMU="
+  Set decryptRes = secretRepo.Decrypt(targetEncryptedPath)
+  If (Not decryptRes.isOK) Then
+    Set ImportCodeSheet = decryptRes
+    Exit Function
+  End If
+
+  Call targetPath.Init(decryptRes.value)
+  targetSheetName = targetPath.Stem
+
+  Set existsSheet = inner_SheetRepo.IsExistsSheet(targetSheetName)
+  If (Not existsSheet.isOK) Then
+    Set ImportCodeSheet = existsSheet
+    Exit Function
+  End If
+  
+  If (existsSheet.value) Then
+    Set ImportCodeSheet = Success()
+  Else
+    Set ImportCodeSheet = inner_SheetRepo.CopySheetFromOuter(targetPath, targetSheetName, visible:=False)
+  End If
+End Function
+
+' コード一覧を入力シートにプルダウンで登録する
+Public Function SetCodesPulldown() As ObjResult
+  ' コード一覧の登録処理
+  Dim codeNameList As ObjResult
+  Set codeNameList = inner_SheetRepo.ReadColumn(CodeSheetName, CodeShowingStartCell)
+  If (Not codeNameList.isOK) Then
+    Set SetCodesPulldown = codeNameList
+    Exit Function
+  End If
+  
+  ' プルダウンを設置
+  Dim errMsgRepo As RepoErrMsgs
+  Set errMsgRepo = New RepoErrMsgs
+  Dim errTitle As String: errTitle = errMsgRepo.GetTitle("service.sheet.pulldown.codes")
+  Dim errMsg As String: errMsg = errMsgRepo.GetMsg("service.sheet.pulldown.codes")
+  Call inner_SheetRepo.Pulldown(FirstInputSheetName, FirstInputCodeCell, codeNameList.value, errTitle, errMsg)
+
+  ' 初期値を設定
+  Call inner_SheetRepo.WriteCell(FirstInputSheetName, FirstInputCodeCell, codeNameList.value.At(-1))
+
+  Set SetCodesPulldown = Success() 
 End Function
 
 ' 目録入力シートの図面番号列を読み取る

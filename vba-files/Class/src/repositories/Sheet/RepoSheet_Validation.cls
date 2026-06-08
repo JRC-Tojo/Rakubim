@@ -19,6 +19,8 @@ Private Function GetPulldownInfo2ColName(sheetName As String, cellAddress As Str
       GetPulldownInfo2ColName = "A"
     Case "–Ú˜^“ü—Í/$H$2"
       GetPulldownInfo2ColName = "B"
+    Case "“ü—Í/$C$6"
+      GetPulldownInfo2ColName = "C"
     Case Else
       Debug.Assert False  ' “o˜^‚³‚ê‚Ä‚¢‚È‚¢‰ÓŠ‚ÅPulldown‚ªŒÄ‚Ño‚³‚ê‚½
   End Select

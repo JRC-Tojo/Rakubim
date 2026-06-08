@@ -24,6 +24,8 @@ Private Sub class_initialize()
       Array("セル読み取りエラー", "{}シート{}の読み取りに失敗しました．\n(エラーコード：{}, {})")
     .Append "repo.sheet.writecol.error", _
       Array("シート書き込みエラー", "{}シート{}列の書き込みに失敗しました．\n(エラーコード：{}, {})")
+    .Append "repo.sheet.writecell.error", _
+      Array("シート書き込みエラー", "{}シート{}に「{}」を書き込めませんでした．\n(エラーコード：{}, {})")
     .Append "repo.sheet.getlastrow.error", _
       Array("最終データ読み取りエラー", "{}シート{}列の末端データ位置の取得に失敗しました．\n(エラーコード：{}, {})")
     .Append "repo.sheet.clearcol.error", _
@@ -36,6 +38,13 @@ Private Sub class_initialize()
       Array("印刷範囲設定エラー", "{}シートの印刷範囲の設定に失敗しました．\n(エラーコード：{}, {})")
     .Append "repo.sheet.clearprintarea.error", _
       Array("印刷範囲設定エラー", "{}シートの印刷範囲のクリアに失敗しました．\n(エラーコード：{}, {})")
+    .Append "repo.sheet.copysheetouter.error", _
+      Array("シートコピーエラー", "{}\nに保存されている{}シートの取り込みに失敗しました．\n(エラーコード：{}, {})")
+
+    .Append "repo.secret.encrypt.error", _
+      Array("秘匿情報エラー", "文字列の暗号化中に不明なエラーが発生しました．\n(エラーコード：{}, {})")
+    .Append "repo.secret.decrypt.error", _
+      Array("秘匿情報エラー", "文字列の復号化中に不明なエラーが発生しました．\n(エラーコード：{}, {})")
     
     .Append "service.file.load.folder_not_found", _
       Array("フォルダエラー", "以下のパスに示すフォルダが見つかりません．\n{}")
@@ -76,6 +85,8 @@ Private Sub class_initialize()
     
     .Append "service.sheet.pulldown.files", _
       Array("入力エラー", "フォルダ内に存在しないファイル名は入力できません．")
+    .Append "service.sheet.pulldown.codes", _
+      Array("入力エラー", "未登録の事業者コードを入力することはできません．")
     .Append "service.sheet.newname.duplicated", _
       Array("入力エラー", "新しいファイル名に重複が含まれます．\n同一名称のファイルは生成できないため，新しいファイル名称に変更して再度お試しください．\n\n【重複が確認された新しいファイル名称】\n・{}")
     .Append "service.sheet.old2new.missmatch", .At("service.file.rename.missmatch")

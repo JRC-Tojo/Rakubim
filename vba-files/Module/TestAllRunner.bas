@@ -21,6 +21,7 @@ Public Sub RunAllTests()
   tests.Add New TestFileRenamer
   tests.Add New TestBPE
   tests.Add New TestCluster
+  tests.Add New TestYearConverter
   tests.Add New TestRealCases
 
   Dim t As Object

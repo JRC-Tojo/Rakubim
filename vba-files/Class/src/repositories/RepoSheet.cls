@@ -39,6 +39,14 @@ Public Function CreateSheet(sheetName As String, Optional visible As Boolean = T
   Set CreateSheet = inner_Body.Create(inner_Workbook, sheetName, visible)
 End Function
 
+Public Function IsExistsSheet(sheetName As String) As ObjResult
+  Set IsExistsSheet = inner_Body.IsExistsSheet(inner_Workbook, sheetName)
+End Function
+
+Public Function CopySheetFromOuter(outerPath As ObjPath, sheetName As String, Optional visible As Boolean = True) As ObjResult
+  Set CopySheetFromOuter = inner_Body.CopySheetFromOuter(inner_Workbook, outerPath, sheetName, visible)
+End Function
+
 ' ========================= IO =========================
 
 Public Function ReadColumn(ByVal sheetName As String, ByVal startCell As String) As ObjResult
@@ -51,6 +59,10 @@ End Function
 
 Public Function WriteColFromCell(sheetName As String, startCell As String, values As ObjList) As ObjResult
   Set WriteColFromCell = inner_IO.WriteColFromCell(inner_Workbook, sheetName, startCell, values)
+End Function
+
+Public Function WriteCell(sheetName As String, cellAddress As String, val As String) As ObjResult
+  Set WriteCell = inner_IO.WriteCell(inner_Workbook, sheetName, cellAddress, val)
 End Function
 
 Public Function GetLastRow(sheetName As String, startCell As String, Optional mustContinue As Boolean = False) As ObjResult
