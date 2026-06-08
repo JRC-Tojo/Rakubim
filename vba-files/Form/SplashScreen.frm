@@ -32,6 +32,9 @@ Private Sub UserForm_Initialize()
   Dim hWnd As LongPtr
   Dim currentStyle As LongPtr
   
+  ' 処理中メッセージの表示
+  MessageArea.Caption = "初期化処理を実行中..."
+  
   ' 1. フォームのウィンドウハンドルを取得
   hWnd = FindWindow("ThunderDFrame", Me.Caption)
   
