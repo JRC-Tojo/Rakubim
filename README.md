@@ -1,4 +1,25 @@
-# らくびむ
+
+<!-- logo -->
+<p align="center">
+    <img src="https://raw.githubusercontent.com/JRC-Tojo/Rakubim/refs/heads/main/%E3%82%89%E3%81%8F%E3%81%B3%E3%82%80%E8%A1%A8%E7%B4%99.png" height="350"/></a>
+</p>
+
+<h1 align="center"> らくびむ </h1>
+
+<h4 align="center">
+    電子納品における納品ファイル名のフォーマットツール
+</h4>
+
+<p align="center">
+    <!-- 実装言語 -->
+    <img src="https://img.shields.io/badge/Language-VBA-purple.svg" />
+    <!-- 最新バージョン -->
+    <img src="https://img.shields.io/github/release/JRC-Tojo/Rakubim.svg" />
+    <!-- ライセンス -->
+    <img src="https://img.shields.io/badge/LICENCE-MIT-green.svg" />
+</p>
+
+
 
 ## 概要
 
@@ -6,7 +27,9 @@
 
 これにより、手作業によるファイル名の変更や整理といった煩雑な作業を大幅に削減し、ヒューマンエラーを防ぎます。
 
-## 初めて使う方へ (利用ガイド)
+
+
+## 初めて使う方へ
 
 1.  `らくびむ_VerX.X.X.xlsb` を開きます。
 2.  Excelシートに必要な図面情報（図面番号、図面名など）を入力します。
@@ -17,75 +40,30 @@
     3. リネームの実行
 5.  処理が完了すると、リネームされたファイルが指定の出力先フォルダに出力されます。
 
-## 開発者向け情報
-
-このプロジェクトでは、VBAコードのバージョン管理と開発効率向上のため、[XVBA](https://marketplace.visualstudio.com/items?itemName=local-smart.excel-live-server) を利用してソースコードをテキストファイルとして管理しています。
-
-### 開発環境の構築
-
-1.  **Visual Studio Codeのインストール**: [公式サイト](https://code.visualstudio.com/) からダウンロードしてインストールします。
-
-2.  **VSCode拡張機能のインストール**:
-    このリポジトリをVSCodeで開くと、推奨する拡張機能のインストールが促されます。これは `.vscode/extensions.json` に定義されています。ポップアップの「インストール」ボタンを押してください。
+> 社内向けの解説文書は[社内フォルダ](https://jrcjregroup.app.box.com/folder/348645297166)を参照してください。
 
 
-### XVBAの初期設定
 
-初めてこのプロジェクトで開発を行う際は、VBAソースコードとExcelファイルを連携させるための設定が必要です。
+## 開発サポート
 
-1.  VSCodeでこのプロジェクトフォルダを開きます。
+本プロジェクトは新機能の提案や問題点の修正コードの投稿を歓迎しています。
 
-2.  VSCode内のExplorer下部に表示されるXVBAタブより，Exportボタンを押下してコードがExcelにコンパイルされることを確認する
+コードを作成した際にはPull Requestを作成する形でぜひご投稿ください！
 
-
-### ビルドとデプロイ (コードのインポート/エクスポート)
-
-VBAコードの編集は、`vba-files` 内のテキストファイルに対して行います。Excelファイルとのコードの同期は、VSCodeのステータスバーに表示されるXVBAのボタンで行います。
-
-*   **Excelファイルからのエクスポート**: `vba-files` ディレクトリ内のコードを `らくびむ_VerX.X.X.xlsb` に反映させるには、ステータスバーの **`Export`** ボタンをクリックします。稀に更新後のExcelが開けなくなるため，Excelを開いた状態で **`Export`** してください。
-
-*   **Excelファイルへのインポート**: `らくびむ_VerX.X.X.xlsb` で直接編集したVBAコードを `vba-files` ディレクトリに書き出すには、ステータスバーの **`Import`** ボタンをクリックします。
-（基本的に利用することはありません）
-
-## テスト
-
-このプロジェクトには、単体テストと統合テストの2種類のテスト方法が用意されています。
-
-### 単体テスト
-
-各関数が所定の要件を満たす挙動を示していることを，ケース別に詳細に確認するための自動テストです．
-
-#### 実行方法
-1. `らくびむ_VerX.X.X.xlsb` を開き，「開発タブ」 > 「マクロ」をクリック
-2. 「RunAllTests」を選択してテスト実行
-3. 実行結果は「Visual Basic」 > 「Ctrl + G」によって表示されるイミディエイトウィンドウに出力
+開発者向けの詳細情報は[開発者向け文書](./CONTRIBUTE.md)を参照してください。
 
 
-### 統合テスト
 
-マッチング処理，リネーム処理が期待通りに動作するかを実際にアプリを動かしながら手動で確認できます．
+## ライセンス
 
-#### 1. 準備
+本プロジェクトのコードは商用・非商用の別にかかわらず自由に改変してご自身のプロジェクトに組み込むことが可能です。
 
-1.  このExcelファイルが保存されている場所と同じ階層に `testCases` という名前のフォルダを作成してください。
-2.  作成した `testCases` フォルダの中に、テスト対象の「らくびむ」を配置します。
-    ```
-    <プロジェクトのルート>/
-    ├── らくびむ_VerX.X.X.xlsb
-    └── testCases/
-        ├── らくびむ_VerX.X.X_Alice.xlsx
-        ├── らくびむ_VerX.X.X_Bob.xlsx
-        └── ...
-    ```
+使用前の事前相談等は一切不要ですが、本ライセンスは著作権の放棄ではないためご自身のプロジェクトのクレジット等で本プロジェクトの著作権表示を行う必要があります。
 
-#### 2. 実行
+ただし、本プロジェクトがライブラリとして利用している以下のコードについては配布元のライセンスが適用されます。
 
-1. `らくびむ_VerX.X.X.xlsb` を開き，「開発タブ」 > 「マクロ」をクリック
-2. 「GenerateRealFiles」を選択してテスト実行
-3. フォルダ内のテストケースが順にメッセージボックスで表示されるため，対象とするケースで「はい」を選択
-4. 「生成が完了しました」のメッセージが出力されればモックファイルの生成が完了
-5. 通常通り「らくびむ」を操作して挙動を確認できる
+- [`vba-files\Class\src\libs\EncryptStringTripleDES`](https://gist.github.com/motoraku/97ad730891e59159d86c): TripleDESによる文字列の暗号化
+- [`vba-files\Class\src\libs\SequenceMatcher`](https://github.com/CPkobo/vba-sequencematcher): 文字列の類似度を計測する
+- [`vba-files\Class\src\libs\VBAtest`](https://github.com/vba-tools/vba-test): VBA環境上で単体テストを記述する
 
-#### 補足: 特定のテストをスキップする方法
 
-`testCases` フォルダ内の一部のテストを実行したくない場合は、対象のファイル名の先頭に `skip` を付けてください (`skip_testcase1.xlsx` のように）。`skip` から始まるファイル名のテストケースは、実行時に自動的に除外されます。
