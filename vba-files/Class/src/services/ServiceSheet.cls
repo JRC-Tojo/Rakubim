@@ -173,15 +173,34 @@ Public Function SetFilesPulldown(pdfFilePaths As ObjList, cadFilePaths As ObjLis
   Dim cadAddress As String
   cadAddress = Range(MatchingCadStartCell).Resize(endRowNum.value).Address
 
+  Dim pdfFileNames As ObjList
+  Set pdfFileNames = ConvertPathToFileNames(pdfFilePaths)
+  Dim cadFileNames As ObjList
+  Set cadFileNames = ConvertPathToFileNames(cadFilePaths)
+
   Dim errMsgRepo As RepoErrMsgs
   Set errMsgRepo = New RepoErrMsgs
   Dim errTitle As String: errTitle = errMsgRepo.GetTitle("service.sheet.pulldown.files")
   Dim errMsg As String: errMsg = errMsgRepo.GetMsg("service.sheet.pulldown.files")
   
-  Call inner_SheetRepo.Pulldown(MatchingSheetName, pdfAddress, pdfFilePaths, errTitle, errMsg)
-  Call inner_SheetRepo.Pulldown(MatchingSheetName, cadAddress, cadFilePaths, errTitle, errMsg)
+  Call inner_SheetRepo.Pulldown(MatchingSheetName, pdfAddress, pdfFileNames, errTitle, errMsg)
+  Call inner_SheetRepo.Pulldown(MatchingSheetName, cadAddress, cadFileNames, errTitle, errMsg)
 
   Set SetFilesPulldown = Success()
+End Function
+
+
+' パス一覧のリストをファイル名のリストに変換する
+Private Function ConvertPathToFileNames(paths As ObjList) As ObjList
+  Dim fileNames As ObjList
+  Set fileNames = New ObjList
+  
+  Dim path As ObjPath
+  For Each path In paths
+    Call fileNames.Append(path.Name)
+  Next
+
+  Set ConvertPathToFileNames = fileNames
 End Function
 
 
