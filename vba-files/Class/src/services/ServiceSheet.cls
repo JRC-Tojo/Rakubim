@@ -187,6 +187,7 @@ Public Function SetFilesPulldown(pdfFilePaths As ObjList, cadFilePaths As ObjLis
   Set endRowNum = inner_SheetRepo.GetLastRow(MatchingSheetName, MatchingPaperNameStartCell)
   If (Not endRowNum.isOK) Then
     Set SetFilesPulldown = endRowNum
+    Exit Function
   End If
 
   Dim pdfAddress As String
