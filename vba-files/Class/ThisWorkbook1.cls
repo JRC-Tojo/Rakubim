@@ -61,8 +61,10 @@ Private  Function LoadLatestGhReleaseVersion(accountName As String, repoName As 
   End If
 
   url = "https://api.github.com/repos/" & accountName & "/" & repoName & "/releases/latest"
+  Const TIMEOUT_MS = 2000
 
-  Set http = CreateObject("MSXML2.XMLHTTP")
+  Set http = CreateObject("WinHttp.WinHttpRequest.5.1")
+  http.setTimeouts TIMEOUT_MS, TIMEOUT_MS, TIMEOUT_MS, TIMEOUT_MS 
   http.Open "GET", url, False
   http.setRequestHeader "Accept", "application/vnd.github.v3+json"
   ' http.setRequestHeader "User-Agent", "VBA-JsonUtils"
