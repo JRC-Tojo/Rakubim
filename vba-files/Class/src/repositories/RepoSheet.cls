@@ -107,6 +107,10 @@ End Function
 
 ' ========================= Validation =========================
 
+Public Function ClearValidation(sheetName As String, cellAddress As String)
+  Call inner_Validation.ClearValidation(inner_Workbook, sheetName, cellAddress)
+End Function
+
 Public Function Pulldown(sheetName As String, cellAddress As String, elems As ObjList, Optional ErrTitle As String = "", Optional ErrMessage As String = "")
   Call inner_Validation.Pulldown(inner_Workbook, sheetName, cellAddress, elems, ErrTitle, ErrMessage)
 End Function

@@ -13,6 +13,12 @@ Public Function Failure(errKey As String, ParamArray args() As Variant) As ObjRe
   Set re = New ObjResultErr
   Set re = re.Init(errKey, args)
 
+  ' Failure‚Ìê‡‚É‚ÍŠÈˆÕLog‚ğo—Í‚·‚é
+  Dim argsList As ObjList
+  Set argsList = New ObjList
+  Call argsList.InitItemsFromArray(args)
+  Debug.Print "[ERROR] (" & errKey & "): " & argsList.Join(", ")
+
   Dim r As ObjResult
   Set r = New ObjResult
   Set Failure = r.InitFailure(re)

@@ -31,7 +31,7 @@ End Function
 Public Function LoadPaths(folderPath As ObjPath, extensions As ModelExts, Optional recursive As Boolean = False) As ObjResult
   ' フォルダの存在チェック
   If (Not folderPath.Exists() Or folderPath.IsFile) Then
-    Set LoadPaths = Failure("service.file.load.folder_not_found", folderPath)
+    Set LoadPaths = Failure("service.file.load.folder_not_found", folderPath.FullPath)
     Exit Function
   End If
 
@@ -39,7 +39,7 @@ Public Function LoadPaths(folderPath As ObjPath, extensions As ModelExts, Option
   Dim pathColl As ObjList
   Set pathColl = collectFilesInFolder(folderPath, extensions, recursive)
   If (pathColl.Count = 0) Then
-    Set LoadPaths = Failure("service.file.load.empty_folder", folderPath)
+    Set LoadPaths = Failure("service.file.load.empty_folder", folderPath.FullPath)
     Exit Function
   End If
 
