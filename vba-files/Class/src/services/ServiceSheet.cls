@@ -160,35 +160,6 @@ Public Function ReadCadColAsPath(basePath As ObjPath, targetExts As ModelExts) A
   Set ReadCadColAsPath = ReadColAsPath(basePath, targetExts, MatchingSheetName, MatchingCadStartCell)
 End Function
 
-' 目録入力シートのPDF列とCAD列にプルダウンメニューを追加する
-Public Function SetFilesPulldown(pdfFilePaths As ObjList, cadFilePaths As ObjList, errLang As String) As ObjResult
-  Dim endRowNum As ObjResult
-  Set endRowNum = inner_SheetRepo.GetLastRow(MatchingSheetName, MatchingPaperNameStartCell)
-  If (Not endRowNum.isOK) Then
-    Set SetFilesPulldown = endRowNum
-  End If
-
-  Dim pdfAddress As String
-  pdfAddress = Range(MatchingPdfStartCell).Resize(endRowNum.value).Address
-  Dim cadAddress As String
-  cadAddress = Range(MatchingCadStartCell).Resize(endRowNum.value).Address
-
-  Dim pdfFileNames As ObjList
-  Set pdfFileNames = ConvertPathToFileNames(pdfFilePaths)
-  Dim cadFileNames As ObjList
-  Set cadFileNames = ConvertPathToFileNames(cadFilePaths)
-
-  Dim errMsgRepo As RepoErrMsgs
-  Set errMsgRepo = New RepoErrMsgs
-  Dim errTitle As String: errTitle = errMsgRepo.GetTitle("service.sheet.pulldown.files")
-  Dim errMsg As String: errMsg = errMsgRepo.GetMsg("service.sheet.pulldown.files")
-  
-  Call inner_SheetRepo.Pulldown(MatchingSheetName, pdfAddress, pdfFileNames, errTitle, errMsg)
-  Call inner_SheetRepo.Pulldown(MatchingSheetName, cadAddress, cadFileNames, errTitle, errMsg)
-
-  Set SetFilesPulldown = Success()
-End Function
-
 
 ' パス一覧のリストをファイル名のリストに変換する
 Private Function ConvertPathToFileNames(paths As ObjList) As ObjList
@@ -201,6 +172,46 @@ Private Function ConvertPathToFileNames(paths As ObjList) As ObjList
   Next
 
   Set ConvertPathToFileNames = fileNames
+End Function
+
+' 指定したセルから行番号までの範囲におけるRangeオブジェクトを返す
+Private Function RangeToRowIndex(startCell As String, rowIndex As Long) As Range
+  Dim startRange As Range
+  Set startRange = Range(startCell)
+  Set RangeToRowIndex = Range(startRange, Cells(rowIndex, startRange.Column))
+End Function
+
+' 目録入力シートのPDF列とCAD列にプルダウンメニューを追加する
+Public Function SetFilesPulldown(pdfFilePaths As ObjList, cadFilePaths As ObjList, errLang As String) As ObjResult
+  Dim endRowNum As ObjResult
+  Set endRowNum = inner_SheetRepo.GetLastRow(MatchingSheetName, MatchingPaperNameStartCell)
+  If (Not endRowNum.isOK) Then
+    Set SetFilesPulldown = endRowNum
+  End If
+
+  Dim pdfAddress As String
+  pdfAddress = RangeToRowIndex(MatchingPdfStartCell, endRowNum.value).Address
+  Dim cadAddress As String
+  cadAddress = RangeToRowIndex(MatchingCadStartCell, endRowNum.value).Address
+
+  Dim pdfFileNames As ObjList
+  Set pdfFileNames = ConvertPathToFileNames(pdfFilePaths)
+  Dim cadFileNames As ObjList
+  Set cadFileNames = ConvertPathToFileNames(cadFilePaths)
+
+  Dim clearPulldownAddress As String
+  clearPulldownAddress = Union(Range(MatchingPdfStartCell), Range(MatchingCadStartCell)).EntireColumn.Address
+  Call inner_SheetRepo.ClearValidation(MatchingSheetName, clearPulldownAddress)
+
+  Dim errMsgRepo As RepoErrMsgs
+  Set errMsgRepo = New RepoErrMsgs
+  Dim errTitle As String: errTitle = errMsgRepo.GetTitle("service.sheet.pulldown.files")
+  Dim errMsg As String: errMsg = errMsgRepo.GetMsg("service.sheet.pulldown.files")
+  
+  Call inner_SheetRepo.Pulldown(MatchingSheetName, pdfAddress, pdfFileNames, errTitle, errMsg)
+  Call inner_SheetRepo.Pulldown(MatchingSheetName, cadAddress, cadFileNames, errTitle, errMsg)
+
+  Set SetFilesPulldown = Success()
 End Function
 
 

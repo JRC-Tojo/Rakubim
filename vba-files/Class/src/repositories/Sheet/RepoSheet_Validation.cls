@@ -26,6 +26,13 @@ Private Function GetPulldownInfo2ColName(sheetName As String, cellAddress As Str
   End Select
 End Function
 
+' 指定した範囲の入力条件の制限を解除する
+Public Function ClearValidation(wb As Workbook, ByVal sheetName As String, ByVal cellAddress As String)
+  With wb.Worksheets(sheetName).Range(cellAddress).Validation
+    .Delete
+  End With
+End Function
+
 ' プルダウンメニューを指定したRangeに設置する
 Public Function Pulldown(wb As Workbook, ByVal sheetName As String, ByVal cellAddress As String, elems As ObjList, Optional ErrTitle As String = "", Optional ErrMessage As String = "")
   Dim repoSheetIo As RepoSheet_IO
