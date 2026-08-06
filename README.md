@@ -62,7 +62,6 @@
 
 ただし、本プロジェクトがライブラリとして利用している以下のコードについては配布元のライセンスが適用されます。
 
-- [`vba-files\Class\src\libs\EncryptStringTripleDES`](https://gist.github.com/motoraku/97ad730891e59159d86c): TripleDESによる文字列の暗号化
 - [`vba-files\Class\src\libs\SequenceMatcher`](https://github.com/CPkobo/vba-sequencematcher): 文字列の類似度を計測する
 - [`vba-files\Class\src\libs\VBAtest`](https://github.com/vba-tools/vba-test): VBA環境上で単体テストを記述する
 
