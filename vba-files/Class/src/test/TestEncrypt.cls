@@ -25,13 +25,13 @@ Public Function Run()
 
     Set encryptedResult = secretRepo.Encrypt(target)
     .IsOk encryptedResult.isOK
-    If Not encryptedResult.isOK Then Exit Function
-
-    Set decryptedResult = secretRepo.Decrypt(encryptedResult.value)
-    .IsOk decryptedResult.isOK
-    If Not decryptedResult.isOK Then Exit Function
-  
-    .IsEqual decryptedResult.value, target
+    If encryptedResult.isOK Then
+      Set decryptedResult = secretRepo.Decrypt(encryptedResult.value)
+      .IsOk decryptedResult.isOK
+      If decryptedResult.isOK Then
+        .IsEqual decryptedResult.value, target
+      End If
+    End If
   End With
 
   Set Run = Ts
