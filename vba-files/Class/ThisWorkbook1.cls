@@ -9,7 +9,7 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 
 Private Const ReleaseFilePath = "https://github.com/JRC-Tojo/Rakubim/releases/latest"
-Private Const ThisVersion = "v1.2.0"
+Private Const ThisVersion = "v1.2.1"
 
 Sub Workbook_Open()
   ' スプラッシュスクリーンを表示しながら、アプリケーションとして必須の処理を実行する
